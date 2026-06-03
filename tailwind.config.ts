@@ -1,7 +1,6 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
-  darkMode: 'class',
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -15,7 +14,7 @@ const config: Config = {
           800: '#1a0d2e',
           700: '#251445',
           600: '#2d1754',
-        },
+        }
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
