@@ -1,0 +1,169 @@
+{
+  "profileViews": [],
+  "interests": [
+    {
+      "id": "55d8a7a0-8a1c-466f-97a3-3d25ce902fc7",
+      "senderId": "1",
+      "receiverId": "4",
+      "status": "pending",
+      "timestamp": "2026-05-28T20:10:26.904Z"
+    },
+    {
+      "id": "96bc4271-e920-46f3-a528-c792ad1e80ff",
+      "senderId": "1",
+      "receiverId": "6",
+      "status": "pending",
+      "timestamp": "2026-05-28T20:10:30.577Z"
+    },
+    {
+      "id": "fb9b8e5c-5d29-4147-8961-b8cd06c50340",
+      "senderId": "1",
+      "receiverId": "2",
+      "status": "pending",
+      "timestamp": "2026-05-28T20:18:59.451Z"
+    },
+    {
+      "id": "3c1ffd17-fbf6-42eb-95f1-d1bd76340f6e",
+      "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+      "receiverId": "4",
+      "status": "pending",
+      "timestamp": "2026-05-31T10:02:05.876Z"
+    },
+    {
+      "id": "d4ef0e9e-7d53-4088-8ef6-67f2f1bfa319",
+      "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+      "receiverId": "2",
+      "status": "pending",
+      "timestamp": "2026-05-31T10:08:38.731Z"
+    },
+    {
+      "id": "e549ac12-058d-4784-928d-9c8a1c382a1e",
+      "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+      "receiverId": "16",
+      "status": "pending",
+      "timestamp": "2026-05-31T10:35:19.148Z"
+    },
+    {
+      "id": "b910aef5-a612-4ff2-a35c-fbe21c3836dc",
+      "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+      "receiverId": "9",
+      "status": "pending",
+      "timestamp": "2026-05-31T10:48:17.721Z"
+    },
+    {
+      "id": "137c58d3-f081-49d6-a968-f6b10998847f",
+      "senderId": "2",
+      "receiverId": "1",
+      "status": "pending",
+      "timestamp": "2026-05-31T11:07:51.628Z"
+    },
+    {
+      "id": "84a59639-1b4f-4268-83f2-5c6651be1a66",
+      "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+      "receiverId": "6",
+      "status": "pending",
+      "timestamp": "2026-05-31T11:17:41.560Z"
+    },
+    {
+      "id": "8be2d817-7245-4e03-8098-6a3a0278d9c5",
+      "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+      "receiverId": "11",
+      "status": "pending",
+      "timestamp": "2026-05-31T11:20:55.608Z"
+    },
+    {
+      "id": "edf1d760-6fe2-4c9d-9946-ba64c8fce25d",
+      "senderId": "2",
+      "receiverId": "115",
+      "status": "pending",
+      "timestamp": "2026-05-31T11:23:47.524Z"
+    },
+    {
+      "id": "50f94a25-98db-4b6b-a6be-49fc9a55fdf9",
+      "senderId": "2",
+      "receiverId": "112",
+      "status": "pending",
+      "timestamp": "2026-05-31T11:24:03.945Z"
+    },
+    {
+      "id": "d211e3fb-01a2-49ef-86de-da29bdc67692",
+      "senderId": "2",
+      "receiverId": "3",
+      "status": "pending",
+      "timestamp": "2026-05-31T11:24:19.513Z"
+    },
+    {
+      "id": "410362a1-7aa0-4bb9-9a56-f2ea93344028",
+      "senderId": "6",
+      "receiverId": "108",
+      "status": "pending",
+      "timestamp": "2026-05-31T11:58:26.404Z"
+    },
+    {
+      "id": "0e3380d1-efa9-454d-9ad1-af8a6f3462d1",
+      "senderId": "109",
+      "receiverId": "2",
+      "status": "pending",
+      "timestamp": "2026-05-31T12:07:29.307Z"
+    },
+    {
+      "id": "7663477a-573a-4d73-8699-05c184511bba",
+      "senderId": "109",
+      "receiverId": "8",
+      "status": "pending",
+      "timestamp": "2026-05-31T12:07:31.467Z"
+    },
+    {
+      "id": "e79216af-d201-4409-b339-552bdffa9be4",
+      "senderId": "109",
+      "receiverId": "6",
+      "status": "pending",
+      "timestamp": "2026-05-31T12:31:12.841Z"
+    },
+    {
+      "id": "de11529d-8881-42ec-be61-96fc1ec7516e",
+      "senderId": "109",
+      "receiverId": "4",
+      "status": "pending",
+      "timestamp": "2026-05-31T12:31:14.353Z"
+    }
+  ],
+  "shortlists": [
+    {
+      "id": "b91fa959-17ca-4be0-a330-3c46ad1ae5ae",
+      "userId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+      "profileId": "2",
+      "timestamp": "2026-05-31T10:08:40.322Z"
+    },
+    {
+      "id": "0544079f-2f70-40a5-b854-5e6831e34251",
+      "userId": "109",
+      "profileId": "4",
+      "timestamp": "2026-06-03T18:26:04.742Z"
+    },
+    {
+      "id": "23a8d39e-21cc-4c04-876e-4068797a500a",
+      "userId": "109",
+      "profileId": "2",
+      "timestamp": "2026-06-03T18:26:06.158Z"
+    },
+    {
+      "id": "30a2ed97-7ef9-4873-9243-0b033270b226",
+      "userId": "109",
+      "profileId": "12",
+      "timestamp": "2026-06-03T18:26:08.720Z"
+    },
+    {
+      "id": "8a9e9107-6f81-4566-835f-99dab335e56e",
+      "userId": "109",
+      "profileId": "15",
+      "timestamp": "2026-06-03T18:26:10.391Z"
+    },
+    {
+      "id": "7f409737-7947-4075-a142-9ef8d5124b5d",
+      "userId": "109",
+      "profileId": "18",
+      "timestamp": "2026-06-03T18:26:12.370Z"
+    }
+  ]
+}

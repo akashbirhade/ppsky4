@@ -1,0 +1,452 @@
+[
+  {
+    "id": "5b00c97d-162d-4f5f-aac2-26e9d6135d8f",
+    "senderId": "2",
+    "receiverId": "1",
+    "content": "Hello, I went through your profile and found it very interesting!",
+    "timestamp": "2026-05-30T17:26:38.575Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "f2d0a4ea-7707-48ff-83a3-62e3f66e1ea5",
+    "senderId": "1",
+    "receiverId": "2",
+    "content": "Thank you so much! Your profile is impressive too.",
+    "timestamp": "2026-05-30T20:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "4cf8726c-75d9-4993-a1af-ee46d2b10063",
+    "senderId": "2",
+    "receiverId": "1",
+    "content": "Would love to know more about you. What do you do for fun?",
+    "timestamp": "2026-05-30T21:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "2ff5f0c2-158e-44b1-a490-b99724e1a644",
+    "senderId": "1",
+    "receiverId": "2",
+    "content": "I enjoy reading, yoga and traveling. What about you?",
+    "timestamp": "2026-05-31T00:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "1f4ef83f-9a0e-4e6d-a1b8-266cff06b183",
+    "senderId": "2",
+    "receiverId": "1",
+    "content": "Love cricket and trekking! We have complementary interests 😊",
+    "timestamp": "2026-05-31T01:26:38.576Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "df7754ed-14b2-4ca1-9966-eb825e60c9bf",
+    "senderId": "1",
+    "receiverId": "2",
+    "content": "That sounds wonderful! Let's connect more 💜",
+    "timestamp": "2026-05-31T04:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "38acded4-9f7a-4578-bc21-2780ce2695de",
+    "senderId": "1",
+    "receiverId": "4",
+    "content": "Hi! I liked your profile. You seem very ambitious.",
+    "timestamp": "2026-05-30T09:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "1f597b36-1c88-4b4a-8fc8-2fc2a34f6f91",
+    "senderId": "4",
+    "receiverId": "1",
+    "content": "Thank you! I noticed your profile too. Where are you based?",
+    "timestamp": "2026-05-30T12:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "c7e5d560-fccb-43c0-88d6-f5d84df8196d",
+    "senderId": "1",
+    "receiverId": "4",
+    "content": "I'm in Mumbai. And you?",
+    "timestamp": "2026-05-30T13:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "93025702-12af-4cf7-af3f-11a0c193ec58",
+    "senderId": "4",
+    "receiverId": "1",
+    "content": "Pune! Just an hour away 😄 Maybe we can meet someday",
+    "timestamp": "2026-05-30T16:26:38.576Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "93acdb1a-5ed9-4c14-a0c0-a375ebdac742",
+    "senderId": "6",
+    "receiverId": "1",
+    "content": "Hi Priya, your smile in the profile pic is lovely!",
+    "timestamp": "2026-05-29T22:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "341bdd6e-54d2-467c-a05c-9f2de58a909b",
+    "senderId": "1",
+    "receiverId": "6",
+    "content": "Aww thank you! That's very sweet of you to say 😊",
+    "timestamp": "2026-05-30T01:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "a1059bab-8e98-4d46-8760-23a1a1ffead4",
+    "senderId": "6",
+    "receiverId": "1",
+    "content": "I'm a software engineer based in Nagpur. What's your background?",
+    "timestamp": "2026-05-30T02:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "910a07c6-1000-49d1-b5b7-2070c773709e",
+    "senderId": "1",
+    "receiverId": "6",
+    "content": "MBA in Marketing. Currently working as Marketing Manager.",
+    "timestamp": "2026-05-30T05:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "41910f52-2d42-4f97-a0e0-2c0483f693a5",
+    "senderId": "6",
+    "receiverId": "1",
+    "content": "Wow great! We could make a great team 🚀",
+    "timestamp": "2026-05-30T08:26:38.576Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "99276e6a-dc3a-455a-8dc4-9abe8119cd93",
+    "senderId": "8",
+    "receiverId": "1",
+    "content": "Namaste! I think we would be a great match.",
+    "timestamp": "2026-05-29T10:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "b5cad7d8-7dab-485a-9db6-f8c20601d8dd",
+    "senderId": "1",
+    "receiverId": "8",
+    "content": "Namaste! What makes you say that? 😊",
+    "timestamp": "2026-05-29T13:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "4275c45c-2191-4d44-ba9b-d538e4678d3b",
+    "senderId": "8",
+    "receiverId": "1",
+    "content": "We share the same religion, similar family values, and both love traveling!",
+    "timestamp": "2026-05-29T14:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "6fa94754-a25b-4fa3-b126-336a09a8c54a",
+    "senderId": "1",
+    "receiverId": "8",
+    "content": "That's true! Tell me more about your family.",
+    "timestamp": "2026-05-29T17:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "1e0e2073-bdbc-447c-9897-369bee985ff1",
+    "senderId": "8",
+    "receiverId": "1",
+    "content": "Joint family, very supportive. My parents are simple people.",
+    "timestamp": "2026-05-29T20:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "9866e84f-bb66-4771-b467-ad670583acaf",
+    "senderId": "1",
+    "receiverId": "8",
+    "content": "That's wonderful. Family values matter a lot to me too.",
+    "timestamp": "2026-05-29T23:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "d742b6f3-d032-4034-86a9-2dec0ec573bd",
+    "senderId": "8",
+    "receiverId": "1",
+    "content": "Can we connect on a call sometime?",
+    "timestamp": "2026-05-31T06:26:38.576Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "f409c715-c412-4011-8596-af455e3d4ec8",
+    "senderId": "1",
+    "receiverId": "9",
+    "content": "Hi! I have liked your profile and believe it to be a good match. Kindly accept this invitation.",
+    "timestamp": "2026-05-29T03:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "be342bc1-9da3-42da-8bbb-9ec77434c0d2",
+    "senderId": "9",
+    "receiverId": "1",
+    "content": "Thank you for the interest! Tell me more about yourself.",
+    "timestamp": "2026-05-29T06:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "e0bb0031-a15c-49a7-8b9b-e20d72186eab",
+    "senderId": "1",
+    "receiverId": "9",
+    "content": "I am a fun-loving person who believes in balance between career and family.",
+    "timestamp": "2026-05-29T07:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "e4a40097-d123-46d8-bc28-3fbb696384f5",
+    "senderId": "9",
+    "receiverId": "1",
+    "content": "That's great! I'm also career-focused but family comes first.",
+    "timestamp": "2026-05-29T10:26:38.576Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "b9d8f241-ddbf-4aea-a0de-35a19451d08d",
+    "senderId": "10",
+    "receiverId": "1",
+    "content": "Hey! Saw your profile. You seem like a wonderful person 🌸",
+    "timestamp": "2026-05-28T16:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "73db74f3-f7d4-4082-82e1-7ea2a23cae2a",
+    "senderId": "1",
+    "receiverId": "10",
+    "content": "That's very kind! You look accomplished too.",
+    "timestamp": "2026-05-28T19:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "32d70180-e69a-4ca9-b8aa-82ce63798e6f",
+    "senderId": "10",
+    "receiverId": "1",
+    "content": "I'm a doctor. Looking for someone who values education and career.",
+    "timestamp": "2026-05-28T22:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "38a5f7f8-8554-4741-b0c7-4227b90472cc",
+    "senderId": "1",
+    "receiverId": "10",
+    "content": "I completely agree. Building something together is important.",
+    "timestamp": "2026-05-29T01:26:38.576Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "c07827ac-17cf-4d56-9531-e7a5b48eb2fa",
+    "senderId": "10",
+    "receiverId": "1",
+    "content": "Absolutely! Can we talk more?",
+    "timestamp": "2026-05-31T08:26:38.576Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "445678d0-60e2-437d-ae75-d24624a75b3f",
+    "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "receiverId": "9",
+    "content": "hi",
+    "timestamp": "2026-05-31T10:48:36.964Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "befc381b-bbff-4bcd-8de3-b2035134bcf1",
+    "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "receiverId": "2",
+    "content": "hi",
+    "timestamp": "2026-05-31T10:51:43.093Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "47d53d73-eb46-4101-a6a3-fe5f1c9d8fda",
+    "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "receiverId": "2",
+    "content": "jesika  bhimaro",
+    "timestamp": "2026-05-31T10:53:13.392Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "8232fd64-277c-4247-87ce-839706f0b055",
+    "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "receiverId": "2",
+    "content": "hi",
+    "timestamp": "2026-05-31T11:06:15.312Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "ef85fbeb-8446-4a69-ac6e-820166f9bba3",
+    "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "receiverId": "9",
+    "content": "ky",
+    "timestamp": "2026-05-31T11:10:16.692Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "e906974a-37cb-441d-9fba-088bc7fa403c",
+    "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "receiverId": "9",
+    "content": "bjb",
+    "timestamp": "2026-05-31T11:10:17.961Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "689d333a-dc67-45fc-8213-82790bf4bd94",
+    "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "receiverId": "11",
+    "content": "himhuhjk]",
+    "timestamp": "2026-05-31T11:21:03.933Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "d8c713f4-9032-4b33-ae73-9f9cac3ed7ff",
+    "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "receiverId": "11",
+    "content": "kjnjonojkn",
+    "timestamp": "2026-05-31T11:21:47.005Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "17adc5be-354d-4a3e-8cc7-e8e0046e4a99",
+    "senderId": "2",
+    "receiverId": "3",
+    "content": "hii",
+    "timestamp": "2026-05-31T11:24:24.765Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "cefaca80-735d-4f93-a680-90c9c0ebf465",
+    "senderId": "2",
+    "receiverId": "3",
+    "content": "jin",
+    "timestamp": "2026-05-31T11:24:28.489Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "f7176086-65c9-484d-b56d-757455f0363d",
+    "senderId": "2",
+    "receiverId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "content": "kn kj",
+    "timestamp": "2026-05-31T11:24:38.013Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "52619422-d8e5-49af-82f2-85d2cb8fc341",
+    "senderId": "2",
+    "receiverId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "content": "bjhb",
+    "timestamp": "2026-05-31T11:24:39.645Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "d942b91c-a34c-4dd7-9e0f-5e206d9fb6fa",
+    "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "receiverId": "2",
+    "content": "mnm",
+    "timestamp": "2026-05-31T11:46:36.325Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "43790c7b-c837-4dcb-9797-7752c3f4de0c",
+    "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "receiverId": "2",
+    "content": "nknkjn",
+    "timestamp": "2026-05-31T11:47:00.302Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "9a4911aa-0252-4e4e-b7f6-f4df80f0321d",
+    "senderId": "2",
+    "receiverId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "content": "nm nm",
+    "timestamp": "2026-05-31T11:47:06.958Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "48752d06-12da-4006-b728-b5b412fd82ac",
+    "senderId": "2",
+    "receiverId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "content": "nnk",
+    "timestamp": "2026-05-31T11:47:14.674Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "c713e11f-0631-46e7-ac63-d9abab6e9c37",
+    "senderId": "6",
+    "receiverId": "108",
+    "content": "ho",
+    "timestamp": "2026-05-31T11:58:33.268Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "37cafc2d-cd81-4801-acf4-104ff2edff54",
+    "senderId": "109",
+    "receiverId": "8",
+    "content": "hi'",
+    "timestamp": "2026-05-31T12:07:34.478Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "7cad68d0-bf5b-4a51-bc43-020431d1298b",
+    "senderId": "109",
+    "receiverId": "10",
+    "content": "ihih",
+    "timestamp": "2026-06-03T18:28:57.773Z",
+    "read": false,
+    "type": "text"
+  }
+]

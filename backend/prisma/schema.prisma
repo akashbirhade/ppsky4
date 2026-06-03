@@ -1,0 +1,642 @@
+// This is your Prisma schema file for Soulmate Sync - Production-Grade Matrimony App
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── ENUMS ──────────────────────────────────────────────────────────────────
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum MaritalStatus {
+  NEVER_MARRIED
+  DIVORCED
+  WIDOWED
+  AWAITING_DIVORCE
+}
+
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+  BANNED
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VOICE_NOTE
+  VIDEO
+  DOCUMENT
+  CALL_LOG
+  SYSTEM
+}
+
+enum CallType {
+  AUDIO
+  VIDEO
+}
+
+enum CallStatus {
+  INITIATED
+  RINGING
+  CONNECTED
+  ENDED
+  MISSED
+  DECLINED
+  FAILED
+}
+
+enum SubscriptionPlan {
+  FREE
+  SILVER
+  GOLD
+  PLATINUM
+  DIAMOND
+}
+
+enum ReportReason {
+  FAKE_PROFILE
+  INAPPROPRIATE_CONTENT
+  HARASSMENT
+  SPAM
+  SCAM
+  UNDERAGE
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  UNDER_REVIEW
+  ACTION_TAKEN
+  DISMISSED
+}
+
+enum NotificationType {
+  LIKE
+  SUPER_LIKE
+  MATCH
+  MESSAGE
+  PROFILE_VIEW
+  CALL
+  VERIFICATION
+  SUBSCRIPTION
+  SYSTEM
+}
+
+// ─── MODELS ─────────────────────────────────────────────────────────────────
+
+model User {
+  id           String        @id @default(cuid())
+  username     String        @unique
+  email        String        @unique
+  password     String
+  mobileNumber String        @unique
+  countryCode  String        @default("+91")
+  gender       Gender
+  accountStatus AccountStatus @default(PENDING_VERIFICATION)
+  emailVerified Boolean      @default(false)
+  mobileVerified Boolean     @default(false)
+  lastLogin    DateTime?
+  lastActive   DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+
+  // Relations
+  profile            Profile?
+  photos             Photo[]
+  preferences        Preference?
+  subscription       Subscription?
+
+  sentLikes          Like[]         @relation("SentLikes")
+  receivedLikes      Like[]         @relation("ReceivedLikes")
+  sentSuperLikes     SuperLike[]    @relation("SentSuperLikes")
+  receivedSuperLikes SuperLike[]    @relation("ReceivedSuperLikes")
+  profileViews       ProfileView[]  @relation("ViewedProfiles")
+  profileViewedBy    ProfileView[]  @relation("ViewerProfiles")
+  favorites          Favorite[]     @relation("FavoriterProfiles")
+  favoritedBy        Favorite[]     @relation("FavoritedByProfiles")
+  blockedUsers       Block[]        @relation("BlockedUsers")
+  blockedBy          Block[]        @relation("BlockedByUsers")
+
+  sentMessages       Message[]      @relation("SentMessages")
+  conversations1     Conversation[] @relation("ConversationUser1")
+  conversations2     Conversation[] @relation("ConversationUser2")
+
+  initiatedCalls     Call[]         @relation("CallerCalls")
+  receivedCalls      Call[]         @relation("ReceiverCalls")
+
+  sentReports        Report[]       @relation("SentReports")
+  reportedBy         Report[]       @relation("ReportedUsers")
+
+  notifications      Notification[]
+  otpVerifications   OtpVerification[]
+  refreshTokens      RefreshToken[]
+  adminUser          AdminUser?
+
+  @@index([gender])
+  @@index([accountStatus])
+  @@index([lastActive])
+  @@index([createdAt])
+  @@map("users")
+}
+
+model Profile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Personal Info
+  firstName       String
+  lastName        String
+  dateOfBirth     DateTime
+  age             Int
+  height          Int       // in cm
+  weight          Int?      // in kg
+  maritalStatus   MaritalStatus @default(NEVER_MARRIED)
+  motherTongue    String
+  religion        String
+  caste           String
+  subCaste        String?
+  gothra          String?
+  manglik         Boolean  @default(false)
+
+  // Education & Career
+  education       String
+  educationDetails String?
+  institution     String?
+  profession      String
+  company         String?
+  annualIncome    Int       // in INR (stored as full value e.g. 500000 = 5 LPA)
+
+  // About
+  bio             String?   @db.Text
+  hobbies         String[]  @default([])
+  familyType      String?   // Nuclear, Joint
+  familyStatus    String?   // Middle Class, Upper Middle Class, Rich
+  fatherOccupation String?
+  motherOccupation String?
+  siblings        Int?
+
+  // Location
+  state           String    @default("Maharashtra")
+  district        String
+  city            String
+  pincode         String?
+  latitude        Decimal   @db.Decimal(10, 8)
+  longitude       Decimal   @db.Decimal(11, 8)
+
+  // Verification
+  emailVerificationStatus  VerificationStatus @default(PENDING)
+  mobileVerificationStatus VerificationStatus @default(PENDING)
+  govtIdVerificationStatus VerificationStatus @default(PENDING)
+  govtIdType      String?   // Aadhar, PAN, Voter ID, Passport
+  isVerified      Boolean   @default(false)
+  verificationBadge Boolean @default(false)
+  profileVerifiedAt DateTime?
+
+  // WhatsApp
+  whatsappNumber  String?
+  whatsappVisible Boolean   @default(false)
+
+  // Profile Stats (denormalized for performance)
+  profileViews    Int       @default(0)
+  likesReceived   Int       @default(0)
+  superLikesReceived Int    @default(0)
+
+  // Completion
+  profileCompletionPercentage Int @default(0)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // ─── INDEXES ─────────────────────────────────────────────────────────
+  // Religion + Caste composite index (optimized — rarely changes)
+  @@index([religion, caste])
+  @@index([religion])
+  @@index([caste])
+  @@index([city])
+  @@index([district])
+  @@index([state])
+  @@index([age])
+  @@index([height])
+  @@index([maritalStatus])
+  @@index([motherTongue])
+  @@index([education])
+  @@index([profession])
+  @@index([annualIncome])
+  @@index([latitude, longitude])  // Geospatial queries
+  @@index([isVerified])
+  @@index([profileCompletionPercentage])
+  @@map("profiles")
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  url       String
+  publicId  String?  // Cloudinary / S3 public ID
+  isMain    Boolean  @default(false)
+  order     Int      @default(0)
+  width     Int?
+  height    Int?
+  size      Int?     // bytes
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([userId, isMain])
+  @@map("photos")
+}
+
+model Preference {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Age
+  minAge Int @default(18)
+  maxAge Int @default(40)
+
+  // Physical
+  minHeight Int?  // cm
+  maxHeight Int?  // cm
+  minWeight Int?
+  maxWeight Int?
+
+  // Background
+  religion      String[] @default([])
+  caste         String[] @default([])
+  maritalStatus MaritalStatus[] @default([])
+  motherTongue  String[] @default([])
+
+  // Education & Career
+  education     String[] @default([])
+  profession    String[] @default([])
+  minIncome     Int?
+  maxIncome     Int?
+
+  // Location
+  preferredCities     String[] @default([])
+  preferredDistricts  String[] @default([])
+  preferredStates     String[] @default([])
+  maxDistance         Int?     // km radius
+
+  // Other
+  manglikPreference String? // Any, Manglik, Non-Manglik
+  familyType        String?
+
+  updatedAt DateTime @updatedAt
+
+  @@map("preferences")
+}
+
+model Subscription {
+  id        String           @id @default(cuid())
+  userId    String           @unique
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan      SubscriptionPlan @default(FREE)
+  startDate DateTime?
+  endDate   DateTime?
+  isActive  Boolean          @default(false)
+  autoRenew Boolean          @default(false)
+
+  // Payment
+  amount    Decimal?  @db.Decimal(10, 2)
+  currency  String    @default("INR")
+  paymentId String?
+  orderId   String?
+  gateway   String?   // razorpay, stripe, etc.
+
+  // Features
+  unlimitedLikes     Boolean @default(false)
+  advancedFilters    Boolean @default(false)
+  seeProfileVisitors Boolean @default(false)
+  priorityListing    Boolean @default(false)
+  videoCallingAccess Boolean @default(false)
+  superLikesPerDay   Int     @default(1)
+  boostsPerMonth     Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("subscriptions")
+}
+
+// ─── SOCIAL INTERACTIONS ────────────────────────────────────────────────────
+
+model Like {
+  id         String   @id @default(cuid())
+  fromUserId String
+  toUserId   String
+  fromUser   User     @relation("SentLikes", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser     User     @relation("ReceivedLikes", fields: [toUserId], references: [id], onDelete: Cascade)
+  isMatch    Boolean  @default(false)
+  matchedAt  DateTime?
+  createdAt  DateTime @default(now())
+
+  @@unique([fromUserId, toUserId])
+  @@index([toUserId])
+  @@index([fromUserId])
+  @@index([isMatch])
+  @@map("likes")
+}
+
+model SuperLike {
+  id         String   @id @default(cuid())
+  fromUserId String
+  toUserId   String
+  fromUser   User     @relation("SentSuperLikes", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser     User     @relation("ReceivedSuperLikes", fields: [toUserId], references: [id], onDelete: Cascade)
+  message    String?
+  createdAt  DateTime @default(now())
+
+  @@unique([fromUserId, toUserId])
+  @@index([toUserId])
+  @@map("super_likes")
+}
+
+model ProfileView {
+  id        String   @id @default(cuid())
+  viewerId  String
+  viewedId  String
+  viewer    User     @relation("ViewerProfiles", fields: [viewerId], references: [id], onDelete: Cascade)
+  viewed    User     @relation("ViewedProfiles", fields: [viewedId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([viewedId])
+  @@index([viewerId])
+  @@index([createdAt])
+  @@map("profile_views")
+}
+
+model Favorite {
+  id             String   @id @default(cuid())
+  userId         String
+  favoriteUserId String
+  user           User     @relation("FavoriterProfiles", fields: [userId], references: [id], onDelete: Cascade)
+  favoriteUser   User     @relation("FavoritedByProfiles", fields: [favoriteUserId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+
+  @@unique([userId, favoriteUserId])
+  @@index([userId])
+  @@map("favorites")
+}
+
+model Block {
+  id        String   @id @default(cuid())
+  blockerId String
+  blockedId String
+  blocker   User     @relation("BlockedUsers", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked   User     @relation("BlockedByUsers", fields: [blockedId], references: [id], onDelete: Cascade)
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
+  @@map("blocks")
+}
+
+// ─── MESSAGING ──────────────────────────────────────────────────────────────
+
+model Conversation {
+  id      String @id @default(cuid())
+  user1Id String
+  user2Id String
+  user1   User   @relation("ConversationUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2   User   @relation("ConversationUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  lastMessage    String?
+  lastMessageAt  DateTime?
+  lastMessageBy  String?
+
+  user1UnreadCount Int @default(0)
+  user2UnreadCount Int @default(0)
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages Message[]
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@index([lastMessageAt])
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  type        MessageType @default(TEXT)
+  content     String?     @db.Text
+  isRead      Boolean     @default(false)
+  isDelivered Boolean     @default(false)
+  readAt      DateTime?
+  deliveredAt DateTime?
+  createdAt   DateTime    @default(now())
+  deletedAt   DateTime?   // Soft delete
+
+  attachments Attachment[]
+
+  @@index([conversationId])
+  @@index([conversationId, createdAt])
+  @@index([senderId])
+  @@map("messages")
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  messageId String
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  url       String
+  publicId  String?
+  type      String   // image, audio, video, document
+  filename  String?
+  size      Int?     // bytes
+  duration  Int?     // seconds (for audio/video)
+  createdAt DateTime @default(now())
+
+  @@index([messageId])
+  @@map("attachments")
+}
+
+// ─── CALLING ────────────────────────────────────────────────────────────────
+
+model Call {
+  id         String     @id @default(cuid())
+  callerId   String
+  receiverId String
+  caller     User       @relation("CallerCalls", fields: [callerId], references: [id], onDelete: Cascade)
+  receiver   User       @relation("ReceiverCalls", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  type      CallType
+  status    CallStatus @default(INITIATED)
+  startedAt DateTime?
+  endedAt   DateTime?
+  duration  Int?       // seconds
+  roomId    String?    @unique // WebRTC room ID
+
+  createdAt DateTime @default(now())
+
+  @@index([callerId])
+  @@index([receiverId])
+  @@index([createdAt])
+  @@index([status])
+  @@map("calls")
+}
+
+// ─── MODERATION ─────────────────────────────────────────────────────────────
+
+model Report {
+  id             String       @id @default(cuid())
+  reporterId     String
+  reportedUserId String
+  reporter       User         @relation("SentReports", fields: [reporterId], references: [id], onDelete: Cascade)
+  reportedUser   User         @relation("ReportedUsers", fields: [reportedUserId], references: [id], onDelete: Cascade)
+
+  reason      ReportReason
+  description String?      @db.Text
+  screenshots String[]     @default([])
+  status      ReportStatus @default(PENDING)
+  reviewedAt  DateTime?
+  reviewedBy  String?      // Admin user ID
+  reviewNotes String?
+
+  createdAt DateTime @default(now())
+
+  @@index([reportedUserId])
+  @@index([status])
+  @@map("reports")
+}
+
+// ─── NOTIFICATIONS ──────────────────────────────────────────────────────────
+
+model Notification {
+  id     String           @id @default(cuid())
+  userId String
+  user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type      NotificationType
+  title     String
+  body      String
+  imageUrl  String?
+  data      Json?    // Arbitrary payload (e.g., { fromUserId, conversationId })
+  isRead    Boolean  @default(false)
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+// ─── VERIFICATION & AUTH ────────────────────────────────────────────────────
+
+model OtpVerification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type      String   // email | mobile | password_reset
+  otp       String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([userId, type])
+  @@map("otp_verifications")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  token     String   @unique
+  expiresAt DateTime
+  isRevoked Boolean  @default(false)
+  userAgent String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+// ─── ADMIN ──────────────────────────────────────────────────────────────────
+
+model AdminUser {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        String   @default("moderator") // super_admin | admin | moderator
+  permissions String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("admin_users")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  adminId    String?
+  action     String
+  entityType String
+  entityId   String?
+  oldValue   Json?
+  newValue   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([adminId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ─── ANALYTICS ──────────────────────────────────────────────────────────────
+
+model DailyStats {
+  id                  String   @id @default(cuid())
+  date                DateTime @unique
+  totalUsers          Int      @default(0)
+  newRegistrations    Int      @default(0)
+  activeUsers         Int      @default(0)
+  premiumUsers        Int      @default(0)
+  totalMatches        Int      @default(0)
+  totalMessages       Int      @default(0)
+  totalCalls          Int      @default(0)
+  totalProfileViews   Int      @default(0)
+  revenue             Decimal  @default(0) @db.Decimal(12, 2)
+  createdAt           DateTime @default(now())
+
+  @@map("daily_stats")
+}
