@@ -79,20 +79,20 @@ export default function AdminPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 animate-fade-in-up">
           <div>
-            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-              <BarChart3 className="h-8 w-8 text-purple-400" /> Admin Dashboard
+            <h1 className="text-3xl font-bold text-slate-800 dark:text-white flex items-center gap-3">
+              <BarChart3 className="h-8 w-8 text-teal-600 dark:text-purple-400" /> Admin Dashboard
             </h1>
-            <p className="text-purple-200/50 mt-1">Platform analytics & user management</p>
+            <p className="text-slate-500 dark:text-purple-200/50 mt-1">Platform analytics & user management</p>
           </div>
           <div className="flex items-center gap-2 text-xs">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
             <span className="text-green-400">Live</span>
-            <span className="text-purple-300/30 ml-2">Last updated: Just now</span>
+            <span className="text-slate-300 dark:text-purple-300/30 ml-2">Last updated: Just now</span>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 bg-white/[0.03] p-1.5 rounded-2xl border border-purple-500/10 overflow-x-auto">
+        <div className="flex gap-1 mb-6 bg-white/[0.03] p-1.5 rounded-2xl border border-teal-100 dark:border-purple-500/10 overflow-x-auto">
           {[
             { id: 'overview' as const, label: 'Overview', icon: BarChart3 },
             { id: 'users' as const, label: 'Users', icon: Users },
@@ -102,12 +102,12 @@ export default function AdminPage() {
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'bg-purple-600/30 text-white border border-purple-500/30'
-                  : 'text-purple-300/50 hover:text-purple-200 hover:bg-white/5'
+                  ? 'bg-purple-600/30 text-slate-800 dark:text-white border border-teal-200 dark:border-purple-500/30'
+                  : 'text-slate-400 dark:text-purple-300/50 hover:text-slate-700 dark:text-purple-200 hover:bg-white/5'
               }`}>
               <tab.icon className="h-4 w-4" /> {tab.label}
               {tab.id === 'reports' && data.reportsOpen > 0 && (
-                <span className="w-5 h-5 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">{data.reportsOpen}</span>
+                <span className="w-5 h-5 bg-red-500 text-slate-800 dark:text-white text-[9px] font-bold rounded-full flex items-center justify-center">{data.reportsOpen}</span>
               )}
             </button>
           ))}
@@ -122,15 +122,15 @@ export default function AdminPage() {
                 <div key={i} className="glass-card !p-4 animate-fade-in-up" style={{ animationDelay: `${i * 0.05}s`, opacity: 0 }}>
                   <div className="flex items-center justify-between mb-3">
                     <div className={`w-9 h-9 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center`}>
-                      <stat.icon className="h-4 w-4 text-white" />
+                      <stat.icon className="h-4 w-4 text-slate-800 dark:text-white" />
                     </div>
                     <span className={`text-[10px] flex items-center gap-0.5 ${stat.up ? 'text-green-400' : 'text-red-400'}`}>
                       {stat.up ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
                       {stat.change}
                     </span>
                   </div>
-                  <p className="text-xl font-bold text-white">{stat.value}</p>
-                  <p className="text-[10px] text-purple-300/40 mt-0.5">{stat.label}</p>
+                  <p className="text-xl font-bold text-slate-800 dark:text-white">{stat.value}</p>
+                  <p className="text-[10px] text-slate-300 dark:text-purple-300/40 mt-0.5">{stat.label}</p>
                 </div>
               ))}
             </div>
@@ -139,8 +139,8 @@ export default function AdminPage() {
             <div className="grid lg:grid-cols-2 gap-6 mb-8">
               {/* Registration Chart */}
               <div className="glass-card animate-fade-in-up" style={{ animationDelay: '0.3s', opacity: 0 }}>
-                <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-purple-400" /> New Registrations (7 days)
+                <h3 className="text-sm font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-teal-600 dark:text-purple-400" /> New Registrations (7 days)
                 </h3>
                 <div className="flex items-end gap-2 h-32">
                   {data.registrationsWeek.map((val, i) => {
@@ -148,10 +148,10 @@ export default function AdminPage() {
                     const height = (val / max) * 100
                     return (
                       <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                        <span className="text-[9px] text-purple-300/40">{val}</span>
+                        <span className="text-[9px] text-slate-300 dark:text-purple-300/40">{val}</span>
                         <div className="w-full rounded-t-lg bg-gradient-to-t from-purple-600 to-fuchsia-500 transition-all duration-500"
                           style={{ height: `${height}%`, minHeight: '8px' }} />
-                        <span className="text-[9px] text-purple-300/30">
+                        <span className="text-[9px] text-slate-300 dark:text-purple-300/30">
                           {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}
                         </span>
                       </div>
@@ -162,7 +162,7 @@ export default function AdminPage() {
 
               {/* Matches Chart */}
               <div className="glass-card animate-fade-in-up" style={{ animationDelay: '0.35s', opacity: 0 }}>
-                <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                   <Heart className="h-4 w-4 text-pink-400" /> Successful Matches (7 days)
                 </h3>
                 <div className="flex items-end gap-2 h-32">
@@ -171,10 +171,10 @@ export default function AdminPage() {
                     const height = (val / max) * 100
                     return (
                       <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                        <span className="text-[9px] text-purple-300/40">{val}</span>
+                        <span className="text-[9px] text-slate-300 dark:text-purple-300/40">{val}</span>
                         <div className="w-full rounded-t-lg bg-gradient-to-t from-pink-600 to-rose-400 transition-all duration-500"
                           style={{ height: `${height}%`, minHeight: '8px' }} />
-                        <span className="text-[9px] text-purple-300/30">
+                        <span className="text-[9px] text-slate-300 dark:text-purple-300/30">
                           {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}
                         </span>
                       </div>
@@ -187,22 +187,22 @@ export default function AdminPage() {
             {/* KPIs */}
             <div className="grid sm:grid-cols-3 gap-4">
               <div className="glass-card !p-5 text-center animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
-                <p className="text-3xl font-bold text-white">{data.retentionRate}%</p>
-                <p className="text-xs text-purple-300/40 mt-1">30-Day Retention Rate</p>
+                <p className="text-3xl font-bold text-slate-800 dark:text-white">{data.retentionRate}%</p>
+                <p className="text-xs text-slate-300 dark:text-purple-300/40 mt-1">30-Day Retention Rate</p>
                 <div className="w-full h-2 bg-white/5 rounded-full mt-3 overflow-hidden">
                   <div className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full" style={{ width: `${data.retentionRate}%` }} />
                 </div>
               </div>
               <div className="glass-card !p-5 text-center animate-fade-in-up" style={{ animationDelay: '0.45s', opacity: 0 }}>
-                <p className="text-3xl font-bold text-white">{data.avgSessionTime}</p>
-                <p className="text-xs text-purple-300/40 mt-1">Avg. Session Duration</p>
+                <p className="text-3xl font-bold text-slate-800 dark:text-white">{data.avgSessionTime}</p>
+                <p className="text-xs text-slate-300 dark:text-purple-300/40 mt-1">Avg. Session Duration</p>
                 <div className="w-full h-2 bg-white/5 rounded-full mt-3 overflow-hidden">
                   <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full" style={{ width: '65%' }} />
                 </div>
               </div>
               <div className="glass-card !p-5 text-center animate-fade-in-up" style={{ animationDelay: '0.5s', opacity: 0 }}>
-                <p className="text-3xl font-bold text-white">10%</p>
-                <p className="text-xs text-purple-300/40 mt-1">Premium Conversion Rate</p>
+                <p className="text-3xl font-bold text-slate-800 dark:text-white">10%</p>
+                <p className="text-xs text-slate-300 dark:text-purple-300/40 mt-1">Premium Conversion Rate</p>
                 <div className="w-full h-2 bg-white/5 rounded-full mt-3 overflow-hidden">
                   <div className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full" style={{ width: '10%' }} />
                 </div>
@@ -215,23 +215,23 @@ export default function AdminPage() {
         {activeTab === 'users' && (
           <div className="animate-fade-in-up">
             <div className="glass-card">
-              <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-                <Users className="h-4 w-4 text-purple-400" /> Recent Registrations
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                <Users className="h-4 w-4 text-teal-600 dark:text-purple-400" /> Recent Registrations
               </h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-purple-500/10">
-                      <th className="text-left py-3 px-2 text-purple-300/40 font-medium">User</th>
-                      <th className="text-left py-3 px-2 text-purple-300/40 font-medium">Email</th>
-                      <th className="text-left py-3 px-2 text-purple-300/40 font-medium">Registered</th>
-                      <th className="text-left py-3 px-2 text-purple-300/40 font-medium">Status</th>
-                      <th className="text-left py-3 px-2 text-purple-300/40 font-medium">Actions</th>
+                    <tr className="border-b border-teal-100 dark:border-purple-500/10">
+                      <th className="text-left py-3 px-2 text-slate-300 dark:text-purple-300/40 font-medium">User</th>
+                      <th className="text-left py-3 px-2 text-slate-300 dark:text-purple-300/40 font-medium">Email</th>
+                      <th className="text-left py-3 px-2 text-slate-300 dark:text-purple-300/40 font-medium">Registered</th>
+                      <th className="text-left py-3 px-2 text-slate-300 dark:text-purple-300/40 font-medium">Status</th>
+                      <th className="text-left py-3 px-2 text-slate-300 dark:text-purple-300/40 font-medium">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {RECENT_REGISTRATIONS.map(u => (
-                      <tr key={u.id} className="border-b border-purple-500/5 hover:bg-purple-500/5 transition-colors">
+                      <tr key={u.id} className="border-b border-purple-500/5 hover:bg-teal-50/50 dark:bg-purple-500/5 transition-colors">
                         <td className="py-3 px-2">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full overflow-hidden">
@@ -241,11 +241,11 @@ export default function AdminPage() {
                                 <ellipse cx="50" cy="80" rx="26" ry="22" fill="rgba(124,58,237,0.6)" />
                               </svg>
                             </div>
-                            <span className="text-white font-medium">{u.name}</span>
+                            <span className="text-slate-800 dark:text-white font-medium">{u.name}</span>
                           </div>
                         </td>
-                        <td className="py-3 px-2 text-purple-300/50">{u.email}</td>
-                        <td className="py-3 px-2 text-purple-300/50 flex items-center gap-1">
+                        <td className="py-3 px-2 text-slate-400 dark:text-purple-300/50">{u.email}</td>
+                        <td className="py-3 px-2 text-slate-400 dark:text-purple-300/50 flex items-center gap-1">
                           <Clock className="h-3 w-3" /> {u.date}
                         </td>
                         <td className="py-3 px-2">
@@ -257,7 +257,7 @@ export default function AdminPage() {
                         </td>
                         <td className="py-3 px-2">
                           <div className="flex gap-1">
-                            <button className="text-[10px] bg-purple-500/10 text-purple-300 px-2 py-1 rounded-lg hover:bg-purple-500/20 transition-all">View</button>
+                            <button className="text-[10px] bg-teal-50 dark:bg-purple-500/10 text-slate-600 dark:text-purple-300 px-2 py-1 rounded-lg hover:bg-teal-100/50 dark:bg-purple-500/20 transition-all">View</button>
                             <button className="text-[10px] bg-red-500/10 text-red-300 px-2 py-1 rounded-lg hover:bg-red-500/20 transition-all">Ban</button>
                           </div>
                         </td>
@@ -284,7 +284,7 @@ export default function AdminPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-semibold text-white">{report.name}</h4>
+                    <h4 className="text-sm font-semibold text-slate-800 dark:text-white">{report.name}</h4>
                     <span className={`text-[9px] px-2 py-0.5 rounded-full border ${
                       report.status === 'pending' ? 'bg-red-500/10 text-red-300 border-red-500/20' :
                       report.status === 'investigating' ? 'bg-yellow-500/10 text-yellow-300 border-yellow-500/20' :
@@ -293,7 +293,7 @@ export default function AdminPage() {
                       {report.status}
                     </span>
                   </div>
-                  <p className="text-xs text-purple-200/50 mt-0.5">{report.reason} • Reported by {report.reportedBy} users • {report.date}</p>
+                  <p className="text-xs text-slate-500 dark:text-purple-200/50 mt-0.5">{report.reason} • Reported by {report.reportedBy} users • {report.date}</p>
                 </div>
                 <div className="flex gap-2">
                   {report.status !== 'resolved' && (
@@ -317,21 +317,21 @@ export default function AdminPage() {
           <div className="animate-fade-in-up">
             <div className="grid sm:grid-cols-3 gap-4 mb-6">
               <div className="glass-card !p-5 text-center">
-                <p className="text-2xl font-bold text-white">₹37.5L</p>
-                <p className="text-xs text-purple-300/40 mt-1">Monthly Revenue</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-white">₹37.5L</p>
+                <p className="text-xs text-slate-300 dark:text-purple-300/40 mt-1">Monthly Revenue</p>
               </div>
               <div className="glass-card !p-5 text-center">
-                <p className="text-2xl font-bold text-white">₹299</p>
-                <p className="text-xs text-purple-300/40 mt-1">ARPU (Avg Revenue/User)</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-white">₹299</p>
+                <p className="text-xs text-slate-300 dark:text-purple-300/40 mt-1">ARPU (Avg Revenue/User)</p>
               </div>
               <div className="glass-card !p-5 text-center">
-                <p className="text-2xl font-bold text-white">87%</p>
-                <p className="text-xs text-purple-300/40 mt-1">Renewal Rate</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-white">87%</p>
+                <p className="text-xs text-slate-300 dark:text-purple-300/40 mt-1">Renewal Rate</p>
               </div>
             </div>
 
             <div className="glass-card">
-              <h3 className="text-sm font-semibold text-white mb-4">Revenue by Plan</h3>
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-white mb-4">Revenue by Plan</h3>
               <div className="space-y-4">
                 {[
                   { plan: 'Platinum', revenue: 18.5, users: 3200, pct: 49 },
@@ -340,8 +340,8 @@ export default function AdminPage() {
                 ].map((item, i) => (
                   <div key={i}>
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm text-white">{item.plan}</span>
-                      <span className="text-xs text-purple-200/50">₹{item.revenue}L • {item.users.toLocaleString()} users</span>
+                      <span className="text-sm text-slate-800 dark:text-white">{item.plan}</span>
+                      <span className="text-xs text-slate-500 dark:text-purple-200/50">₹{item.revenue}L • {item.users.toLocaleString()} users</span>
                     </div>
                     <div className="h-3 bg-white/5 rounded-full overflow-hidden">
                       <div className="h-full bg-gradient-to-r from-purple-600 to-fuchsia-500 rounded-full transition-all duration-1000"

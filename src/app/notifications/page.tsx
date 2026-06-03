@@ -91,14 +91,14 @@ export default function NotificationsPage() {
       case 'interest_received': return <HalfHeart className="h-4 w-4" />
       case 'interest_accepted': return <UserCheck className="h-4 w-4 text-green-400" />
       case 'interest_declined': return <UserX className="h-4 w-4 text-red-400" />
-      case 'profile_view': return <Eye className="h-4 w-4 text-purple-400" />
+      case 'profile_view': return <Eye className="h-4 w-4 text-teal-600 dark:text-purple-400" />
       case 'match': return <Sparkles className="h-4 w-4 text-yellow-400" />
       case 'message': return <MessageCircle className="h-4 w-4 text-blue-400" />
       case 'contact_viewed': return <Phone className="h-4 w-4 text-green-400" />
       case 'shortlisted': return <Star className="h-4 w-4 text-amber-400" />
       case 'photo_request': return <Eye className="h-4 w-4 text-fuchsia-400" />
       case 'reminder': return <Bell className="h-4 w-4 text-orange-400" />
-      case 'system': return <Bell className="h-4 w-4 text-purple-300" />
+      case 'system': return <Bell className="h-4 w-4 text-slate-600 dark:text-purple-300" />
     }
   }
 
@@ -126,16 +126,16 @@ export default function NotificationsPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6 animate-fade-in-up">
           <div>
-            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-              <Bell className="h-8 w-8 text-purple-400" /> Notifications
+            <h1 className="text-3xl font-bold text-slate-800 dark:text-white flex items-center gap-3">
+              <Bell className="h-8 w-8 text-teal-600 dark:text-purple-400" /> Notifications
             </h1>
-            <p className="text-purple-200/50 mt-1 text-sm">{unreadCount} unread notifications</p>
+            <p className="text-slate-500 dark:text-purple-200/50 mt-1 text-sm">{unreadCount} unread notifications</p>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setShowEmailSettings(!showEmailSettings)} className="text-xs text-purple-300/60 hover:text-purple-200 transition-colors p-1.5 rounded-lg hover:bg-white/5" title="Email settings">
+            <button onClick={() => setShowEmailSettings(!showEmailSettings)} className="text-xs text-slate-400 dark:text-purple-300/60 hover:text-slate-700 dark:text-purple-200 transition-colors p-1.5 rounded-lg hover:bg-white/5" title="Email settings">
               <Mail className="h-4 w-4" />
             </button>
-            <button onClick={markAllRead} className="text-xs text-purple-300/60 hover:text-purple-200 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5">
+            <button onClick={markAllRead} className="text-xs text-slate-400 dark:text-purple-300/60 hover:text-slate-700 dark:text-purple-200 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5">
               Mark all read
             </button>
             <button onClick={clearAll} className="text-xs text-red-300/60 hover:text-red-300 transition-colors p-1.5 rounded-lg hover:bg-red-500/10">
@@ -149,9 +149,9 @@ export default function NotificationsPage() {
           <div className="glass-card mb-6 animate-fade-in-up border-blue-500/10">
             <div className="flex items-center gap-2 mb-4">
               <Mail className="h-4 w-4 text-blue-400" />
-              <h3 className="text-sm font-semibold text-white">Email Notification Preferences</h3>
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-white">Email Notification Preferences</h3>
             </div>
-            <p className="text-[11px] text-purple-300/40 mb-4">Choose which notifications you receive via email</p>
+            <p className="text-[11px] text-slate-300 dark:text-purple-300/40 mb-4">Choose which notifications you receive via email</p>
             <div className="grid sm:grid-cols-2 gap-2">
               {[
                 { key: 'newMatch', label: 'New Mutual Match' },
@@ -167,13 +167,13 @@ export default function NotificationsPage() {
                     type="checkbox"
                     checked={emailPrefs[item.key as keyof typeof emailPrefs]}
                     onChange={e => setEmailPrefs(prev => ({ ...prev, [item.key]: e.target.checked }))}
-                    className="w-4 h-4 rounded border-purple-500/30 bg-white/5 text-purple-500 focus:ring-purple-500/50"
+                    className="w-4 h-4 rounded border-teal-200 dark:border-purple-500/30 bg-white/5 text-teal-600 dark:text-purple-500 focus:ring-purple-500/50"
                   />
-                  <span className="text-xs text-purple-200/70">{item.label}</span>
+                  <span className="text-xs text-slate-500 dark:text-purple-200/70">{item.label}</span>
                 </label>
               ))}
             </div>
-            <div className="mt-3 pt-3 border-t border-purple-500/10 flex items-center gap-2">
+            <div className="mt-3 pt-3 border-t border-teal-100 dark:border-purple-500/10 flex items-center gap-2">
               <CheckCircle className="h-3.5 w-3.5 text-green-400" />
               <span className="text-[10px] text-green-300/60">Email notifications will be sent to {user.email}</span>
             </div>
@@ -192,7 +192,7 @@ export default function NotificationsPage() {
           ]).map(f => (
             <button key={f.id} onClick={() => setFilter(f.id)}
               className={`px-3 py-2 rounded-xl text-xs font-medium transition-all whitespace-nowrap flex items-center gap-1.5 flex-shrink-0 ${
-                filter === f.id ? 'bg-purple-600/30 text-white border border-purple-500/30' : 'text-purple-300/50 hover:bg-white/5 border border-transparent'
+                filter === f.id ? 'bg-purple-600/30 text-slate-800 dark:text-white border border-teal-200 dark:border-purple-500/30' : 'text-slate-400 dark:text-purple-300/50 hover:bg-white/5 border border-transparent'
               }`}>
               {f.label}
               <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${filter === f.id ? 'bg-purple-500/30' : 'bg-white/5'}`}>{f.count}</span>
@@ -204,7 +204,7 @@ export default function NotificationsPage() {
         {filtered.length === 0 ? (
           <div className="glass-card p-12 text-center animate-fade-in-up">
             <Bell className="h-16 w-16 text-purple-300/15 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-white mb-2">All caught up!</h3>
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">All caught up!</h3>
             <p className="text-sm text-purple-200/40">No new notifications right now</p>
           </div>
         ) : (
@@ -213,8 +213,8 @@ export default function NotificationsPage() {
               <div
                 key={n.id}
                 onClick={() => { markRead(n.id); if (n.link) router.push(n.link) }}
-                className={`glass-card !p-4 cursor-pointer hover:border-purple-400/30 transition-all animate-fade-in-up group ${
-                  !n.read ? 'border-purple-500/30 bg-purple-500/5' : ''
+                className={`glass-card !p-4 cursor-pointer hover:border-teal-200/50 dark:border-purple-400/30 transition-all animate-fade-in-up group ${
+                  !n.read ? 'border-teal-200 dark:border-purple-500/30 bg-teal-50/50 dark:bg-purple-500/5' : ''
                 }`}
                 style={{ animationDelay: `${i * 0.04}s`, opacity: 0 }}
               >
@@ -230,12 +230,12 @@ export default function NotificationsPage() {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className={`text-sm font-medium ${!n.read ? 'text-white' : 'text-purple-200/70'}`}>{n.title}</p>
+                      <p className={`text-sm font-medium ${!n.read ? 'text-slate-800 dark:text-white' : 'text-slate-500 dark:text-purple-200/70'}`}>{n.title}</p>
                       {!n.read && <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse flex-shrink-0" />}
                     </div>
-                    <p className="text-xs text-purple-200/50 mt-0.5 truncate">{n.message}</p>
+                    <p className="text-xs text-slate-500 dark:text-purple-200/50 mt-0.5 truncate">{n.message}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <p className="text-[10px] text-purple-300/30">{n.time}</p>
+                      <p className="text-[10px] text-slate-300 dark:text-purple-300/30">{n.time}</p>
                       {n.emailSent && (
                         <span className="text-[9px] text-blue-300/40 flex items-center gap-0.5">
                           <Mail className="h-2.5 w-2.5" /> Email sent
@@ -246,7 +246,7 @@ export default function NotificationsPage() {
                   {/* Action indicator */}
                   <div className="flex flex-col items-end gap-1">
                     {n.link && (
-                      <div className="text-purple-300/20 group-hover:text-purple-300/60 transition-colors text-sm">→</div>
+                      <div className="text-purple-300/20 group-hover:text-slate-400 dark:text-purple-300/60 transition-colors text-sm">→</div>
                     )}
                     {n.type === 'interest_received' && !n.read && (
                       <div className="flex gap-1 mt-1">
@@ -262,13 +262,13 @@ export default function NotificationsPage() {
         )}
 
         {/* Push Notification Prompt */}
-        <div className="mt-8 glass-card p-5 border-purple-500/20 animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
+        <div className="mt-8 glass-card p-5 border-teal-200/50 dark:border-purple-500/20 animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
-              <Bell className="h-5 w-5 text-purple-400" />
+            <div className="w-10 h-10 rounded-xl bg-teal-100/50 dark:bg-purple-500/20 flex items-center justify-center">
+              <Bell className="h-5 w-5 text-teal-600 dark:text-purple-400" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-white">Enable Push Notifications</p>
+              <p className="text-sm font-medium text-slate-800 dark:text-white">Enable Push Notifications</p>
               <p className="text-xs text-purple-200/40">Never miss when someone shows interest</p>
             </div>
             <button className="btn-primary text-xs py-2 px-4">Enable</button>

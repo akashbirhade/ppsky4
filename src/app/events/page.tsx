@@ -110,8 +110,8 @@ export default function EventsPage() {
       case 'mixer': return 'bg-blue-500/10 text-blue-300 border-blue-500/20'
       case 'webinar': return 'bg-green-500/10 text-green-300 border-green-500/20'
       case 'meetup': return 'bg-amber-500/10 text-amber-300 border-amber-500/20'
-      case 'festival': return 'bg-purple-500/10 text-purple-300 border-purple-500/20'
-      default: return 'bg-purple-500/10 text-purple-300 border-purple-500/20'
+      case 'festival': return 'bg-teal-50 dark:bg-purple-500/10 text-slate-600 dark:text-purple-300 border-teal-200/50 dark:border-purple-500/20'
+      default: return 'bg-teal-50 dark:bg-purple-500/10 text-slate-600 dark:text-purple-300 border-teal-200/50 dark:border-purple-500/20'
     }
   }
 
@@ -129,8 +129,8 @@ export default function EventsPage() {
             <Calendar className="h-4 w-4 text-pink-400" />
             <span className="text-xs text-pink-300">Meet In Person</span>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-3">Matchmaking Events</h1>
-          <p className="text-purple-200/50 max-w-lg mx-auto">Speed dating, mixers, festivals & workshops — meet your match face-to-face</p>
+          <h1 className="text-4xl font-bold text-slate-800 dark:text-white mb-3">Matchmaking Events</h1>
+          <p className="text-slate-500 dark:text-purple-200/50 max-w-lg mx-auto">Speed dating, mixers, festivals & workshops — meet your match face-to-face</p>
         </div>
 
         {/* Featured Event Banner */}
@@ -147,9 +147,9 @@ export default function EventsPage() {
                     <span className="text-[10px] bg-pink-500/20 text-pink-300 px-2 py-0.5 rounded-full border border-pink-500/20 font-semibold">⭐ FEATURED</span>
                     <span className={`text-[10px] px-2 py-0.5 rounded-full border ${getTypeColor(feat.type)}`}>{feat.type.replace('-', ' ')}</span>
                   </div>
-                  <h2 className="text-xl font-bold text-white mb-2">{feat.title}</h2>
-                  <p className="text-sm text-purple-200/50 mb-4">{feat.description}</p>
-                  <div className="flex flex-wrap items-center gap-4 text-xs text-purple-200/60 mb-4">
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">{feat.title}</h2>
+                  <p className="text-sm text-slate-500 dark:text-purple-200/50 mb-4">{feat.description}</p>
+                  <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-purple-200/60 mb-4">
                     <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {formatDate(feat.date)}</span>
                     <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {feat.time}</span>
                     <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {feat.location}</span>
@@ -177,8 +177,8 @@ export default function EventsPage() {
             <button key={f.id} onClick={() => setFilter(f.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all border ${
                 filter === f.id
-                  ? 'bg-purple-600/30 text-white border-purple-500/40'
-                  : 'bg-white/[0.02] text-purple-200/60 border-purple-500/10 hover:bg-white/[0.05]'
+                  ? 'bg-purple-600/30 text-slate-800 dark:text-white border-purple-500/40'
+                  : 'bg-white/[0.02] text-slate-500 dark:text-purple-200/60 border-teal-100 dark:border-purple-500/10 hover:bg-white/[0.05]'
               }`}>
               <f.icon className="h-3.5 w-3.5" /> {f.label}
             </button>
@@ -188,14 +188,14 @@ export default function EventsPage() {
         {/* Events List */}
         <div className="space-y-4">
           {filtered.map((event, i) => (
-            <div key={event.id} className="glass-card !p-0 overflow-hidden flex flex-col sm:flex-row hover:border-purple-400/30 transition-all animate-fade-in-up"
+            <div key={event.id} className="glass-card !p-0 overflow-hidden flex flex-col sm:flex-row hover:border-teal-200/50 dark:border-purple-400/30 transition-all animate-fade-in-up"
               style={{ animationDelay: `${(i + 2) * 0.04}s`, opacity: 0 }}>
               {/* Date Badge */}
-              <div className="sm:w-24 flex-shrink-0 bg-gradient-to-b from-purple-500/10 to-fuchsia-500/5 flex items-center justify-center p-4 sm:flex-col border-b sm:border-b-0 sm:border-r border-purple-500/10">
+              <div className="sm:w-24 flex-shrink-0 bg-gradient-to-b from-purple-500/10 to-fuchsia-500/5 flex items-center justify-center p-4 sm:flex-col border-b sm:border-b-0 sm:border-r border-teal-100 dark:border-purple-500/10">
                 <span className="text-3xl mr-3 sm:mr-0 sm:mb-2">{event.image}</span>
                 <div className="sm:text-center">
-                  <p className="text-xs font-bold text-white">{formatDate(event.date)}</p>
-                  <p className="text-[10px] text-purple-300/40">{event.isOnline ? '🌐 Online' : '📍 In-person'}</p>
+                  <p className="text-xs font-bold text-slate-800 dark:text-white">{formatDate(event.date)}</p>
+                  <p className="text-[10px] text-slate-300 dark:text-purple-300/40">{event.isOnline ? '🌐 Online' : '📍 In-person'}</p>
                 </div>
               </div>
 
@@ -206,25 +206,25 @@ export default function EventsPage() {
                     <span className={`text-[9px] px-2 py-0.5 rounded-full border capitalize ${getTypeColor(event.type)}`}>{event.type.replace('-', ' ')}</span>
                     {event.featured && <Star className="h-3 w-3 text-amber-400 fill-amber-400" />}
                   </div>
-                  <h3 className="text-sm font-semibold text-white mb-1">{event.title}</h3>
-                  <div className="flex flex-wrap items-center gap-3 text-[11px] text-purple-200/50">
+                  <h3 className="text-sm font-semibold text-slate-800 dark:text-white mb-1">{event.title}</h3>
+                  <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 dark:text-purple-200/50">
                     <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {event.time}</span>
                     <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {event.location.length > 25 ? event.location.slice(0, 25) + '...' : event.location}</span>
                     <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {event.attendees}/{event.maxAttendees}</span>
                   </div>
                   <div className="flex gap-1.5 mt-2">
                     {event.tags.map(tag => (
-                      <span key={tag} className="text-[9px] bg-purple-500/10 text-purple-300/60 px-2 py-0.5 rounded-full">{tag}</span>
+                      <span key={tag} className="text-[9px] bg-teal-50 dark:bg-purple-500/10 text-slate-400 dark:text-purple-300/60 px-2 py-0.5 rounded-full">{tag}</span>
                     ))}
                   </div>
                 </div>
                 <div className="flex items-center gap-3 sm:flex-col sm:items-end">
-                  <span className="text-sm font-bold text-white">{event.price}</span>
+                  <span className="text-sm font-bold text-slate-800 dark:text-white">{event.price}</span>
                   <button onClick={() => toggleRegister(event.id)}
                     className={`text-xs py-2 px-4 rounded-xl font-medium transition-all flex items-center gap-1.5 ${
                       event.isRegistered
                         ? 'bg-green-500/10 text-green-300 border border-green-500/20'
-                        : 'bg-purple-600/40 text-white border border-purple-500/30 hover:bg-purple-600/60'
+                        : 'bg-purple-600/40 text-slate-800 dark:text-white border border-teal-200 dark:border-purple-500/30 hover:bg-purple-600/60'
                     }`}>
                     {event.isRegistered ? <><CheckCircle className="h-3.5 w-3.5" /> Registered</> : <><Ticket className="h-3.5 w-3.5" /> Register</>}
                   </button>
@@ -237,21 +237,21 @@ export default function EventsPage() {
         {/* Capacity Bar */}
         <div className="mt-10 glass-card p-6 animate-fade-in-up">
           <div className="flex items-center gap-3 mb-4">
-            <Sparkles className="h-5 w-5 text-purple-400" />
-            <h3 className="text-sm font-semibold text-white">Why attend events?</h3>
+            <Sparkles className="h-5 w-5 text-teal-600 dark:text-purple-400" />
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-white">Why attend events?</h3>
           </div>
           <div className="grid sm:grid-cols-3 gap-4">
             <div className="text-center p-4 rounded-xl bg-white/[0.02] border border-purple-500/5">
-              <p className="text-2xl font-bold text-white mb-1">73%</p>
-              <p className="text-[11px] text-purple-200/50">of attendees find a match within 3 events</p>
+              <p className="text-2xl font-bold text-slate-800 dark:text-white mb-1">73%</p>
+              <p className="text-[11px] text-slate-500 dark:text-purple-200/50">of attendees find a match within 3 events</p>
             </div>
             <div className="text-center p-4 rounded-xl bg-white/[0.02] border border-purple-500/5">
-              <p className="text-2xl font-bold text-white mb-1">4.8★</p>
-              <p className="text-[11px] text-purple-200/50">average event rating by attendees</p>
+              <p className="text-2xl font-bold text-slate-800 dark:text-white mb-1">4.8★</p>
+              <p className="text-[11px] text-slate-500 dark:text-purple-200/50">average event rating by attendees</p>
             </div>
             <div className="text-center p-4 rounded-xl bg-white/[0.02] border border-purple-500/5">
-              <p className="text-2xl font-bold text-white mb-1">100%</p>
-              <p className="text-[11px] text-purple-200/50">verified attendees for your safety</p>
+              <p className="text-2xl font-bold text-slate-800 dark:text-white mb-1">100%</p>
+              <p className="text-[11px] text-slate-500 dark:text-purple-200/50">verified attendees for your safety</p>
             </div>
           </div>
         </div>

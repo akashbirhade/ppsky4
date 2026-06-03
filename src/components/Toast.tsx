@@ -87,10 +87,10 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
         <Icon className="h-5 w-5" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-white">{toast.title}</p>
-        {toast.message && <p className="text-xs text-purple-200/60 mt-0.5">{toast.message}</p>}
+        <p className="text-sm font-semibold text-slate-800 dark:text-white">{toast.title}</p>
+        {toast.message && <p className="text-xs text-slate-500 dark:text-purple-200/60 mt-0.5">{toast.message}</p>}
       </div>
-      <button onClick={() => onRemove(toast.id)} className="flex-shrink-0 text-purple-300/40 hover:text-white transition-colors">
+      <button onClick={() => onRemove(toast.id)} className="flex-shrink-0 text-slate-300 dark:text-purple-300/40 hover:text-slate-800 dark:text-white transition-colors">
         <X className="h-4 w-4" />
       </button>
     </div>

@@ -117,10 +117,10 @@ export default function SettingsPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8 animate-fade-in-up">
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <Shield className="h-8 w-8 text-purple-400" /> Settings
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-white flex items-center gap-3">
+            <Shield className="h-8 w-8 text-teal-600 dark:text-purple-400" /> Settings
           </h1>
-          <p className="text-purple-200/50 mt-2">Manage your privacy, notifications, and account security</p>
+          <p className="text-slate-500 dark:text-purple-200/50 mt-2">Manage your privacy, notifications, and account security</p>
         </div>
 
         {saved && (
@@ -131,13 +131,13 @@ export default function SettingsPage() {
         )}
 
         {/* Section Tabs */}
-        <div className="flex gap-1 mb-6 bg-white/[0.03] p-1.5 rounded-2xl border border-purple-500/10 overflow-x-auto">
+        <div className="flex gap-1 mb-6 bg-white/[0.03] p-1.5 rounded-2xl border border-teal-100 dark:border-purple-500/10 overflow-x-auto">
           {sections.map(sec => (
             <button key={sec.id} onClick={() => setActiveSection(sec.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
                 activeSection === sec.id
-                  ? 'bg-purple-600/30 text-white border border-purple-500/30 shadow-[0_0_15px_rgba(147,51,234,0.2)]'
-                  : 'text-purple-300/50 hover:text-purple-200 hover:bg-white/5'
+                  ? 'bg-purple-600/30 text-slate-800 dark:text-white border border-teal-200 dark:border-purple-500/30 shadow-[0_0_15px_rgba(147,51,234,0.2)]'
+                  : 'text-slate-400 dark:text-purple-300/50 hover:text-slate-700 dark:text-purple-200 hover:bg-white/5'
               }`}>
               <sec.icon className="h-4 w-4" /> {sec.label}
             </button>
@@ -149,8 +149,8 @@ export default function SettingsPage() {
           <div className="space-y-6 animate-fade-in-up">
             {/* Profile Visibility */}
             <div className="glass-card p-6">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
-                <Eye className="h-5 w-5 text-purple-400" /> Profile Visibility
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2 mb-5">
+                <Eye className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Profile Visibility
               </h2>
               <div className="space-y-3">
                 <ToggleItem icon={EyeOff} label="Hide My Profile" description="Won't appear in search results" enabled={settings.hideProfile} onToggle={() => toggle('hideProfile')} />
@@ -167,21 +167,21 @@ export default function SettingsPage() {
 
             {/* Photo Privacy */}
             <div className="glass-card p-6">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
-                <Camera className="h-5 w-5 text-purple-400" /> Photo Privacy
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2 mb-5">
+                <Camera className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Photo Privacy
               </h2>
-              <p className="text-sm text-purple-200/60 mb-3">Who can see your photos?</p>
+              <p className="text-sm text-slate-500 dark:text-purple-200/60 mb-3">Who can see your photos?</p>
               {(['everyone', 'matches', 'accepted'] as const).map(opt => (
                 <button key={opt} onClick={() => setSettings(prev => ({ ...prev, photoPrivacy: opt }))}
                   className={`w-full p-4 rounded-xl border text-left transition-all flex items-center gap-3 mb-2 ${
-                    settings.photoPrivacy === opt ? 'border-purple-500/50 bg-purple-500/10' : 'border-purple-500/10 bg-white/[0.02] hover:bg-white/[0.04]'
+                    settings.photoPrivacy === opt ? 'border-purple-500/50 bg-teal-50 dark:bg-purple-500/10' : 'border-teal-100 dark:border-purple-500/10 bg-white/[0.02] hover:bg-white/[0.04]'
                   }`}>
-                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${settings.photoPrivacy === opt ? 'border-purple-400' : 'border-purple-500/30'}`}>
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${settings.photoPrivacy === opt ? 'border-purple-400' : 'border-teal-200 dark:border-purple-500/30'}`}>
                     {settings.photoPrivacy === opt && <div className="w-2 h-2 rounded-full bg-purple-400" />}
                   </div>
                   <div>
-                    <span className="text-sm text-white font-medium capitalize">{opt === 'everyone' ? 'Everyone' : opt === 'matches' ? 'Mutual Matches Only' : 'Accepted Interests Only'}</span>
-                    <p className="text-xs text-purple-300/40">
+                    <span className="text-sm text-slate-800 dark:text-white font-medium capitalize">{opt === 'everyone' ? 'Everyone' : opt === 'matches' ? 'Mutual Matches Only' : 'Accepted Interests Only'}</span>
+                    <p className="text-xs text-slate-300 dark:text-purple-300/40">
                       {opt === 'everyone' && 'All members can view your photos'}
                       {opt === 'matches' && 'Only people you both liked can see photos'}
                       {opt === 'accepted' && 'Only people whose interest you accepted'}
@@ -193,20 +193,20 @@ export default function SettingsPage() {
 
             {/* Communication Controls */}
             <div className="glass-card p-6">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
-                <MessageCircle className="h-5 w-5 text-purple-400" /> Communication Controls
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2 mb-5">
+                <MessageCircle className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Communication Controls
               </h2>
-              <p className="text-sm text-purple-200/60 mb-3">Who can send you interests and messages?</p>
+              <p className="text-sm text-slate-500 dark:text-purple-200/60 mb-3">Who can send you interests and messages?</p>
               {(['everyone', 'premium', 'none'] as const).map(opt => (
                 <button key={opt} onClick={() => setSettings(prev => ({ ...prev, whoCanContact: opt }))}
                   className={`w-full p-4 rounded-xl border text-left transition-all flex items-center gap-3 mb-2 ${
-                    settings.whoCanContact === opt ? 'border-purple-500/50 bg-purple-500/10' : 'border-purple-500/10 bg-white/[0.02] hover:bg-white/[0.04]'
+                    settings.whoCanContact === opt ? 'border-purple-500/50 bg-teal-50 dark:bg-purple-500/10' : 'border-teal-100 dark:border-purple-500/10 bg-white/[0.02] hover:bg-white/[0.04]'
                   }`}>
-                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${settings.whoCanContact === opt ? 'border-purple-400' : 'border-purple-500/30'}`}>
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${settings.whoCanContact === opt ? 'border-purple-400' : 'border-teal-200 dark:border-purple-500/30'}`}>
                     {settings.whoCanContact === opt && <div className="w-2 h-2 rounded-full bg-purple-400" />}
                   </div>
                   <div>
-                    <span className="text-sm text-white font-medium flex items-center gap-2">
+                    <span className="text-sm text-slate-800 dark:text-white font-medium flex items-center gap-2">
                       {opt === 'everyone' && 'Everyone'}
                       {opt === 'premium' && <><Crown className="h-3.5 w-3.5 text-amber-400" /> Premium Members Only</>}
                       {opt === 'none' && 'Nobody (Pause Communications)'}
@@ -218,15 +218,15 @@ export default function SettingsPage() {
 
             {/* Match Preferences */}
             <div className="glass-card p-6">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
-                <BadgeCheck className="h-5 w-5 text-purple-400" /> Match Preferences
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2 mb-5">
+                <BadgeCheck className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Match Preferences
               </h2>
               <ToggleItem icon={BadgeCheck} label="Show Only Verified Profiles" description="Filter out unverified profiles from matches" enabled={settings.showOnlyVerified} onToggle={() => toggle('showOnlyVerified')} />
             </div>
 
             {/* Blocked Users */}
             <div className="glass-card p-6">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2 mb-5">
                 <UserX className="h-5 w-5 text-red-400" /> Blocked Users
               </h2>
               {blockedUsers.length === 0 ? (
@@ -237,8 +237,8 @@ export default function SettingsPage() {
               ) : (
                 <div className="space-y-2">
                   {blockedUsers.map(id => (
-                    <div key={id} className="flex items-center justify-between p-3 bg-white/[0.02] rounded-xl border border-purple-500/10">
-                      <span className="text-sm text-purple-200">User #{id}</span>
+                    <div key={id} className="flex items-center justify-between p-3 bg-white/[0.02] rounded-xl border border-teal-100 dark:border-purple-500/10">
+                      <span className="text-sm text-slate-700 dark:text-purple-200">User #{id}</span>
                       <button className="text-xs text-red-400 hover:text-red-300 transition-colors">Unblock</button>
                     </div>
                   ))}
@@ -252,8 +252,8 @@ export default function SettingsPage() {
         {activeSection === 'notifications' && (
           <div className="space-y-6 animate-fade-in-up">
             <div className="glass-card p-6">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
-                <Bell className="h-5 w-5 text-purple-400" /> Notification Channels
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2 mb-5">
+                <Bell className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Notification Channels
               </h2>
               <div className="space-y-3">
                 <ToggleItem icon={Smartphone} label="Push Notifications" description="Receive notifications on your device" enabled={notifications.pushEnabled} onToggle={() => toggleNotif('pushEnabled')} />
@@ -264,8 +264,8 @@ export default function SettingsPage() {
             </div>
 
             <div className="glass-card p-6">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
-                <Bell className="h-5 w-5 text-purple-400" /> Alert Preferences
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2 mb-5">
+                <Bell className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Alert Preferences
               </h2>
               <div className="space-y-3">
                 <ToggleItem icon={BadgeCheck} label="Match Alerts" description="When you get a new match" enabled={notifications.matchAlerts} onToggle={() => toggleNotif('matchAlerts')} />
@@ -283,57 +283,57 @@ export default function SettingsPage() {
         {activeSection === 'security' && (
           <div className="space-y-6 animate-fade-in-up">
             <div className="glass-card p-6">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
-                <Fingerprint className="h-5 w-5 text-purple-400" /> Two-Factor Authentication
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2 mb-5">
+                <Fingerprint className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Two-Factor Authentication
               </h2>
-              <div className="flex items-center justify-between p-4 bg-white/[0.02] rounded-xl border border-purple-500/10">
+              <div className="flex items-center justify-between p-4 bg-white/[0.02] rounded-xl border border-teal-100 dark:border-purple-500/10">
                 <div className="flex items-center gap-3">
-                  <Fingerprint className="h-5 w-5 text-purple-300/60" />
+                  <Fingerprint className="h-5 w-5 text-slate-400 dark:text-purple-300/60" />
                   <div>
-                    <span className="text-sm text-white font-medium">2FA Authentication</span>
-                    <p className="text-xs text-purple-300/40">Add an extra layer of security</p>
+                    <span className="text-sm text-slate-800 dark:text-white font-medium">2FA Authentication</span>
+                    <p className="text-xs text-slate-300 dark:text-purple-300/40">Add an extra layer of security</p>
                   </div>
                 </div>
-                <button className="text-xs px-4 py-2 bg-purple-500/10 text-purple-300 rounded-xl border border-purple-500/20 hover:bg-purple-500/20 transition-all">
+                <button className="text-xs px-4 py-2 bg-teal-50 dark:bg-purple-500/10 text-slate-600 dark:text-purple-300 rounded-xl border border-teal-200/50 dark:border-purple-500/20 hover:bg-teal-100/50 dark:bg-purple-500/20 transition-all">
                   Enable
                 </button>
               </div>
             </div>
 
             <div className="glass-card p-6">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
-                <Key className="h-5 w-5 text-purple-400" /> Password & Login
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2 mb-5">
+                <Key className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Password & Login
               </h2>
               <div className="space-y-3">
-                <button className="w-full flex items-center justify-between p-4 bg-white/[0.02] rounded-xl border border-purple-500/10 hover:border-purple-500/20 transition-all">
+                <button className="w-full flex items-center justify-between p-4 bg-white/[0.02] rounded-xl border border-teal-100 dark:border-purple-500/10 hover:border-teal-200/50 dark:border-purple-500/20 transition-all">
                   <div className="flex items-center gap-3">
-                    <Key className="h-4 w-4 text-purple-300/60" />
-                    <span className="text-sm text-white">Change Password</span>
+                    <Key className="h-4 w-4 text-slate-400 dark:text-purple-300/60" />
+                    <span className="text-sm text-slate-800 dark:text-white">Change Password</span>
                   </div>
-                  <span className="text-xs text-purple-300/40">Last changed 30 days ago</span>
+                  <span className="text-xs text-slate-300 dark:text-purple-300/40">Last changed 30 days ago</span>
                 </button>
-                <button className="w-full flex items-center justify-between p-4 bg-white/[0.02] rounded-xl border border-purple-500/10 hover:border-purple-500/20 transition-all">
+                <button className="w-full flex items-center justify-between p-4 bg-white/[0.02] rounded-xl border border-teal-100 dark:border-purple-500/10 hover:border-teal-200/50 dark:border-purple-500/20 transition-all">
                   <div className="flex items-center gap-3">
-                    <Mail className="h-4 w-4 text-purple-300/60" />
-                    <span className="text-sm text-white">Change Email</span>
+                    <Mail className="h-4 w-4 text-slate-400 dark:text-purple-300/60" />
+                    <span className="text-sm text-slate-800 dark:text-white">Change Email</span>
                   </div>
-                  <span className="text-xs text-purple-300/40">{user.email}</span>
+                  <span className="text-xs text-slate-300 dark:text-purple-300/40">{user.email}</span>
                 </button>
               </div>
             </div>
 
             <div className="glass-card p-6">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
-                <Monitor className="h-5 w-5 text-purple-400" /> Active Devices
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2 mb-5">
+                <Monitor className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Active Devices
               </h2>
               <div className="space-y-3">
                 {devices.map(device => (
-                  <div key={device.id} className="flex items-center justify-between p-4 bg-white/[0.02] rounded-xl border border-purple-500/10">
+                  <div key={device.id} className="flex items-center justify-between p-4 bg-white/[0.02] rounded-xl border border-teal-100 dark:border-purple-500/10">
                     <div className="flex items-center gap-3">
-                      <Smartphone className="h-4 w-4 text-purple-300/60" />
+                      <Smartphone className="h-4 w-4 text-slate-400 dark:text-purple-300/60" />
                       <div>
-                        <span className="text-sm text-white">{device.name}</span>
-                        <p className="text-xs text-purple-300/40">{device.lastActive} {device.current && '• Current device'}</p>
+                        <span className="text-sm text-slate-800 dark:text-white">{device.name}</span>
+                        <p className="text-xs text-slate-300 dark:text-purple-300/40">{device.lastActive} {device.current && '• Current device'}</p>
                       </div>
                     </div>
                     {!device.current && (
@@ -345,7 +345,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="glass-card p-6">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2 mb-5">
                 <Shield className="h-5 w-5 text-green-400" /> Verification Status
               </h2>
               <div className="grid sm:grid-cols-2 gap-3">
@@ -355,15 +355,15 @@ export default function SettingsPage() {
                   { label: 'ID Verification', status: false, icon: Shield },
                   { label: 'Selfie Verification', status: false, icon: Camera },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 bg-white/[0.02] rounded-xl border border-purple-500/10">
+                  <div key={i} className="flex items-center justify-between p-4 bg-white/[0.02] rounded-xl border border-teal-100 dark:border-purple-500/10">
                     <div className="flex items-center gap-3">
-                      <item.icon className="h-4 w-4 text-purple-300/60" />
-                      <span className="text-sm text-white">{item.label}</span>
+                      <item.icon className="h-4 w-4 text-slate-400 dark:text-purple-300/60" />
+                      <span className="text-sm text-slate-800 dark:text-white">{item.label}</span>
                     </div>
                     {item.status ? (
                       <span className="text-[10px] px-2 py-1 bg-green-500/10 text-green-400 rounded-full border border-green-500/20">Verified</span>
                     ) : (
-                      <button className="text-[10px] px-2 py-1 bg-purple-500/10 text-purple-300 rounded-full border border-purple-500/20 hover:bg-purple-500/20 transition-all">Verify</button>
+                      <button className="text-[10px] px-2 py-1 bg-teal-50 dark:bg-purple-500/10 text-slate-600 dark:text-purple-300 rounded-full border border-teal-200/50 dark:border-purple-500/20 hover:bg-teal-100/50 dark:bg-purple-500/20 transition-all">Verify</button>
                     )}
                   </div>
                 ))}
@@ -377,17 +377,17 @@ export default function SettingsPage() {
           <div className="space-y-6 animate-fade-in-up">
             {/* Language */}
             <div className="glass-card p-6">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
-                <Globe className="h-5 w-5 text-purple-400" /> Language / भाषा
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2 mb-5">
+                <Globe className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Language / भाषा
               </h2>
               <div className="grid grid-cols-3 gap-3">
                 {languages.map(lang => (
                   <button key={lang.code} onClick={() => setLanguage(lang.code)}
                     className={`p-4 rounded-xl border text-center transition-all ${
-                      language === lang.code ? 'border-purple-500/50 bg-purple-500/10 shadow-[0_0_15px_rgba(147,51,234,0.2)]' : 'border-purple-500/10 bg-white/[0.02] hover:bg-white/[0.04]'
+                      language === lang.code ? 'border-purple-500/50 bg-teal-50 dark:bg-purple-500/10 shadow-[0_0_15px_rgba(147,51,234,0.2)]' : 'border-teal-100 dark:border-purple-500/10 bg-white/[0.02] hover:bg-white/[0.04]'
                     }`}>
-                    <p className="text-base font-semibold text-white mb-0.5">{lang.nativeName}</p>
-                    <p className="text-[10px] text-purple-300/40">{lang.name}</p>
+                    <p className="text-base font-semibold text-slate-800 dark:text-white mb-0.5">{lang.nativeName}</p>
+                    <p className="text-[10px] text-slate-300 dark:text-purple-300/40">{lang.name}</p>
                   </button>
                 ))}
               </div>
@@ -395,7 +395,7 @@ export default function SettingsPage() {
 
             {/* Danger Zone */}
             <div className="glass-card p-6 border-red-500/20">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2 mb-5">
                 <AlertTriangle className="h-5 w-5 text-red-400" /> Danger Zone
               </h2>
               <div className="space-y-3">
@@ -428,15 +428,15 @@ function ToggleItem({ icon: Icon, label, description, enabled, onToggle }: {
   icon: any; label: string; description: string; enabled: boolean; onToggle: () => void
 }) {
   return (
-    <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-purple-500/10 hover:border-purple-500/20 transition-all">
+    <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-teal-100 dark:border-purple-500/10 hover:border-teal-200/50 dark:border-purple-500/20 transition-all">
       <div className="flex items-center gap-3">
-        <Icon className="h-4 w-4 text-purple-300/60" />
+        <Icon className="h-4 w-4 text-slate-400 dark:text-purple-300/60" />
         <div>
-          <span className="text-sm text-white font-medium">{label}</span>
-          <p className="text-xs text-purple-300/40">{description}</p>
+          <span className="text-sm text-slate-800 dark:text-white font-medium">{label}</span>
+          <p className="text-xs text-slate-300 dark:text-purple-300/40">{description}</p>
         </div>
       </div>
-      <button onClick={onToggle} className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-purple-600' : 'bg-purple-500/20'}`}>
+      <button onClick={onToggle} className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-purple-600' : 'bg-teal-100/50 dark:bg-purple-500/20'}`}>
         <div className={`absolute top-0.5 w-5 h-5 rounded-full transition-transform ${enabled ? 'translate-x-5.5 bg-white' : 'translate-x-0.5 bg-purple-300/40'}`} style={{ transform: enabled ? 'translateX(22px)' : 'translateX(2px)' }} />
       </button>
     </div>

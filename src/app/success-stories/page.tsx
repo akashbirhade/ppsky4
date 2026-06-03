@@ -63,7 +63,7 @@ export default function SuccessStoriesPage() {
           <div className="inline-flex items-center gap-2 bg-pink-500/10 border border-pink-500/20 text-pink-300 text-xs px-4 py-2 rounded-full mb-4">
             <Heart className="h-3.5 w-3.5" /> Love Stories
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3">
+          <h1 className="text-4xl sm:text-5xl font-bold text-slate-800 dark:text-white mb-3">
             Real <span className="gradient-text">Success Stories</span>
           </h1>
           <p className="text-purple-200/40 max-w-lg mx-auto text-sm">
@@ -80,7 +80,7 @@ export default function SuccessStoriesPage() {
           ].map(([num, label], i) => (
             <div key={i} className="glass-card !p-4 text-center">
               <p className="text-lg sm:text-xl font-bold gradient-text">{num}</p>
-              <p className="text-[10px] text-purple-300/40 mt-0.5">{label}</p>
+              <p className="text-[10px] text-slate-300 dark:text-purple-300/40 mt-0.5">{label}</p>
             </div>
           ))}
         </div>
@@ -94,8 +94,8 @@ export default function SuccessStoriesPage() {
                   {story.image}
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white group-hover:text-pink-200 transition-colors">{story.couple}</h3>
-                  <p className="text-[11px] text-purple-300/40">{story.location} • {story.year}</p>
+                  <h3 className="text-base font-bold text-slate-800 dark:text-white group-hover:text-pink-200 transition-colors">{story.couple}</h3>
+                  <p className="text-[11px] text-slate-300 dark:text-purple-300/40">{story.location} • {story.year}</p>
                 </div>
                 <div className="ml-auto flex gap-0.5">
                   {[1,2,3,4,5].map(s => <Star key={s} className="h-3 w-3 text-amber-400 fill-amber-400" />)}
@@ -103,11 +103,11 @@ export default function SuccessStoriesPage() {
               </div>
 
               <div className="relative pl-4 border-l-2 border-pink-500/20 mb-4">
-                <Quote className="absolute -top-1 -left-3 h-5 w-5 text-pink-400/30 bg-dark-900 p-0.5" />
-                <p className="text-sm text-purple-200/60 italic leading-relaxed">{story.quote}</p>
+                <Quote className="absolute -top-1 -left-3 h-5 w-5 text-pink-400/30 bg-white dark:bg-dark-900 p-0.5" />
+                <p className="text-sm text-slate-500 dark:text-purple-200/60 italic leading-relaxed">{story.quote}</p>
               </div>
 
-              <p className="text-xs text-purple-300/40 leading-relaxed">{story.story}</p>
+              <p className="text-xs text-slate-300 dark:text-purple-300/40 leading-relaxed">{story.story}</p>
             </div>
           ))}
         </div>
@@ -115,8 +115,8 @@ export default function SuccessStoriesPage() {
         {/* CTA */}
         <div className="glass-card text-center border-pink-500/10 animate-fade-in-up delay-500" style={{opacity:0}}>
           <Heart className="h-10 w-10 text-pink-400/60 mx-auto mb-3 animate-heartbeat" />
-          <h2 className="text-2xl font-bold text-white mb-2">Write Your Own Love Story</h2>
-          <p className="text-sm text-purple-300/40 mb-5 max-w-md mx-auto">
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Write Your Own Love Story</h2>
+          <p className="text-sm text-slate-300 dark:text-purple-300/40 mb-5 max-w-md mx-auto">
             Join millions who found their life partner. Your story could be next.
           </p>
           <Link href="/register" className="btn-primary inline-flex items-center gap-2 px-8 py-3">

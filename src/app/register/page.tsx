@@ -59,15 +59,15 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-mesh flex items-center justify-center py-20 px-4">
       {/* Background elements */}
-      <div className="absolute top-20 right-20 w-64 h-64 bg-purple-600/10 rounded-full blur-[80px] animate-float" />
+      <div className="absolute top-20 right-20 w-64 h-64 bg-teal-50 dark:bg-purple-600/10 rounded-full blur-[80px] animate-float" />
       <div className="absolute bottom-20 left-20 w-80 h-80 bg-fuchsia-600/10 rounded-full blur-[100px] animate-float-slow" />
 
       <div className="relative w-full max-w-lg">
         {/* Logo */}
         <div className="text-center mb-8 animate-fade-in-up">
           <HalfHeart className="h-10 w-10 mx-auto mb-3 animate-heartbeat" />
-          <h1 className="text-3xl font-bold text-white">Join Soulmate Sync</h1>
-          <p className="text-purple-300/50 mt-1">Begin your journey to forever</p>
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Join Soulmate Sync</h1>
+          <p className="text-slate-400 dark:text-purple-300/50 mt-1">Begin your journey to forever</p>
         </div>
 
         {/* Progress */}
@@ -76,12 +76,12 @@ export default function RegisterPage() {
             <div key={i} className="flex items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 ${
                 step >= i 
-                  ? 'bg-purple-600 text-white shadow-[0_0_20px_rgba(147,51,234,0.4)]' 
-                  : 'bg-white/5 text-purple-300/40 border border-purple-500/20'
+                  ? 'bg-purple-600 text-slate-800 dark:text-white shadow-[0_0_20px_rgba(147,51,234,0.4)]' 
+                  : 'bg-white/5 text-slate-300 dark:text-purple-300/40 border border-teal-200/50 dark:border-purple-500/20'
               }`}>
                 {step > i ? <CheckCircle className="h-4 w-4" /> : i}
               </div>
-              {i < 3 && <div className={`w-12 h-0.5 mx-1 transition-all duration-500 ${step > i ? 'bg-purple-500' : 'bg-purple-500/20'}`} />}
+              {i < 3 && <div className={`w-12 h-0.5 mx-1 transition-all duration-500 ${step > i ? 'bg-purple-500' : 'bg-teal-100/50 dark:bg-purple-500/20'}`} />}
             </div>
           ))}
         </div>
@@ -98,20 +98,20 @@ export default function RegisterPage() {
             {/* Step 1: Basic Info */}
             {step === 1 && (
               <div className="space-y-4 animate-fade-in-up">
-                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-purple-400" /> Let&apos;s get started
+                <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Let&apos;s get started
                 </h2>
                 <div>
-                  <label className="block text-sm text-purple-200/60 mb-1.5">Full Name</label>
+                  <label className="block text-sm text-slate-500 dark:text-purple-200/60 mb-1.5">Full Name</label>
                   <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-400/50" />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-teal-600 dark:text-purple-400/50" />
                     <input type="text" name="name" value={formData.name} onChange={handleChange} className="input-field pl-11" placeholder="Enter your full name" required />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-purple-200/60 mb-1.5">Email Address</label>
+                  <label className="block text-sm text-slate-500 dark:text-purple-200/60 mb-1.5">Email Address</label>
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-400/50" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-teal-600 dark:text-purple-400/50" />
                     <input type="email" name="email" value={formData.email} onChange={handleChange} className="input-field pl-11" placeholder="Enter your email" required />
                   </div>
                 </div>
@@ -124,31 +124,31 @@ export default function RegisterPage() {
             {/* Step 2: Personal Details */}
             {step === 2 && (
               <div className="space-y-4 animate-fade-in-up">
-                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                  <Users className="h-5 w-5 text-purple-400" /> Tell us about you
+                <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2">
+                  <Users className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Tell us about you
                 </h2>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm text-purple-200/60 mb-1.5">I am a</label>
+                    <label className="block text-sm text-slate-500 dark:text-purple-200/60 mb-1.5">I am a</label>
                     <select name="gender" value={formData.gender} onChange={handleChange} className="input-field" required>
-                      <option value="" className="bg-dark-900">Select</option>
-                      <option value="Male" className="bg-dark-900">Male</option>
-                      <option value="Female" className="bg-dark-900">Female</option>
+                      <option value="" className="bg-white dark:bg-dark-900">Select</option>
+                      <option value="Male" className="bg-white dark:bg-dark-900">Male</option>
+                      <option value="Female" className="bg-white dark:bg-dark-900">Female</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm text-purple-200/60 mb-1.5">Looking for</label>
+                    <label className="block text-sm text-slate-500 dark:text-purple-200/60 mb-1.5">Looking for</label>
                     <select name="lookingFor" value={formData.lookingFor} onChange={handleChange} className="input-field">
-                      <option value="" className="bg-dark-900">Select</option>
-                      <option value="Bride" className="bg-dark-900">Bride</option>
-                      <option value="Groom" className="bg-dark-900">Groom</option>
+                      <option value="" className="bg-white dark:bg-dark-900">Select</option>
+                      <option value="Bride" className="bg-white dark:bg-dark-900">Bride</option>
+                      <option value="Groom" className="bg-white dark:bg-dark-900">Groom</option>
                     </select>
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-purple-200/60 mb-1.5">Date of Birth</label>
+                  <label className="block text-sm text-slate-500 dark:text-purple-200/60 mb-1.5">Date of Birth</label>
                   <div className="relative">
-                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-400/50" />
+                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-teal-600 dark:text-purple-400/50" />
                     <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} className="input-field pl-11" required />
                   </div>
                 </div>
@@ -166,25 +166,25 @@ export default function RegisterPage() {
             {/* Step 3: Password */}
             {step === 3 && (
               <div className="space-y-4 animate-fade-in-up">
-                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                  <Lock className="h-5 w-5 text-purple-400" /> Secure your account
+                <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2">
+                  <Lock className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Secure your account
                 </h2>
                 <div>
-                  <label className="block text-sm text-purple-200/60 mb-1.5">Password</label>
+                  <label className="block text-sm text-slate-500 dark:text-purple-200/60 mb-1.5">Password</label>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-400/50" />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-teal-600 dark:text-purple-400/50" />
                     <input type="password" name="password" value={formData.password} onChange={handleChange} className="input-field pl-11" placeholder="Min 6 characters" required minLength={6} />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-purple-200/60 mb-1.5">Confirm Password</label>
+                  <label className="block text-sm text-slate-500 dark:text-purple-200/60 mb-1.5">Confirm Password</label>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-400/50" />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-teal-600 dark:text-purple-400/50" />
                     <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className="input-field pl-11" placeholder="Re-enter password" required />
                   </div>
                 </div>
-                <label className="flex items-start gap-2 text-xs text-purple-300/50">
-                  <input type="checkbox" className="mt-0.5 rounded bg-white/5 border-purple-500/30" required />
+                <label className="flex items-start gap-2 text-xs text-slate-400 dark:text-purple-300/50">
+                  <input type="checkbox" className="mt-0.5 rounded bg-white/5 border-teal-200 dark:border-purple-500/30" required />
                   I agree to the Terms of Service and Privacy Policy. I confirm I am 18+ years old.
                 </label>
                 <div className="flex gap-3">
@@ -199,10 +199,10 @@ export default function RegisterPage() {
             )}
           </form>
 
-          <div className="mt-6 text-center border-t border-purple-500/10 pt-5">
-            <p className="text-sm text-purple-300/50">
+          <div className="mt-6 text-center border-t border-teal-100 dark:border-purple-500/10 pt-5">
+            <p className="text-sm text-slate-400 dark:text-purple-300/50">
               Already have an account?{' '}
-              <Link href="/login" className="text-purple-300 hover:text-white transition-colors font-medium">Sign In</Link>
+              <Link href="/login" className="text-slate-600 dark:text-purple-300 hover:text-slate-800 dark:text-white transition-colors font-medium">Sign In</Link>
             </p>
           </div>
         </div>

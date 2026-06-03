@@ -116,18 +116,18 @@ export default function MeetingPage() {
           <div className="inline-flex items-center gap-2 bg-pink-500/10 border border-pink-500/20 text-pink-300 text-xs px-4 py-2 rounded-full mb-4">
             <Heart className="h-3.5 w-3.5" /> Meeting Assistant
           </div>
-          <h1 className="text-3xl font-bold text-white">Plan Your Perfect Meeting</h1>
-          <p className="text-purple-200/50 mt-2">AI-powered tools to help you plan, prepare, and enjoy your meetings</p>
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Plan Your Perfect Meeting</h1>
+          <p className="text-slate-500 dark:text-purple-200/50 mt-2">AI-powered tools to help you plan, prepare, and enjoy your meetings</p>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 bg-white/[0.03] p-1.5 rounded-2xl border border-purple-500/10 overflow-x-auto">
+        <div className="flex gap-1 mb-6 bg-white/[0.03] p-1.5 rounded-2xl border border-teal-100 dark:border-purple-500/10 overflow-x-auto">
           {tabs.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'bg-purple-600/30 text-white border border-purple-500/30 shadow-[0_0_15px_rgba(147,51,234,0.2)]'
-                  : 'text-purple-300/50 hover:text-purple-200 hover:bg-white/5'
+                  ? 'bg-purple-600/30 text-slate-800 dark:text-white border border-teal-200 dark:border-purple-500/30 shadow-[0_0_15px_rgba(147,51,234,0.2)]'
+                  : 'text-slate-400 dark:text-purple-300/50 hover:text-slate-700 dark:text-purple-200 hover:bg-white/5'
               }`}>
               <tab.icon className="h-4 w-4" /> {tab.label}
             </button>
@@ -139,64 +139,64 @@ export default function MeetingPage() {
           <div className="space-y-6 animate-fade-in-up">
             {/* Quick Actions */}
             <div className="grid sm:grid-cols-3 gap-4">
-              <button onClick={() => setShowNewMeeting(true)} className="glass-card !p-5 text-left hover:border-purple-500/30 transition-all group">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-3 group-hover:bg-purple-500/20 transition-colors">
-                  <Coffee className="h-5 w-5 text-purple-400" />
+              <button onClick={() => setShowNewMeeting(true)} className="glass-card !p-5 text-left hover:border-teal-200 dark:border-purple-500/30 transition-all group">
+                <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-purple-500/10 border border-teal-200/50 dark:border-purple-500/20 flex items-center justify-center mb-3 group-hover:bg-teal-100/50 dark:bg-purple-500/20 transition-colors">
+                  <Coffee className="h-5 w-5 text-teal-600 dark:text-purple-400" />
                 </div>
-                <h3 className="text-sm font-semibold text-white mb-1">Coffee Date</h3>
-                <p className="text-[11px] text-purple-300/40">Casual first meeting</p>
+                <h3 className="text-sm font-semibold text-slate-800 dark:text-white mb-1">Coffee Date</h3>
+                <p className="text-[11px] text-slate-300 dark:text-purple-300/40">Casual first meeting</p>
               </button>
-              <button onClick={() => { setShowNewMeeting(true); setNewMeeting(p => ({...p, type: 'video'})) }} className="glass-card !p-5 text-left hover:border-purple-500/30 transition-all group">
+              <button onClick={() => { setShowNewMeeting(true); setNewMeeting(p => ({...p, type: 'video'})) }} className="glass-card !p-5 text-left hover:border-teal-200 dark:border-purple-500/30 transition-all group">
                 <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-3 group-hover:bg-blue-500/20 transition-colors">
                   <Video className="h-5 w-5 text-blue-400" />
                 </div>
-                <h3 className="text-sm font-semibold text-white mb-1">Video Call</h3>
-                <p className="text-[11px] text-purple-300/40">Virtual face-to-face</p>
+                <h3 className="text-sm font-semibold text-slate-800 dark:text-white mb-1">Video Call</h3>
+                <p className="text-[11px] text-slate-300 dark:text-purple-300/40">Virtual face-to-face</p>
               </button>
-              <button onClick={() => { setShowNewMeeting(true); setNewMeeting(p => ({...p, type: 'family'})) }} className="glass-card !p-5 text-left hover:border-purple-500/30 transition-all group">
+              <button onClick={() => { setShowNewMeeting(true); setNewMeeting(p => ({...p, type: 'family'})) }} className="glass-card !p-5 text-left hover:border-teal-200 dark:border-purple-500/30 transition-all group">
                 <div className="w-10 h-10 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mb-3 group-hover:bg-pink-500/20 transition-colors">
                   <Users className="h-5 w-5 text-pink-400" />
                 </div>
-                <h3 className="text-sm font-semibold text-white mb-1">Family Meet</h3>
-                <p className="text-[11px] text-purple-300/40">Introduce families</p>
+                <h3 className="text-sm font-semibold text-slate-800 dark:text-white mb-1">Family Meet</h3>
+                <p className="text-[11px] text-slate-300 dark:text-purple-300/40">Introduce families</p>
               </button>
             </div>
 
             {/* New Meeting Form */}
             {showNewMeeting && (
               <div className="glass-card animate-fade-in-up">
-                <h3 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
-                  <Plus className="h-5 w-5 text-purple-400" /> Schedule New Meeting
+                <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-5 flex items-center gap-2">
+                  <Plus className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Schedule New Meeting
                 </h3>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-purple-200/50 mb-1.5">Partner Name</label>
+                    <label className="block text-xs text-slate-500 dark:text-purple-200/50 mb-1.5">Partner Name</label>
                     <input type="text" value={newMeeting.partnerName} onChange={e => setNewMeeting(p => ({...p, partnerName: e.target.value}))} className="input-field" placeholder="Enter name..." />
                   </div>
                   <div>
-                    <label className="block text-xs text-purple-200/50 mb-1.5">Meeting Type</label>
+                    <label className="block text-xs text-slate-500 dark:text-purple-200/50 mb-1.5">Meeting Type</label>
                     <select value={newMeeting.type} onChange={e => setNewMeeting(p => ({...p, type: e.target.value as Meeting['type']}))} className="input-field">
-                      <option value="coffee" className="bg-dark-900">Coffee Date</option>
-                      <option value="video" className="bg-dark-900">Video Call</option>
-                      <option value="restaurant" className="bg-dark-900">Restaurant</option>
-                      <option value="family" className="bg-dark-900">Family Meeting</option>
-                      <option value="virtual" className="bg-dark-900">Virtual Date</option>
+                      <option value="coffee" className="bg-white dark:bg-dark-900">Coffee Date</option>
+                      <option value="video" className="bg-white dark:bg-dark-900">Video Call</option>
+                      <option value="restaurant" className="bg-white dark:bg-dark-900">Restaurant</option>
+                      <option value="family" className="bg-white dark:bg-dark-900">Family Meeting</option>
+                      <option value="virtual" className="bg-white dark:bg-dark-900">Virtual Date</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-purple-200/50 mb-1.5">Date</label>
+                    <label className="block text-xs text-slate-500 dark:text-purple-200/50 mb-1.5">Date</label>
                     <input type="date" value={newMeeting.date} onChange={e => setNewMeeting(p => ({...p, date: e.target.value}))} className="input-field" />
                   </div>
                   <div>
-                    <label className="block text-xs text-purple-200/50 mb-1.5">Time</label>
+                    <label className="block text-xs text-slate-500 dark:text-purple-200/50 mb-1.5">Time</label>
                     <input type="time" value={newMeeting.time} onChange={e => setNewMeeting(p => ({...p, time: e.target.value}))} className="input-field" />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="block text-xs text-purple-200/50 mb-1.5">Location (optional)</label>
+                    <label className="block text-xs text-slate-500 dark:text-purple-200/50 mb-1.5">Location (optional)</label>
                     <input type="text" value={newMeeting.location} onChange={e => setNewMeeting(p => ({...p, location: e.target.value}))} className="input-field" placeholder="Venue or meeting link..." />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="block text-xs text-purple-200/50 mb-1.5">Notes</label>
+                    <label className="block text-xs text-slate-500 dark:text-purple-200/50 mb-1.5">Notes</label>
                     <textarea value={newMeeting.notes} onChange={e => setNewMeeting(p => ({...p, notes: e.target.value}))} className="input-field resize-none" rows={2} placeholder="Any notes for this meeting..." />
                   </div>
                 </div>
@@ -211,33 +211,33 @@ export default function MeetingPage() {
 
             {/* Upcoming Meetings */}
             <div className="glass-card">
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <Clock className="h-5 w-5 text-purple-400" /> Your Meetings
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                <Clock className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Your Meetings
               </h3>
               {meetings.length === 0 ? (
                 <div className="text-center py-10">
-                  <Calendar className="h-12 w-12 text-purple-400/20 mx-auto mb-3" />
+                  <Calendar className="h-12 w-12 text-teal-600 dark:text-purple-400/20 mx-auto mb-3" />
                   <p className="text-sm text-purple-200/40">No meetings scheduled yet</p>
-                  <p className="text-xs text-purple-300/30 mt-1">Schedule your first meeting to get started</p>
+                  <p className="text-xs text-slate-300 dark:text-purple-300/30 mt-1">Schedule your first meeting to get started</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {meetings.map(meeting => (
-                    <div key={meeting.id} className="flex items-center gap-4 p-4 bg-white/[0.02] rounded-xl border border-purple-500/10 hover:border-purple-500/20 transition-all">
+                    <div key={meeting.id} className="flex items-center gap-4 p-4 bg-white/[0.02] rounded-xl border border-teal-100 dark:border-purple-500/10 hover:border-teal-200/50 dark:border-purple-500/20 transition-all">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                         meeting.type === 'coffee' ? 'bg-amber-500/10' :
                         meeting.type === 'video' ? 'bg-blue-500/10' :
-                        meeting.type === 'family' ? 'bg-pink-500/10' : 'bg-purple-500/10'
+                        meeting.type === 'family' ? 'bg-pink-500/10' : 'bg-teal-50 dark:bg-purple-500/10'
                       }`}>
                         {meeting.type === 'coffee' && <Coffee className="h-5 w-5 text-amber-400" />}
                         {meeting.type === 'video' && <Video className="h-5 w-5 text-blue-400" />}
                         {meeting.type === 'family' && <Users className="h-5 w-5 text-pink-400" />}
                         {meeting.type === 'restaurant' && <MapPin className="h-5 w-5 text-green-400" />}
-                        {meeting.type === 'virtual' && <Phone className="h-5 w-5 text-purple-400" />}
+                        {meeting.type === 'virtual' && <Phone className="h-5 w-5 text-teal-600 dark:text-purple-400" />}
                       </div>
                       <div className="flex-1">
-                        <h4 className="text-sm font-medium text-white">{meeting.partnerName}</h4>
-                        <p className="text-xs text-purple-300/50">{meeting.date} at {meeting.time} {meeting.location && `• ${meeting.location}`}</p>
+                        <h4 className="text-sm font-medium text-slate-800 dark:text-white">{meeting.partnerName}</h4>
+                        <p className="text-xs text-slate-400 dark:text-purple-300/50">{meeting.date} at {meeting.time} {meeting.location && `• ${meeting.location}`}</p>
                       </div>
                       <span className={`text-[10px] px-2.5 py-1 rounded-full ${
                         meeting.status === 'scheduled' ? 'bg-blue-500/10 text-blue-300 border border-blue-500/20' :
@@ -259,16 +259,16 @@ export default function MeetingPage() {
           <div className="space-y-6 animate-fade-in-up">
             {/* AI Ice Breaker Card */}
             <div className="glass-card text-center relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-600/10 rounded-full blur-[60px]" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-teal-50 dark:bg-purple-600/10 rounded-full blur-[60px]" />
               <div className="relative">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 border border-purple-500/20 flex items-center justify-center mx-auto mb-4">
-                  <Brain className="h-7 w-7 text-purple-400" />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 border border-teal-200/50 dark:border-purple-500/20 flex items-center justify-center mx-auto mb-4">
+                  <Brain className="h-7 w-7 text-teal-600 dark:text-purple-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-2">AI Conversation Starter</h3>
-                <p className="text-purple-300/40 text-sm mb-6">Perfect questions to break the ice</p>
+                <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">AI Conversation Starter</h3>
+                <p className="text-slate-300 dark:text-purple-300/40 text-sm mb-6">Perfect questions to break the ice</p>
                 
-                <div className="bg-purple-500/5 border border-purple-500/10 rounded-2xl p-6 mb-4">
-                  <p className="text-lg text-white font-medium leading-relaxed">&ldquo;{iceBreakers[currentIceBreaker]}&rdquo;</p>
+                <div className="bg-teal-50/50 dark:bg-purple-500/5 border border-teal-100 dark:border-purple-500/10 rounded-2xl p-6 mb-4">
+                  <p className="text-lg text-slate-800 dark:text-white font-medium leading-relaxed">&ldquo;{iceBreakers[currentIceBreaker]}&rdquo;</p>
                 </div>
                 
                 <button onClick={nextIceBreaker} className="btn-primary px-6 py-2.5 text-sm flex items-center gap-2 mx-auto">
@@ -279,8 +279,8 @@ export default function MeetingPage() {
 
             {/* Conversation Topics by Category */}
             <div className="glass-card">
-              <h3 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
-                <MessageCircle className="h-5 w-5 text-purple-400" /> Conversation Topics
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-5 flex items-center gap-2">
+                <MessageCircle className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Conversation Topics
               </h3>
               
               <div className="flex gap-2 mb-5 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
@@ -288,8 +288,8 @@ export default function MeetingPage() {
                   <button key={cat.category} onClick={() => setSelectedCategory(i)}
                     className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
                       selectedCategory === i
-                        ? 'bg-purple-600/30 text-white border border-purple-500/30'
-                        : 'bg-white/[0.03] text-purple-300/50 border border-purple-500/10 hover:bg-purple-500/10'
+                        ? 'bg-purple-600/30 text-slate-800 dark:text-white border border-teal-200 dark:border-purple-500/30'
+                        : 'bg-white/[0.03] text-slate-400 dark:text-purple-300/50 border border-teal-100 dark:border-purple-500/10 hover:bg-teal-50 dark:bg-purple-500/10'
                     }`}>
                     {cat.category}
                   </button>
@@ -298,9 +298,9 @@ export default function MeetingPage() {
 
               <div className="space-y-3">
                 {conversationStarters[selectedCategory].questions.map((q, i) => (
-                  <div key={i} className="flex items-start gap-3 p-4 bg-white/[0.02] rounded-xl border border-purple-500/10">
-                    <span className="w-6 h-6 rounded-full bg-purple-500/10 flex items-center justify-center text-[10px] text-purple-300 shrink-0">{i + 1}</span>
-                    <p className="text-sm text-purple-200/70">{q}</p>
+                  <div key={i} className="flex items-start gap-3 p-4 bg-white/[0.02] rounded-xl border border-teal-100 dark:border-purple-500/10">
+                    <span className="w-6 h-6 rounded-full bg-teal-50 dark:bg-purple-500/10 flex items-center justify-center text-[10px] text-slate-600 dark:text-purple-300 shrink-0">{i + 1}</span>
+                    <p className="text-sm text-slate-500 dark:text-purple-200/70">{q}</p>
                   </div>
                 ))}
               </div>
@@ -308,7 +308,7 @@ export default function MeetingPage() {
 
             {/* Follow-up Tips */}
             <div className="glass-card">
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                 <Star className="h-5 w-5 text-amber-400" /> Follow-up Suggestions
               </h3>
               <div className="space-y-3">
@@ -320,8 +320,8 @@ export default function MeetingPage() {
                   'Share your feelings with family for their input'
                 ].map((tip, i) => (
                   <div key={i} className="flex items-center gap-3 p-3 bg-white/[0.02] rounded-xl">
-                    <ChevronRight className="h-4 w-4 text-purple-400/60 shrink-0" />
-                    <span className="text-sm text-purple-200/60">{tip}</span>
+                    <ChevronRight className="h-4 w-4 text-teal-600 dark:text-purple-400/60 shrink-0" />
+                    <span className="text-sm text-slate-500 dark:text-purple-200/60">{tip}</span>
                   </div>
                 ))}
               </div>
@@ -333,22 +333,22 @@ export default function MeetingPage() {
         {activeTab === 'venues' && (
           <div className="space-y-6 animate-fade-in-up">
             <div className="glass-card">
-              <h3 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-purple-400" /> Recommended Venues
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-5 flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Recommended Venues
               </h3>
-              <p className="text-xs text-purple-300/40 mb-5">AI-curated venues perfect for a first meeting</p>
+              <p className="text-xs text-slate-300 dark:text-purple-300/40 mb-5">AI-curated venues perfect for a first meeting</p>
 
               <div className="grid sm:grid-cols-2 gap-4">
                 {restaurantSuggestions.map((venue, i) => (
-                  <div key={i} className="p-4 bg-white/[0.02] rounded-xl border border-purple-500/10 hover:border-purple-500/20 transition-all">
+                  <div key={i} className="p-4 bg-white/[0.02] rounded-xl border border-teal-100 dark:border-purple-500/10 hover:border-teal-200/50 dark:border-purple-500/20 transition-all">
                     <div className="flex items-start justify-between mb-2">
-                      <h4 className="text-sm font-semibold text-white">{venue.name}</h4>
+                      <h4 className="text-sm font-semibold text-slate-800 dark:text-white">{venue.name}</h4>
                       <div className="flex items-center gap-1 text-[10px] text-amber-400">
                         <Star className="h-3 w-3 fill-amber-400" /> {venue.rating}
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-purple-300/50">
-                      <span className="px-2 py-0.5 bg-purple-500/10 rounded-full">{venue.type}</span>
+                    <div className="flex items-center gap-3 text-xs text-slate-400 dark:text-purple-300/50">
+                      <span className="px-2 py-0.5 bg-teal-50 dark:bg-purple-500/10 rounded-full">{venue.type}</span>
                       <span>{venue.cuisine}</span>
                       <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {venue.distance}</span>
                     </div>
@@ -359,14 +359,14 @@ export default function MeetingPage() {
 
             {/* Virtual Date Ideas */}
             <div className="glass-card">
-              <h3 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-5 flex items-center gap-2">
                 <Video className="h-5 w-5 text-blue-400" /> Virtual Date Ideas
               </h3>
               <div className="grid sm:grid-cols-2 gap-3">
                 {['Cook Together Over Video', 'Watch a Movie Simultaneously', 'Play Online Games Together', 'Virtual Temple/Museum Tour', 'Stargazing Video Call', 'Book Discussion Session'].map((idea, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 bg-white/[0.02] rounded-xl border border-purple-500/10">
-                    <Sparkles className="h-4 w-4 text-purple-400/60 shrink-0" />
-                    <span className="text-sm text-purple-200/60">{idea}</span>
+                  <div key={i} className="flex items-center gap-3 p-3 bg-white/[0.02] rounded-xl border border-teal-100 dark:border-purple-500/10">
+                    <Sparkles className="h-4 w-4 text-teal-600 dark:text-purple-400/60 shrink-0" />
+                    <span className="text-sm text-slate-500 dark:text-purple-200/60">{idea}</span>
                   </div>
                 ))}
               </div>
@@ -378,17 +378,17 @@ export default function MeetingPage() {
         {activeTab === 'checklist' && (
           <div className="space-y-6 animate-fade-in-up">
             <div className="glass-card">
-              <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2 flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-400" /> Meeting Preparation
               </h3>
-              <p className="text-xs text-purple-300/40 mb-5">Complete these before your meeting</p>
+              <p className="text-xs text-slate-300 dark:text-purple-300/40 mb-5">Complete these before your meeting</p>
 
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-purple-300/50">Progress</span>
-                  <span className="text-xs text-purple-200">{checklist.filter(c => c.done).length}/{checklist.length}</span>
+                  <span className="text-xs text-slate-400 dark:text-purple-300/50">Progress</span>
+                  <span className="text-xs text-slate-700 dark:text-purple-200">{checklist.filter(c => c.done).length}/{checklist.length}</span>
                 </div>
-                <div className="w-full h-2 bg-purple-500/10 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-teal-50 dark:bg-purple-500/10 rounded-full overflow-hidden">
                   <div className="h-full bg-gradient-to-r from-purple-500 to-green-500 rounded-full transition-all duration-500" style={{ width: `${(checklist.filter(c => c.done).length / checklist.length) * 100}%` }} />
                 </div>
               </div>
@@ -399,14 +399,14 @@ export default function MeetingPage() {
                     className={`w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${
                       item.done
                         ? 'bg-green-500/5 border-green-500/20'
-                        : 'bg-white/[0.02] border-purple-500/10 hover:border-purple-500/20'
+                        : 'bg-white/[0.02] border-teal-100 dark:border-purple-500/10 hover:border-teal-200/50 dark:border-purple-500/20'
                     }`}>
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                      item.done ? 'border-green-400 bg-green-400' : 'border-purple-500/30'
+                      item.done ? 'border-green-400 bg-green-400' : 'border-teal-200 dark:border-purple-500/30'
                     }`}>
-                      {item.done && <CheckCircle className="h-3 w-3 text-white" />}
+                      {item.done && <CheckCircle className="h-3 w-3 text-slate-800 dark:text-white" />}
                     </div>
-                    <span className={`text-sm ${item.done ? 'text-green-300/70 line-through' : 'text-purple-200/70'}`}>
+                    <span className={`text-sm ${item.done ? 'text-green-300/70 line-through' : 'text-slate-500 dark:text-purple-200/70'}`}>
                       {item.text}
                     </span>
                   </button>
@@ -420,16 +420,16 @@ export default function MeetingPage() {
         {activeTab === 'timeline' && (
           <div className="space-y-6 animate-fade-in-up">
             <div className="glass-card">
-              <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2 flex items-center gap-2">
                 <Heart className="h-5 w-5 text-pink-400" /> Relationship Timeline
               </h3>
-              <p className="text-xs text-purple-300/40 mb-6">Track your journey together</p>
+              <p className="text-xs text-slate-300 dark:text-purple-300/40 mb-6">Track your journey together</p>
 
               {meetings.length === 0 ? (
                 <div className="text-center py-10">
-                  <Heart className="h-12 w-12 text-purple-400/20 mx-auto mb-3" />
+                  <Heart className="h-12 w-12 text-teal-600 dark:text-purple-400/20 mx-auto mb-3" />
                   <p className="text-sm text-purple-200/40">Your timeline will appear here</p>
-                  <p className="text-xs text-purple-300/30 mt-1">Schedule meetings to start building your timeline</p>
+                  <p className="text-xs text-slate-300 dark:text-purple-300/30 mt-1">Schedule meetings to start building your timeline</p>
                 </div>
               ) : (
                 <div className="relative pl-8">
@@ -437,12 +437,12 @@ export default function MeetingPage() {
                   {meetings.map((meeting, i) => (
                     <div key={meeting.id} className="relative mb-6 last:mb-0">
                       <div className="absolute -left-5 w-4 h-4 rounded-full bg-purple-500 border-2 border-dark-900 shadow-[0_0_10px_rgba(147,51,234,0.5)]" />
-                      <div className="p-4 bg-white/[0.02] rounded-xl border border-purple-500/10">
+                      <div className="p-4 bg-white/[0.02] rounded-xl border border-teal-100 dark:border-purple-500/10">
                         <div className="flex items-center justify-between mb-1">
-                          <h4 className="text-sm font-medium text-white">{meeting.partnerName}</h4>
-                          <span className="text-[10px] text-purple-300/40">{meeting.date}</span>
+                          <h4 className="text-sm font-medium text-slate-800 dark:text-white">{meeting.partnerName}</h4>
+                          <span className="text-[10px] text-slate-300 dark:text-purple-300/40">{meeting.date}</span>
                         </div>
-                        <p className="text-xs text-purple-300/50 capitalize">{meeting.type} meeting at {meeting.time}</p>
+                        <p className="text-xs text-slate-400 dark:text-purple-300/50 capitalize">{meeting.type} meeting at {meeting.time}</p>
                         {meeting.notes && <p className="text-xs text-purple-200/40 mt-2 italic">{meeting.notes}</p>}
                       </div>
                     </div>

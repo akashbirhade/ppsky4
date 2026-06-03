@@ -92,7 +92,7 @@ export default function PremiumPage() {
           <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs px-4 py-2 rounded-full mb-4">
             <Crown className="h-3.5 w-3.5" /> Premium Membership
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3">
+          <h1 className="text-4xl sm:text-5xl font-bold text-slate-800 dark:text-white mb-3">
             Find Love <span className="gradient-text">Faster</span>
           </h1>
           <p className="text-purple-200/40 max-w-lg mx-auto text-sm">
@@ -102,11 +102,11 @@ export default function PremiumPage() {
 
         {/* Billing Toggle */}
         <div className="flex items-center justify-center gap-3 mb-10 animate-fade-in-up delay-100" style={{opacity:0}}>
-          <span className={`text-sm ${billingCycle === 'monthly' ? 'text-white' : 'text-purple-300/40'}`}>Monthly</span>
-          <button onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')} className="relative w-12 h-6 bg-purple-600/30 rounded-full border border-purple-500/20 transition-colors">
+          <span className={`text-sm ${billingCycle === 'monthly' ? 'text-slate-800 dark:text-white' : 'text-slate-300 dark:text-purple-300/40'}`}>Monthly</span>
+          <button onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')} className="relative w-12 h-6 bg-purple-600/30 rounded-full border border-teal-200/50 dark:border-purple-500/20 transition-colors">
             <div className={`absolute top-0.5 w-5 h-5 bg-gradient-to-r from-purple-500 to-fuchsia-500 rounded-full transition-transform ${billingCycle === 'yearly' ? 'translate-x-6' : 'translate-x-0.5'}`} />
           </button>
-          <span className={`text-sm ${billingCycle === 'yearly' ? 'text-white' : 'text-purple-300/40'}`}>Yearly</span>
+          <span className={`text-sm ${billingCycle === 'yearly' ? 'text-slate-800 dark:text-white' : 'text-slate-300 dark:text-purple-300/40'}`}>Yearly</span>
           <span className="text-[10px] bg-green-500/10 text-green-400 px-2 py-0.5 rounded-full border border-green-500/20">Save 40%</span>
         </div>
 
@@ -119,7 +119,7 @@ export default function PremiumPage() {
               className={`relative glass-card cursor-pointer transition-all duration-300 animate-fade-in-up ${
                 selectedPlan === plan.id
                   ? 'border-purple-500/40 shadow-[0_0_40px_' + plan.glow + '] scale-[1.02]'
-                  : 'hover:border-purple-500/20 hover:scale-[1.01]'
+                  : 'hover:border-teal-200/50 dark:border-purple-500/20 hover:scale-[1.01]'
               } ${plan.popular ? 'md:-mt-4 md:mb-4' : ''}`}
               style={{animationDelay: `${i * 0.1 + 0.2}s`, opacity: 0}}
             >
@@ -131,12 +131,12 @@ export default function PremiumPage() {
 
               <div className="text-center mb-6">
                 <div className={`w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br ${plan.color} flex items-center justify-center mb-3 shadow-lg`}>
-                  <plan.icon className="h-7 w-7 text-white" />
+                  <plan.icon className="h-7 w-7 text-slate-800 dark:text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-white">{plan.name}</h3>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white">{plan.name}</h3>
                 <div className="mt-2">
-                  <span className="text-3xl font-bold text-white">{plan.price}</span>
-                  <span className="text-sm text-purple-300/40">/{plan.duration}</span>
+                  <span className="text-3xl font-bold text-slate-800 dark:text-white">{plan.price}</span>
+                  <span className="text-sm text-slate-300 dark:text-purple-300/40">/{plan.duration}</span>
                 </div>
               </div>
 
@@ -144,7 +144,7 @@ export default function PremiumPage() {
                 {plan.features.map((feature, fi) => (
                   <li key={fi} className="flex items-start gap-2">
                     <Check className="h-4 w-4 text-green-400 mt-0.5 shrink-0" />
-                    <span className="text-sm text-purple-200/60">{feature}</span>
+                    <span className="text-sm text-slate-500 dark:text-purple-200/60">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -152,7 +152,7 @@ export default function PremiumPage() {
               <button onClick={selectedPlan === plan.id ? handleGetStarted : () => setSelectedPlan(plan.id)} className={`w-full py-3 rounded-2xl font-semibold text-sm transition-all ${
                 selectedPlan === plan.id
                   ? 'btn-primary'
-                  : 'bg-white/5 text-purple-300/60 border border-purple-500/10 hover:bg-purple-500/10'
+                  : 'bg-white/5 text-slate-400 dark:text-purple-300/60 border border-teal-100 dark:border-purple-500/10 hover:bg-teal-50 dark:bg-purple-500/10'
               }`}>
                 {selectedPlan === plan.id ? 'Get Started →' : 'Select Plan'}
               </button>
@@ -162,7 +162,7 @@ export default function PremiumPage() {
 
         {/* Features Section */}
         <div className="glass-card animate-fade-in-up delay-500" style={{opacity:0}}>
-          <h2 className="text-xl font-bold text-white text-center mb-8">
+          <h2 className="text-xl font-bold text-slate-800 dark:text-white text-center mb-8">
             Why Go <span className="gradient-text">Premium?</span>
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -173,11 +173,11 @@ export default function PremiumPage() {
               { icon: Shield, title: 'Verified Profiles', desc: 'Connect only with real, verified people' },
             ].map((f, i) => (
               <div key={i} className="text-center">
-                <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mx-auto mb-3">
-                  <f.icon className="h-5 w-5 text-purple-400" />
+                <div className="w-12 h-12 rounded-xl bg-teal-50 dark:bg-purple-500/10 border border-teal-200/50 dark:border-purple-500/20 flex items-center justify-center mx-auto mb-3">
+                  <f.icon className="h-5 w-5 text-teal-600 dark:text-purple-400" />
                 </div>
-                <h4 className="text-sm font-semibold text-white mb-1">{f.title}</h4>
-                <p className="text-[11px] text-purple-300/40">{f.desc}</p>
+                <h4 className="text-sm font-semibold text-slate-800 dark:text-white mb-1">{f.title}</h4>
+                <p className="text-[11px] text-slate-300 dark:text-purple-300/40">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -186,20 +186,20 @@ export default function PremiumPage() {
         {/* Trust Indicators */}
         <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 animate-fade-in-up delay-500" style={{opacity:0}}>
           <div className="text-center p-4 glass-card !bg-white/[0.02]">
-            <p className="text-2xl font-bold text-white">50L+</p>
-            <p className="text-[10px] text-purple-300/40">Active Members</p>
+            <p className="text-2xl font-bold text-slate-800 dark:text-white">50L+</p>
+            <p className="text-[10px] text-slate-300 dark:text-purple-300/40">Active Members</p>
           </div>
           <div className="text-center p-4 glass-card !bg-white/[0.02]">
-            <p className="text-2xl font-bold text-white">10L+</p>
-            <p className="text-[10px] text-purple-300/40">Success Stories</p>
+            <p className="text-2xl font-bold text-slate-800 dark:text-white">10L+</p>
+            <p className="text-[10px] text-slate-300 dark:text-purple-300/40">Success Stories</p>
           </div>
           <div className="text-center p-4 glass-card !bg-white/[0.02]">
-            <p className="text-2xl font-bold text-white">99.2%</p>
-            <p className="text-[10px] text-purple-300/40">Verified Profiles</p>
+            <p className="text-2xl font-bold text-slate-800 dark:text-white">99.2%</p>
+            <p className="text-[10px] text-slate-300 dark:text-purple-300/40">Verified Profiles</p>
           </div>
           <div className="text-center p-4 glass-card !bg-white/[0.02]">
-            <p className="text-2xl font-bold text-white">4.8★</p>
-            <p className="text-[10px] text-purple-300/40">User Rating</p>
+            <p className="text-2xl font-bold text-slate-800 dark:text-white">4.8★</p>
+            <p className="text-[10px] text-slate-300 dark:text-purple-300/40">User Rating</p>
           </div>
         </div>
       </div>

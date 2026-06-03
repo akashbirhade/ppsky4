@@ -74,25 +74,25 @@ function CallPageInner() {
           <div className="py-12">
             {/* Header */}
             <div className="text-center mb-10 animate-fade-in-up">
-              <div className="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mx-auto mb-4">
-                <Video className="h-8 w-8 text-purple-400" />
+              <div className="w-16 h-16 rounded-2xl bg-teal-50 dark:bg-purple-500/10 border border-teal-200/50 dark:border-purple-500/20 flex items-center justify-center mx-auto mb-4">
+                <Video className="h-8 w-8 text-teal-600 dark:text-purple-400" />
               </div>
-              <h1 className="text-3xl font-bold text-white mb-2">Connect via Call</h1>
+              <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">Connect via Call</h1>
               <p className="text-sm text-purple-200/40">Have a safe, in-app conversation before meeting in person</p>
             </div>
 
             {/* Recent Contacts */}
             <div className="glass-card mb-6 animate-fade-in-up delay-100" style={{opacity:0}}>
-              <h2 className="text-sm font-semibold text-white mb-4">Recent Matches</h2>
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-white mb-4">Recent Matches</h2>
               <div className="space-y-3">
                 {['Priya Sharma', 'Ananya Desai', 'Meera Patel'].map((name, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.02] border border-purple-500/5 hover:border-purple-500/20 transition-all">
-                    <div className="w-11 h-11 rounded-full overflow-hidden border border-purple-400/20">
+                  <div key={i} className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.02] border border-purple-500/5 hover:border-teal-200/50 dark:border-purple-500/20 transition-all">
+                    <div className="w-11 h-11 rounded-full overflow-hidden border border-teal-200/40 dark:border-purple-400/20">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src="/avatars/female.svg" alt={name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-white">{name}</p>
+                      <p className="text-sm font-medium text-slate-800 dark:text-white">{name}</p>
                       <p className="text-[10px] text-green-400">Online</p>
                     </div>
                     <div className="flex gap-2">
@@ -110,7 +110,7 @@ function CallPageInner() {
 
             {/* Safety Note */}
             <div className="glass-card border-green-500/10 animate-fade-in-up delay-200" style={{opacity:0}}>
-              <h3 className="text-sm font-semibold text-white mb-2 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-white mb-2 flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-green-400" /> Safe Calling Features
               </h3>
               <ul className="space-y-2">
@@ -120,7 +120,7 @@ function CallPageInner() {
                   'Report or block at any time during the call',
                   'Premium: Unlimited call duration & HD video'
                 ].map((tip, i) => (
-                  <li key={i} className="flex items-center gap-2 text-xs text-purple-200/50">
+                  <li key={i} className="flex items-center gap-2 text-xs text-slate-500 dark:text-purple-200/50">
                     <div className="w-1.5 h-1.5 rounded-full bg-green-400/50" />
                     {tip}
                   </li>
@@ -130,17 +130,17 @@ function CallPageInner() {
 
             {/* Schedule a Call */}
             <div className="glass-card mt-6 animate-fade-in-up delay-300" style={{opacity:0}}>
-              <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-blue-400" /> Schedule a Call
               </h3>
               <p className="text-xs text-purple-200/40 mb-4">Coordinate a call time with your match. They&apos;ll get a notification.</p>
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div>
-                  <label className="text-[11px] text-purple-300/50 mb-1 block">Date</label>
+                  <label className="text-[11px] text-slate-400 dark:text-purple-300/50 mb-1 block">Date</label>
                   <input type="date" className="input-field w-full text-sm" />
                 </div>
                 <div>
-                  <label className="text-[11px] text-purple-300/50 mb-1 block">Time</label>
+                  <label className="text-[11px] text-slate-400 dark:text-purple-300/50 mb-1 block">Time</label>
                   <input type="time" className="input-field w-full text-sm" />
                 </div>
               </div>
@@ -162,37 +162,37 @@ function CallPageInner() {
           <div className="h-[calc(100vh-5rem)] flex flex-col items-center justify-center relative">
             {/* Background effects for call */}
             <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-600/10 rounded-full blur-[80px] animate-float" />
+              <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-teal-50 dark:bg-purple-600/10 rounded-full blur-[80px] animate-float" />
               <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-fuchsia-600/10 rounded-full blur-[60px] animate-float" style={{animationDelay: '2s'}} />
             </div>
 
             {/* Video placeholder / avatar */}
             <div className="relative z-10 flex flex-col items-center">
               {callType === 'video' && callState === 'connected' && !isVideoOff ? (
-                <div className="w-72 h-96 sm:w-96 sm:h-[28rem] rounded-3xl bg-gradient-to-br from-purple-900/50 to-dark-900 border border-purple-500/20 flex items-center justify-center mb-6 shadow-[0_0_60px_rgba(147,51,234,0.2)] overflow-hidden relative">
+                <div className="w-72 h-96 sm:w-96 sm:h-[28rem] rounded-3xl bg-gradient-to-br from-purple-900/50 to-dark-900 border border-teal-200/50 dark:border-purple-500/20 flex items-center justify-center mb-6 shadow-[0_0_60px_rgba(147,51,234,0.2)] overflow-hidden relative">
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60" />
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/avatars/female.svg" alt={callerName} className="w-full h-full object-cover" />
                   {/* Self view */}
-                  <div className="absolute bottom-4 right-4 w-20 h-28 rounded-xl overflow-hidden border border-purple-400/20">
+                  <div className="absolute bottom-4 right-4 w-20 h-28 rounded-xl overflow-hidden border border-teal-200/40 dark:border-purple-400/20">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={user?.gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg'} alt="You" className="w-full h-full object-cover" />
                   </div>
                   {/* Duration overlay */}
                   <div className="absolute top-4 left-4 bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full">
-                    <span className="text-xs text-white font-mono">{formatDuration(duration)}</span>
+                    <span className="text-xs text-slate-800 dark:text-white font-mono">{formatDuration(duration)}</span>
                   </div>
                 </div>
               ) : (
                 <div className="mb-8 text-center">
-                  <div className={`w-32 h-32 rounded-full overflow-hidden border-2 border-purple-400/30 mx-auto mb-6 ${
+                  <div className={`w-32 h-32 rounded-full overflow-hidden border-2 border-teal-200/50 dark:border-purple-400/30 mx-auto mb-6 ${
                     callState === 'calling' ? 'animate-pulse shadow-[0_0_40px_rgba(147,51,234,0.4)]' : 'shadow-[0_0_30px_rgba(147,51,234,0.2)]'
                   }`}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/avatars/female.svg" alt={callerName} className="w-full h-full object-cover" />
                   </div>
-                  <h2 className="text-xl font-bold text-white mb-1">{callerName}</h2>
-                  <p className={`text-sm ${callState === 'calling' ? 'text-purple-300/50 animate-pulse' : callState === 'ended' ? 'text-red-400/60' : 'text-green-400'}`}>
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-1">{callerName}</h2>
+                  <p className={`text-sm ${callState === 'calling' ? 'text-slate-400 dark:text-purple-300/50 animate-pulse' : callState === 'ended' ? 'text-red-400/60' : 'text-green-400'}`}>
                     {callState === 'calling' ? (callType === 'video' ? 'Video calling...' : 'Calling...') :
                      callState === 'connected' ? formatDuration(duration) :
                      'Call ended'}
@@ -203,25 +203,25 @@ function CallPageInner() {
               {/* Call Controls */}
               {callState !== 'ended' && (
                 <div className="flex items-center gap-4">
-                  <button onClick={() => setIsMuted(!isMuted)} className={`p-4 rounded-full transition-all ${isMuted ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-white/5 text-white border border-purple-500/20 hover:bg-white/10'}`}>
+                  <button onClick={() => setIsMuted(!isMuted)} className={`p-4 rounded-full transition-all ${isMuted ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-white/5 text-slate-800 dark:text-white border border-teal-200/50 dark:border-purple-500/20 hover:bg-white/10'}`}>
                     {isMuted ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
                   </button>
                   
                   {callType === 'video' && (
-                    <button onClick={() => setIsVideoOff(!isVideoOff)} className={`p-4 rounded-full transition-all ${isVideoOff ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-white/5 text-white border border-purple-500/20 hover:bg-white/10'}`}>
+                    <button onClick={() => setIsVideoOff(!isVideoOff)} className={`p-4 rounded-full transition-all ${isVideoOff ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-white/5 text-slate-800 dark:text-white border border-teal-200/50 dark:border-purple-500/20 hover:bg-white/10'}`}>
                       {isVideoOff ? <VideoOff className="h-5 w-5" /> : <Video className="h-5 w-5" />}
                     </button>
                   )}
 
-                  <button onClick={endCall} className="p-5 rounded-full bg-red-500 text-white hover:bg-red-600 shadow-[0_0_30px_rgba(239,68,68,0.4)] transition-all">
+                  <button onClick={endCall} className="p-5 rounded-full bg-red-500 text-slate-800 dark:text-white hover:bg-red-600 shadow-[0_0_30px_rgba(239,68,68,0.4)] transition-all">
                     <PhoneOff className="h-6 w-6" />
                   </button>
 
-                  <button className="p-4 rounded-full bg-white/5 text-white border border-purple-500/20 hover:bg-white/10 transition-all">
+                  <button className="p-4 rounded-full bg-white/5 text-slate-800 dark:text-white border border-teal-200/50 dark:border-purple-500/20 hover:bg-white/10 transition-all">
                     <Volume2 className="h-5 w-5" />
                   </button>
 
-                  <button className="p-4 rounded-full bg-white/5 text-white border border-purple-500/20 hover:bg-white/10 transition-all">
+                  <button className="p-4 rounded-full bg-white/5 text-slate-800 dark:text-white border border-teal-200/50 dark:border-purple-500/20 hover:bg-white/10 transition-all">
                     <MessageCircle className="h-5 w-5" />
                   </button>
                 </div>
@@ -236,7 +236,7 @@ function CallPageInner() {
 
 export default function CallPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-mesh flex items-center justify-center pt-20"><div className="text-purple-300/50 animate-pulse">Loading...</div></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-mesh flex items-center justify-center pt-20"><div className="text-slate-400 dark:text-purple-300/50 animate-pulse">Loading...</div></div>}>
       <CallPageInner />
     </Suspense>
   )

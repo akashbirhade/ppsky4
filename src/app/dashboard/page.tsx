@@ -108,17 +108,17 @@ export default function DashboardPage() {
         {/* Header - What they're looking for */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6" ref={headerRef}>
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-              <Users className="h-6 w-6 text-purple-400" />
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+              <Users className="h-6 w-6 text-teal-600 dark:text-purple-400" />
               Find Your {lookingFor}
             </h1>
-            <p className="text-sm text-purple-300/50 mt-1">
+            <p className="text-sm text-slate-400 dark:text-purple-300/50 mt-1">
               {profiles.length} {lookingFor === 'Bride' ? 'women' : 'men'} matching your preferences
             </p>
           </div>
           <button 
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2.5 glass-card !p-0 !px-4 !py-2.5 text-sm text-purple-200 hover:bg-white/10 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 glass-card !p-0 !px-4 !py-2.5 text-sm text-slate-700 dark:text-purple-200 hover:bg-white/10 transition-colors"
           >
             <SlidersHorizontal className="h-4 w-4" />
             Filters
@@ -129,38 +129,38 @@ export default function DashboardPage() {
         {/* Profile Analytics Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <div className="glass-card !p-4 text-center">
-            <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mx-auto mb-2">
-              <Eye className="h-4 w-4 text-purple-400" />
+            <div className="w-9 h-9 rounded-xl bg-teal-50 dark:bg-purple-500/10 border border-teal-200/50 dark:border-purple-500/20 flex items-center justify-center mx-auto mb-2">
+              <Eye className="h-4 w-4 text-teal-600 dark:text-purple-400" />
             </div>
-            <p className="text-xl font-bold text-white">47</p>
-            <p className="text-[10px] text-purple-300/40">Profile Views</p>
+            <p className="text-xl font-bold text-slate-800 dark:text-white">47</p>
+            <p className="text-[10px] text-slate-300 dark:text-purple-300/40">Profile Views</p>
           </div>
           <div className="glass-card !p-4 text-center">
             <div className="w-9 h-9 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mx-auto mb-2">
               <HalfHeart className="h-4 w-4" />
             </div>
-            <p className="text-xl font-bold text-white">12</p>
-            <p className="text-[10px] text-purple-300/40">Interests Received</p>
+            <p className="text-xl font-bold text-slate-800 dark:text-white">12</p>
+            <p className="text-[10px] text-slate-300 dark:text-purple-300/40">Interests Received</p>
           </div>
           <div className="glass-card !p-4 text-center">
             <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mx-auto mb-2">
               <MessageCircle className="h-4 w-4 text-blue-400" />
             </div>
-            <p className="text-xl font-bold text-white">8</p>
-            <p className="text-[10px] text-purple-300/40">Conversations</p>
+            <p className="text-xl font-bold text-slate-800 dark:text-white">8</p>
+            <p className="text-[10px] text-slate-300 dark:text-purple-300/40">Conversations</p>
           </div>
           <div className="glass-card !p-4 text-center">
             <div className="w-9 h-9 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center mx-auto mb-2">
               <TrendingUp className="h-4 w-4 text-green-400" />
             </div>
-            <p className="text-xl font-bold text-white">85%</p>
-            <p className="text-[10px] text-purple-300/40">Profile Score</p>
+            <p className="text-xl font-bold text-slate-800 dark:text-white">85%</p>
+            <p className="text-[10px] text-slate-300 dark:text-purple-300/40">Profile Score</p>
           </div>
         </div>
 
         {/* Quick Actions */}
         <div className="flex gap-3 mb-6 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-          <Link href="/search" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-200 hover:bg-purple-500/20 transition-all whitespace-nowrap">
+          <Link href="/search" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-50 dark:bg-purple-500/10 border border-teal-200/50 dark:border-purple-500/20 text-xs text-slate-700 dark:text-purple-200 hover:bg-teal-100/50 dark:bg-purple-500/20 transition-all whitespace-nowrap">
             <Search className="h-3.5 w-3.5" /> Search Profiles
           </Link>
           <Link href="/meeting" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-pink-500/10 border border-pink-500/20 text-xs text-pink-200 hover:bg-pink-500/20 transition-all whitespace-nowrap">
@@ -178,26 +178,26 @@ export default function DashboardPage() {
         {showFilters && (
           <div className="glass-card mb-6 animate-fade-in-up" ref={filtersRef}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-white">Filter Profiles</h3>
-              <button onClick={() => setShowFilters(false)} className="text-purple-300/50 hover:text-white">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-white">Filter Profiles</h3>
+              <button onClick={() => setShowFilters(false)} className="text-slate-400 dark:text-purple-300/50 hover:text-slate-800 dark:text-white">
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               <div>
-                <label className="text-[10px] text-purple-300/50 uppercase tracking-wider">Age From</label>
+                <label className="text-[10px] text-slate-400 dark:text-purple-300/50 uppercase tracking-wider">Age From</label>
                 <input type="number" value={filters.ageMin} onChange={e => setFilters({...filters, ageMin: e.target.value})}
-                  className="w-full mt-1 bg-white/5 border border-purple-500/20 rounded-lg px-3 py-2 text-sm text-white focus:border-purple-400 outline-none" />
+                  className="w-full mt-1 bg-white/5 border border-teal-200/50 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white focus:border-purple-400 outline-none" />
               </div>
               <div>
-                <label className="text-[10px] text-purple-300/50 uppercase tracking-wider">Age To</label>
+                <label className="text-[10px] text-slate-400 dark:text-purple-300/50 uppercase tracking-wider">Age To</label>
                 <input type="number" value={filters.ageMax} onChange={e => setFilters({...filters, ageMax: e.target.value})}
-                  className="w-full mt-1 bg-white/5 border border-purple-500/20 rounded-lg px-3 py-2 text-sm text-white focus:border-purple-400 outline-none" />
+                  className="w-full mt-1 bg-white/5 border border-teal-200/50 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white focus:border-purple-400 outline-none" />
               </div>
               <div>
-                <label className="text-[10px] text-purple-300/50 uppercase tracking-wider">Religion</label>
+                <label className="text-[10px] text-slate-400 dark:text-purple-300/50 uppercase tracking-wider">Religion</label>
                 <select value={filters.religion} onChange={e => setFilters({...filters, religion: e.target.value})}
-                  className="w-full mt-1 bg-white/5 border border-purple-500/20 rounded-lg px-3 py-2 text-sm text-white focus:border-purple-400 outline-none">
+                  className="w-full mt-1 bg-white/5 border border-teal-200/50 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white focus:border-purple-400 outline-none">
                   <option value="">Any</option>
                   <option value="Hindu">Hindu</option>
                   <option value="Muslim">Muslim</option>
@@ -208,14 +208,14 @@ export default function DashboardPage() {
                 </select>
               </div>
               <div>
-                <label className="text-[10px] text-purple-300/50 uppercase tracking-wider">City</label>
+                <label className="text-[10px] text-slate-400 dark:text-purple-300/50 uppercase tracking-wider">City</label>
                 <input type="text" value={filters.city} onChange={e => setFilters({...filters, city: e.target.value})} placeholder="Any city"
-                  className="w-full mt-1 bg-white/5 border border-purple-500/20 rounded-lg px-3 py-2 text-sm text-white placeholder:text-purple-300/30 focus:border-purple-400 outline-none" />
+                  className="w-full mt-1 bg-white/5 border border-teal-200/50 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white placeholder:text-slate-300 dark:text-purple-300/30 focus:border-purple-400 outline-none" />
               </div>
               <div>
-                <label className="text-[10px] text-purple-300/50 uppercase tracking-wider">Education</label>
+                <label className="text-[10px] text-slate-400 dark:text-purple-300/50 uppercase tracking-wider">Education</label>
                 <select value={filters.education} onChange={e => setFilters({...filters, education: e.target.value})}
-                  className="w-full mt-1 bg-white/5 border border-purple-500/20 rounded-lg px-3 py-2 text-sm text-white focus:border-purple-400 outline-none">
+                  className="w-full mt-1 bg-white/5 border border-teal-200/50 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white focus:border-purple-400 outline-none">
                   <option value="">Any</option>
                   <option value="B.Tech">B.Tech / B.E.</option>
                   <option value="MBBS">MBBS / MD</option>
@@ -238,8 +238,8 @@ export default function DashboardPage() {
             <button key={tab} onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                 activeTab === tab 
-                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30' 
-                  : 'bg-white/5 text-purple-300/60 hover:bg-white/10 hover:text-purple-200'
+                  ? 'bg-purple-600 text-slate-800 dark:text-white shadow-lg shadow-purple-500/30' 
+                  : 'bg-white/5 text-slate-400 dark:text-purple-300/60 hover:bg-white/10 hover:text-teal-600 dark:hover:text-purple-200'
               }`}>
               {tab === 'all' && `All ${lookingFor}s`}
               {tab === 'new' && 'Newly Joined'}
@@ -254,20 +254,20 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {Array.from({length: 9}).map((_, i) => (
               <div key={i} className="glass-card animate-pulse !p-0 overflow-hidden">
-                <div className="h-52 bg-purple-500/10" />
+                <div className="h-52 bg-teal-50 dark:bg-purple-500/10" />
                 <div className="p-4 space-y-2">
-                  <div className="h-5 bg-purple-500/10 rounded w-2/3" />
-                  <div className="h-4 bg-purple-500/10 rounded w-1/2" />
-                  <div className="h-4 bg-purple-500/10 rounded w-3/4" />
+                  <div className="h-5 bg-teal-50 dark:bg-purple-500/10 rounded w-2/3" />
+                  <div className="h-4 bg-teal-50 dark:bg-purple-500/10 rounded w-1/2" />
+                  <div className="h-4 bg-teal-50 dark:bg-purple-500/10 rounded w-3/4" />
                 </div>
               </div>
             ))}
           </div>
         ) : profiles.length === 0 ? (
           <div className="text-center py-20">
-            <Users className="h-16 w-16 text-purple-400/30 mx-auto mb-4" />
-            <h3 className="text-lg font-bold text-white mb-2">No profiles found</h3>
-            <p className="text-sm text-purple-300/50">Try adjusting your filters to see more matches</p>
+            <Users className="h-16 w-16 text-teal-600 dark:text-purple-400/30 mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">No profiles found</h3>
+            <p className="text-sm text-slate-400 dark:text-purple-300/50">Try adjusting your filters to see more matches</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" ref={gridRef}>
@@ -297,10 +297,10 @@ export default function DashboardPage() {
                   {/* Badges */}
                   <div className="absolute top-3 left-3 flex gap-1.5">
                     {profile.verified && (
-                      <span className="bg-green-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">Verified</span>
+                      <span className="bg-green-500 text-slate-800 dark:text-white text-[9px] font-bold px-2 py-0.5 rounded-full">Verified</span>
                     )}
                     {profile.premium && (
-                      <span className="bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                      <span className="bg-amber-500 text-slate-800 dark:text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
                         <Crown className="h-2.5 w-2.5" /> Premium
                       </span>
                     )}
@@ -309,29 +309,29 @@ export default function DashboardPage() {
                   <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent" />
                   {/* Name on photo */}
                   <div className="absolute bottom-3 left-3 right-3">
-                    <h3 className="text-base font-bold text-white drop-shadow-lg">{profile.name}, {profile.age}</h3>
+                    <h3 className="text-base font-bold text-slate-800 dark:text-white drop-shadow-lg">{profile.name}, {profile.age}</h3>
                   </div>
                 </div>
 
                 {/* Profile Details */}
                 <div className="p-4 space-y-2">
-                  <div className="flex items-center gap-2 text-xs text-purple-300/60">
+                  <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-purple-300/60">
                     {profile.city && (
                       <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{profile.city}{profile.state ? `, ${profile.state}` : ''}</span>
                     )}
                   </div>
                   {profile.occupation && (
-                    <p className="flex items-center gap-1.5 text-xs text-purple-300/60">
+                    <p className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-purple-300/60">
                       <Briefcase className="h-3 w-3 shrink-0" /> {profile.occupation}
                     </p>
                   )}
                   {profile.education && (
-                    <p className="flex items-center gap-1.5 text-xs text-purple-300/60">
+                    <p className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-purple-300/60">
                       <GraduationCap className="h-3 w-3 shrink-0" /> {profile.education}
                     </p>
                   )}
                   {profile.religion && (
-                    <p className="text-xs text-purple-300/40">{profile.religion}{profile.caste ? ` - ${profile.caste}` : ''}</p>
+                    <p className="text-xs text-slate-300 dark:text-purple-300/40">{profile.religion}{profile.caste ? ` - ${profile.caste}` : ''}</p>
                   )}
 
                   {/* Action Buttons */}
@@ -341,7 +341,7 @@ export default function DashboardPage() {
                         <a href={`https://wa.me/?text=${encodeURIComponent(`Hi ${profile.name}, I found your profile on Soulmate Sync and would like to connect!`)}`}
                           onClick={(e) => e.stopPropagation()}
                           target="_blank" rel="noopener"
-                          className="flex-1 py-2 text-xs bg-green-600/80 text-white rounded-lg font-medium hover:bg-green-600 transition-colors flex items-center justify-center gap-1.5"
+                          className="flex-1 py-2 text-xs bg-green-600/80 text-slate-800 dark:text-white rounded-lg font-medium hover:bg-green-600 transition-colors flex items-center justify-center gap-1.5"
                           title="WhatsApp">
                           <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                           WhatsApp
@@ -351,22 +351,22 @@ export default function DashboardPage() {
                           <Phone className="h-3.5 w-3.5" />
                         </button>
                         <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push(`/messages?chat=${profile.id}`) }}
-                          className="py-2 px-3 text-xs bg-purple-500/20 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-colors border border-purple-500/20" title="Chat">
+                          className="py-2 px-3 text-xs bg-teal-100/50 dark:bg-purple-500/20 text-slate-600 dark:text-purple-300 rounded-lg hover:bg-purple-500/30 transition-colors border border-teal-200/50 dark:border-purple-500/20" title="Chat">
                           <MessageCircle className="h-3.5 w-3.5" />
                         </button>
                         <button onClick={(e) => handleShortlist(e, profile.id)}
-                          className={`py-2 px-3 text-xs rounded-lg transition-colors border ${shortlisted.has(profile.id) ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-white/5 text-purple-300 border-purple-500/20 hover:bg-white/10'}`} title="Shortlist">
+                          className={`py-2 px-3 text-xs rounded-lg transition-colors border ${shortlisted.has(profile.id) ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-white/5 text-slate-600 dark:text-purple-300 border-teal-200/50 dark:border-purple-500/20 hover:bg-white/10'}`} title="Shortlist">
                           <Star className={`h-3.5 w-3.5 ${shortlisted.has(profile.id) ? 'fill-amber-400' : ''}`} />
                         </button>
                       </>
                     ) : (
                       <>
                         <button onClick={(e) => handleSendInterest(e, profile.id)} 
-                          className="flex-1 py-2 text-xs bg-purple-600/80 text-white rounded-lg font-medium hover:bg-purple-600 transition-colors flex items-center justify-center gap-1.5">
+                          className="flex-1 py-2 text-xs bg-purple-600/80 text-slate-800 dark:text-white rounded-lg font-medium hover:bg-purple-600 transition-colors flex items-center justify-center gap-1.5">
                           <HalfHeart className="h-3.5 w-3.5" /> Send Interest
                         </button>
                         <button onClick={(e) => handleShortlist(e, profile.id)}
-                          className={`py-2 px-3 text-xs rounded-lg transition-colors border ${shortlisted.has(profile.id) ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-white/5 text-purple-300 border-purple-500/20 hover:bg-white/10'}`}>
+                          className={`py-2 px-3 text-xs rounded-lg transition-colors border ${shortlisted.has(profile.id) ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-white/5 text-slate-600 dark:text-purple-300 border-teal-200/50 dark:border-purple-500/20 hover:bg-white/10'}`}>
                           <Star className={`h-3.5 w-3.5 ${shortlisted.has(profile.id) ? 'fill-amber-400' : ''}`} />
                         </button>
                       </>

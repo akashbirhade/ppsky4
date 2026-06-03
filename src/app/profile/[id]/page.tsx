@@ -151,16 +151,16 @@ export default function ProfileDetailPage() {
 
   if (loading) return (
     <div className="min-h-screen bg-mesh flex items-center justify-center pt-20">
-      <div className="text-purple-300/50 animate-pulse">Loading profile...</div>
+      <div className="text-slate-400 dark:text-purple-300/50 animate-pulse">Loading profile...</div>
     </div>
   )
 
   if (!profile) return (
     <div className="min-h-screen bg-mesh flex items-center justify-center pt-20">
       <div className="text-center">
-        <User className="h-16 w-16 text-purple-400/20 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-white mb-2">Profile not found</h2>
-        <Link href="/search" className="text-purple-400 hover:text-purple-300 text-sm">← Back to Search</Link>
+        <User className="h-16 w-16 text-teal-600 dark:text-purple-400/20 mx-auto mb-4" />
+        <h2 className="text-xl font-semibold text-slate-800 dark:text-white mb-2">Profile not found</h2>
+        <Link href="/search" className="text-purple-400 hover:text-slate-600 dark:text-purple-300 text-sm">← Back to Search</Link>
       </div>
     </div>
   )
@@ -173,7 +173,7 @@ export default function ProfileDetailPage() {
     return (
       <div className="min-h-screen bg-mesh pt-24 pb-12 px-4">
         <div className="max-w-2xl mx-auto">
-          <button onClick={() => router.back()} className="flex items-center gap-2 text-purple-300/50 hover:text-purple-200 mb-6 transition-colors text-sm">
+          <button onClick={() => router.back()} className="flex items-center gap-2 text-slate-400 dark:text-purple-300/50 hover:text-slate-700 dark:text-purple-200 mb-6 transition-colors text-sm">
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
 
@@ -196,13 +196,13 @@ export default function ProfileDetailPage() {
                 </div>
               )}
               {/* Lock overlay */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-dark-900/60 backdrop-blur-sm">
-                <div className="w-20 h-20 rounded-full bg-purple-600/20 border-2 border-purple-500/40 flex items-center justify-center">
-                  <Lock className="h-9 w-9 text-purple-300" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-white dark:bg-dark-900/60 backdrop-blur-sm">
+                <div className="w-20 h-20 rounded-full bg-teal-100/50 dark:bg-purple-600/20 border-2 border-purple-500/40 flex items-center justify-center">
+                  <Lock className="h-9 w-9 text-slate-600 dark:text-purple-300" />
                 </div>
                 <div className="text-center px-4">
-                  <p className="text-white font-semibold text-lg">Photos are hidden</p>
-                  <p className="text-purple-300/60 text-sm mt-1">Register free to view this profile</p>
+                  <p className="text-slate-800 dark:text-white font-semibold text-lg">Photos are hidden</p>
+                  <p className="text-slate-400 dark:text-purple-300/60 text-sm mt-1">Register free to view this profile</p>
                 </div>
               </div>
             </div>
@@ -213,7 +213,7 @@ export default function ProfileDetailPage() {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <h1 className="text-2xl font-bold text-white tracking-wide">{maskedName}</h1>
+                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-wide">{maskedName}</h1>
                     {profile.premium && (
                       <span className="flex items-center gap-1 bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-500/30">
                         <Crown className="h-3 w-3" /> Premium
@@ -223,15 +223,15 @@ export default function ProfileDetailPage() {
                       <BadgeCheck className="h-5 w-5 text-blue-400" />
                     )}
                   </div>
-                  <p className="text-purple-300/60 text-sm">
+                  <p className="text-slate-400 dark:text-purple-300/60 text-sm">
                     {profile.age} yrs · {profile.height} · {profile.maritalStatus}
                   </p>
-                  <p className="text-purple-300/50 text-xs mt-1 flex items-center gap-1">
+                  <p className="text-slate-400 dark:text-purple-300/50 text-xs mt-1 flex items-center gap-1">
                     <MapPin className="h-3 w-3" /> {profile.city}, {profile.state}
                   </p>
                 </div>
-                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-purple-500/30 bg-purple-900/40 flex items-center justify-center shrink-0">
-                  <Lock className="h-7 w-7 text-purple-400/50" />
+                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-teal-200 dark:border-purple-500/30 bg-purple-900/40 flex items-center justify-center shrink-0">
+                  <Lock className="h-7 w-7 text-teal-600 dark:text-purple-400/50" />
                 </div>
               </div>
 
@@ -243,10 +243,10 @@ export default function ProfileDetailPage() {
                   { icon: Building, label: 'Income', value: '••••••' },
                   { icon: Users, label: 'Religion', value: profile.religion },
                 ].map(({ icon: Icon, label, value }) => (
-                  <div key={label} className="bg-white/[0.03] rounded-xl p-3 border border-purple-500/10">
-                    <p className="text-[10px] text-purple-300/40 uppercase tracking-wider mb-1">{label}</p>
-                    <p className="text-sm text-white/80 flex items-center gap-2">
-                      <Icon className="h-3.5 w-3.5 text-purple-400/60 shrink-0" />
+                  <div key={label} className="bg-white/[0.03] rounded-xl p-3 border border-teal-100 dark:border-purple-500/10">
+                    <p className="text-[10px] text-slate-300 dark:text-purple-300/40 uppercase tracking-wider mb-1">{label}</p>
+                    <p className="text-sm text-slate-800 dark:text-white/80 flex items-center gap-2">
+                      <Icon className="h-3.5 w-3.5 text-teal-600 dark:text-purple-400/60 shrink-0" />
                       {value}
                     </p>
                   </div>
@@ -255,11 +255,11 @@ export default function ProfileDetailPage() {
 
               {/* About blurred */}
               <div className="mb-6 relative">
-                <p className="text-sm text-purple-300/30 line-clamp-2 blur-sm select-none">
+                <p className="text-sm text-slate-300 dark:text-purple-300/30 line-clamp-2 blur-sm select-none">
                   {profile.about || 'This member has written an interesting bio about themselves and their preferences. Register to read the full profile.'}
                 </p>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs text-purple-400/60 bg-dark-900/80 px-3 py-1 rounded-full border border-purple-500/20">
+                  <span className="text-xs text-teal-600 dark:text-purple-400/60 bg-white dark:bg-dark-900/80 px-3 py-1 rounded-full border border-teal-200/50 dark:border-purple-500/20">
                     <Lock className="h-3 w-3 inline mr-1" />Register to read bio
                   </span>
                 </div>
@@ -268,17 +268,17 @@ export default function ProfileDetailPage() {
               {/* CTA */}
               <div className="space-y-3">
                 <Link href={`/register`}
-                  className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-purple-600 to-fuchsia-600 rounded-2xl text-white font-semibold hover:shadow-[0_0_20px_rgba(147,51,234,0.4)] transition-all">
+                  className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-purple-600 to-fuchsia-600 rounded-2xl text-slate-800 dark:text-white font-semibold hover:shadow-[0_0_20px_rgba(147,51,234,0.4)] transition-all">
                   <Sparkles className="h-4 w-4" />
                   Register Free to View Full Profile
                 </Link>
                 <Link href={`/login?redirect=/profile/${profile.id}`}
-                  className="w-full flex items-center justify-center gap-2 py-3 bg-purple-500/10 border border-purple-500/20 rounded-2xl text-purple-200 text-sm hover:bg-purple-500/20 transition-all">
-                  Already have an account? <span className="font-semibold text-purple-300">Sign in</span>
+                  className="w-full flex items-center justify-center gap-2 py-3 bg-teal-50 dark:bg-purple-500/10 border border-teal-200/50 dark:border-purple-500/20 rounded-2xl text-slate-700 dark:text-purple-200 text-sm hover:bg-teal-100/50 dark:bg-purple-500/20 transition-all">
+                  Already have an account? <span className="font-semibold text-slate-600 dark:text-purple-300">Sign in</span>
                 </Link>
               </div>
 
-              <p className="text-center text-[10px] text-purple-300/30 mt-4">
+              <p className="text-center text-[10px] text-slate-300 dark:text-purple-300/30 mt-4">
                 🔒 Profile details are protected. Register to connect.
               </p>
             </div>
@@ -334,7 +334,7 @@ export default function ProfileDetailPage() {
   return (
     <div className="min-h-screen bg-mesh pt-24 pb-12 px-4">
       <div className="max-w-5xl mx-auto">
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-purple-300/50 hover:text-purple-200 mb-6 transition-colors text-sm">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-slate-400 dark:text-purple-300/50 hover:text-slate-700 dark:text-purple-200 mb-6 transition-colors text-sm">
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
 
@@ -359,14 +359,14 @@ export default function ProfileDetailPage() {
                     </svg>
                   </div>
                   {/* Photo counter */}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-dark-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple-500/20">
-                    <button className="text-white/60 hover:text-white text-xs">‹</button>
-                    <span className="text-[10px] text-white/80 font-medium">1 of {profile.photos.length}</span>
-                    <button className="text-white/60 hover:text-white text-xs">›</button>
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white dark:bg-dark-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-teal-200/50 dark:border-purple-500/20">
+                    <button className="text-slate-800 dark:text-white/60 hover:text-slate-800 dark:text-white text-xs">‹</button>
+                    <span className="text-[10px] text-slate-800 dark:text-white/80 font-medium">1 of {profile.photos.length}</span>
+                    <button className="text-slate-800 dark:text-white/60 hover:text-slate-800 dark:text-white text-xs">›</button>
                   </div>
                   {/* Premium Badge */}
                   {profile.premium && (
-                    <div className="absolute top-4 left-4 flex items-center gap-1 bg-amber-500/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-lg">
+                    <div className="absolute top-4 left-4 flex items-center gap-1 bg-amber-500/90 text-slate-800 dark:text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-lg">
                       <Crown className="h-3 w-3" /> Premium
                     </div>
                   )}
@@ -383,14 +383,14 @@ export default function ProfileDetailPage() {
 
               {/* Verified Section Below Photo */}
               {profile.verified && (
-                <div className="p-4 border-t border-purple-500/10 bg-green-500/5">
+                <div className="p-4 border-t border-teal-100 dark:border-purple-500/10 bg-green-500/5">
                   <div className="flex items-center gap-2 mb-1">
                     <Shield className="h-4 w-4 text-green-400" />
                     <p className="text-xs font-semibold text-green-300">Verified profile</p>
                   </div>
-                  <p className="text-[10px] text-purple-300/40 ml-6">Selfie verified with Profile Photo</p>
-                  <p className="text-[10px] text-purple-300/40 ml-6">Mobile no. is verified</p>
-                  <button className="text-[10px] text-purple-400 hover:text-purple-300 ml-6 mt-1 transition-colors">Get Your Blue Tick →</button>
+                  <p className="text-[10px] text-slate-300 dark:text-purple-300/40 ml-6">Selfie verified with Profile Photo</p>
+                  <p className="text-[10px] text-slate-300 dark:text-purple-300/40 ml-6">Mobile no. is verified</p>
+                  <button className="text-[10px] text-teal-600 dark:text-purple-400 hover:text-slate-600 dark:text-purple-300 ml-6 mt-1 transition-colors">Get Your Blue Tick →</button>
                 </div>
               )}
             </div>
@@ -401,11 +401,11 @@ export default function ProfileDetailPage() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h1 className="text-xl font-bold text-white">{profile.name}</h1>
+                    <h1 className="text-xl font-bold text-slate-800 dark:text-white">{profile.name}</h1>
                     {profile.verified && <BadgeCheck className="h-4 w-4 text-blue-400" />}
                     {profile.premium && <Crown className="h-4 w-4 text-amber-400" />}
                   </div>
-                  <div className="flex items-center gap-4 mt-1.5 text-xs text-purple-300/50">
+                  <div className="flex items-center gap-4 mt-1.5 text-xs text-slate-400 dark:text-purple-300/50">
                     <span className="flex items-center gap-1.5">
                       <span className={`w-2 h-2 rounded-full ${profile.online ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
                       {profile.online ? 'Online now' : 'Offline'}
@@ -427,8 +427,8 @@ export default function ProfileDetailPage() {
                     </button>
                   ) : (
                     <div className="text-center">
-                      <p className="text-[10px] text-purple-300/40 mb-1">Upgrade to</p>
-                      <p className="text-[10px] text-purple-300/40">Contact her directly</p>
+                      <p className="text-[10px] text-slate-300 dark:text-purple-300/40 mb-1">Upgrade to</p>
+                      <p className="text-[10px] text-slate-300 dark:text-purple-300/40">Contact her directly</p>
                       <button onClick={() => { setPremiumAction('call'); setShowPremiumModal(true) }}
                         className="mt-1.5 flex items-center gap-1.5 px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-300 text-xs hover:bg-blue-500/20 transition-all">
                         <Phone className="h-3 w-3" /> Call
@@ -446,39 +446,39 @@ export default function ProfileDetailPage() {
                     <circle cx="18" cy="18" r="14" fill="none" stroke="url(#gradP)" strokeWidth="3" strokeDasharray={`${score * 0.88} 88`} strokeLinecap="round" />
                     <defs><linearGradient id="gradP"><stop stopColor="#a855f7"/><stop offset="1" stopColor="#ec4899"/></linearGradient></defs>
                   </svg>
-                  <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-white">{score}%</span>
+                  <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-slate-800 dark:text-white">{score}%</span>
                 </div>
-                <span className="text-[11px] text-purple-300/50">AI Match Score</span>
+                <span className="text-[11px] text-slate-400 dark:text-purple-300/50">AI Match Score</span>
               </div>
 
               {/* Details Grid */}
               <div className="mt-5 grid grid-cols-2 gap-x-6 gap-y-2.5 text-[12px]">
                 <div className="flex justify-between py-1.5 border-b border-purple-500/5">
-                  <span className="text-purple-300/40">{profile.age} yrs, {profile.height}</span>
-                  <span className="text-purple-200 font-medium">{extendedData.maritalStatus}</span>
+                  <span className="text-slate-300 dark:text-purple-300/40">{profile.age} yrs, {profile.height}</span>
+                  <span className="text-slate-700 dark:text-purple-200 font-medium">{extendedData.maritalStatus}</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-purple-500/5">
-                  <span className="text-purple-300/40">{profile.motherTongue}</span>
-                  <span className="text-purple-200 font-medium">{profile.city}, {profile.state}</span>
+                  <span className="text-slate-300 dark:text-purple-300/40">{profile.motherTongue}</span>
+                  <span className="text-slate-700 dark:text-purple-200 font-medium">{profile.city}, {profile.state}</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-purple-500/5">
-                  <span className="text-purple-300/40">{profile.religion}</span>
-                  <span className="text-purple-200 font-medium">{profile.occupation}</span>
+                  <span className="text-slate-300 dark:text-purple-300/40">{profile.religion}</span>
+                  <span className="text-slate-700 dark:text-purple-200 font-medium">{profile.occupation}</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-purple-500/5">
-                  <span className="text-purple-300/40">{profile.education}</span>
-                  <span className="text-purple-200 font-medium">{profile.income}</span>
+                  <span className="text-slate-300 dark:text-purple-300/40">{profile.education}</span>
+                  <span className="text-slate-700 dark:text-purple-200 font-medium">{profile.income}</span>
                 </div>
               </div>
 
               {/* Interest Status */}
-              <div className="mt-4 py-2.5 px-3 bg-purple-500/5 border border-purple-500/10 rounded-xl">
+              <div className="mt-4 py-2.5 px-3 bg-teal-50/50 dark:bg-purple-500/5 border border-teal-100 dark:border-purple-500/10 rounded-xl">
                 {interestSent ? (
                   <p className="text-[11px] text-green-300 flex items-center gap-1.5">
                     <Sparkles className="h-3.5 w-3.5" /> You Accepted her Invitation on {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}.
                   </p>
                 ) : (
-                  <p className="text-[11px] text-purple-300/50">Send interest to start connecting</p>
+                  <p className="text-[11px] text-slate-400 dark:text-purple-300/50">Send interest to start connecting</p>
                 )}
               </div>
 
@@ -486,31 +486,31 @@ export default function ProfileDetailPage() {
               {profile.about && (
                 <div className="mt-4 flex items-start gap-2">
                   <span className="text-purple-400/20 text-2xl leading-none">&ldquo;</span>
-                  <p className="text-[12px] text-purple-200/60 leading-relaxed line-clamp-3">{profile.about}</p>
+                  <p className="text-[12px] text-slate-500 dark:text-purple-200/60 leading-relaxed line-clamp-3">{profile.about}</p>
                 </div>
               )}
 
               {/* Tabs Section */}
-              <div className="mt-5 border-t border-purple-500/10 pt-4">
-                <div className="flex gap-6 border-b border-purple-500/10">
-                  <button onClick={() => setDetailTab('about')} className={`pb-2 text-xs font-medium transition-colors ${detailTab === 'about' ? 'text-purple-300 border-b-2 border-purple-400' : 'text-purple-300/30 hover:text-purple-200'}`}>Detailed Profile</button>
-                  <button onClick={() => setDetailTab('preferences')} className={`pb-2 text-xs font-medium transition-colors ${detailTab === 'preferences' ? 'text-purple-300 border-b-2 border-purple-400' : 'text-purple-300/30 hover:text-purple-200'}`}>Partner Preferences</button>
+              <div className="mt-5 border-t border-teal-100 dark:border-purple-500/10 pt-4">
+                <div className="flex gap-6 border-b border-teal-100 dark:border-purple-500/10">
+                  <button onClick={() => setDetailTab('about')} className={`pb-2 text-xs font-medium transition-colors ${detailTab === 'about' ? 'text-slate-600 dark:text-purple-300 border-b-2 border-purple-400' : 'text-slate-300 dark:text-purple-300/30 hover:text-teal-600 dark:hover:text-purple-200'}`}>Detailed Profile</button>
+                  <button onClick={() => setDetailTab('preferences')} className={`pb-2 text-xs font-medium transition-colors ${detailTab === 'preferences' ? 'text-slate-600 dark:text-purple-300 border-b-2 border-purple-400' : 'text-slate-300 dark:text-purple-300/30 hover:text-teal-600 dark:hover:text-purple-200'}`}>Partner Preferences</button>
                 </div>
                 {detailTab === 'about' ? (
-                  <div className="mt-3 text-[11px] text-purple-200/60 leading-relaxed">
-                    <p className="font-semibold text-white text-xs mb-2 flex items-center gap-1.5">
+                  <div className="mt-3 text-[11px] text-slate-500 dark:text-purple-200/60 leading-relaxed">
+                    <p className="font-semibold text-slate-800 dark:text-white text-xs mb-2 flex items-center gap-1.5">
                       <span className="text-purple-400/30">&ldquo;</span> About {profile.name.split(' ')[0]}
                     </p>
                     <p className="line-clamp-4">{profile.about || `A well-educated ${profile.occupation} based in ${profile.city}. Looking for a compatible life partner.`}</p>
                   </div>
                 ) : (
                   <div className="mt-3 space-y-2">
-                    <p className="text-xs font-semibold text-white mb-2">{profile.name.split(' ')[0]} is looking for:</p>
+                    <p className="text-xs font-semibold text-slate-800 dark:text-white mb-2">{profile.name.split(' ')[0]} is looking for:</p>
                     <div className="grid grid-cols-2 gap-2">
                       {Object.entries(extendedData.herPreferences).map(([key, value]) => (
-                        <div key={key} className="flex justify-between items-center p-2 rounded-lg bg-white/[0.02] border border-purple-500/10">
-                          <span className="text-[10px] text-purple-300/50 capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-                          <span className="text-[10px] text-white font-medium">{value}</span>
+                        <div key={key} className="flex justify-between items-center p-2 rounded-lg bg-white/[0.02] border border-teal-100 dark:border-purple-500/10">
+                          <span className="text-[10px] text-slate-400 dark:text-purple-300/50 capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                          <span className="text-[10px] text-slate-800 dark:text-white font-medium">{value}</span>
                         </div>
                       ))}
                     </div>
@@ -518,10 +518,10 @@ export default function ProfileDetailPage() {
                 )}
                 {/* ID Badge */}
                 <div className="flex items-center gap-3 mt-4">
-                  <span className="text-[10px] bg-white/[0.03] text-purple-300/40 px-3 py-1.5 rounded-full border border-purple-500/10 flex items-center gap-1.5">
+                  <span className="text-[10px] bg-white/[0.03] text-slate-300 dark:text-purple-300/40 px-3 py-1.5 rounded-full border border-teal-100 dark:border-purple-500/10 flex items-center gap-1.5">
                     ID: {profileId}
                   </span>
-                  <span className="text-[10px] bg-white/[0.03] text-purple-300/40 px-3 py-1.5 rounded-full border border-purple-500/10">
+                  <span className="text-[10px] bg-white/[0.03] text-slate-300 dark:text-purple-300/40 px-3 py-1.5 rounded-full border border-teal-100 dark:border-purple-500/10">
                     Profile Managed by {extendedData.managedBy}
                   </span>
                 </div>
@@ -553,13 +553,13 @@ export default function ProfileDetailPage() {
 
         {/* Similar Profiles Section */}
         <div className="glass-card mb-6 animate-fade-in-up" style={{ animationDelay: '0.05s', opacity: 0 }}>
-          <h2 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-            <Users className="h-4 w-4 text-purple-400" /> Similar Profiles
+          <h2 className="text-sm font-semibold text-slate-800 dark:text-white mb-3 flex items-center gap-2">
+            <Users className="h-4 w-4 text-teal-600 dark:text-purple-400" /> Similar Profiles
           </h2>
           <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
             {similarProfiles.length > 0 ? similarProfiles.map((sp) => (
-              <Link key={sp.id} href={`/profile/${sp.id}`} className="shrink-0 w-32 p-3 rounded-xl bg-white/[0.02] border border-purple-500/10 text-center hover:bg-purple-500/5 transition-colors cursor-pointer">
-                <div className="w-14 h-14 rounded-full overflow-hidden mx-auto border border-purple-500/10">
+              <Link key={sp.id} href={`/profile/${sp.id}`} className="shrink-0 w-32 p-3 rounded-xl bg-white/[0.02] border border-teal-100 dark:border-purple-500/10 text-center hover:bg-teal-50/50 dark:bg-purple-500/5 transition-colors cursor-pointer">
+                <div className="w-14 h-14 rounded-full overflow-hidden mx-auto border border-teal-100 dark:border-purple-500/10">
                   {sp.photos && sp.photos[0] ? (
                     <img src={sp.photos[0]} alt={sp.name} className="w-full h-full object-cover" />
                   ) : (
@@ -570,11 +570,11 @@ export default function ProfileDetailPage() {
                     </svg>
                   )}
                 </div>
-                <p className="text-[11px] text-white mt-2 font-medium truncate">{sp.name}</p>
-                <p className="text-[9px] text-purple-300/40 mt-0.5">{sp.age} yrs, {sp.city || 'India'}</p>
+                <p className="text-[11px] text-slate-800 dark:text-white mt-2 font-medium truncate">{sp.name}</p>
+                <p className="text-[9px] text-slate-300 dark:text-purple-300/40 mt-0.5">{sp.age} yrs, {sp.city || 'India'}</p>
               </Link>
             )) : (
-              <p className="text-xs text-purple-300/40 py-4">Loading similar profiles...</p>
+              <p className="text-xs text-slate-300 dark:text-purple-300/40 py-4">Loading similar profiles...</p>
             )}
           </div>
         </div>
@@ -584,20 +584,20 @@ export default function ProfileDetailPage() {
           <div className="lg:col-span-2 space-y-6">
             {/* About */}
             <div className="glass-card animate-fade-in-up" style={{ animationDelay: '0.05s', opacity: 0 }}>
-              <h2 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-                <Star className="h-4 w-4 text-purple-400" /> About {profile.name.split(' ')[0]}
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-white mb-3 flex items-center gap-2">
+                <Star className="h-4 w-4 text-teal-600 dark:text-purple-400" /> About {profile.name.split(' ')[0]}
               </h2>
-              <p className="text-sm text-purple-200/60 leading-relaxed">{profile.about}</p>
+              <p className="text-sm text-slate-500 dark:text-purple-200/60 leading-relaxed">{profile.about}</p>
             </div>
 
             {/* Hobbies & Interests */}
             <div className="glass-card animate-fade-in-up" style={{ animationDelay: '0.1s', opacity: 0 }}>
-              <h2 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-white mb-3 flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-fuchsia-400" /> Hobbies & Interests
               </h2>
               <div className="flex flex-wrap gap-2">
                 {extendedData.hobbies.map(hobby => (
-                  <span key={hobby} className="text-xs bg-purple-500/10 text-purple-200/70 px-3 py-1.5 rounded-full border border-purple-500/15">
+                  <span key={hobby} className="text-xs bg-teal-50 dark:bg-purple-500/10 text-slate-500 dark:text-purple-200/70 px-3 py-1.5 rounded-full border border-purple-500/15">
                     {hobby}
                   </span>
                 ))}
@@ -606,7 +606,7 @@ export default function ProfileDetailPage() {
 
             {/* Basic Details */}
             <div className="glass-card animate-fade-in-up" style={{ animationDelay: '0.15s', opacity: 0 }}>
-              <h2 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                 <User className="h-4 w-4 text-blue-400" /> Basic Details
               </h2>
               <div className="grid grid-cols-2 gap-3">
@@ -623,8 +623,8 @@ export default function ProfileDetailPage() {
                   { label: 'Managed By', value: extendedData.managedBy },
                 ].map((item, i) => (
                   <div key={i} className="flex justify-between items-center p-2.5 rounded-xl bg-white/[0.02] border border-purple-500/5">
-                    <span className="text-[11px] text-purple-300/40">{item.label}</span>
-                    <span className="text-[11px] text-white font-medium text-right">{item.value}</span>
+                    <span className="text-[11px] text-slate-300 dark:text-purple-300/40">{item.label}</span>
+                    <span className="text-[11px] text-slate-800 dark:text-white font-medium text-right">{item.value}</span>
                   </div>
                 ))}
               </div>
@@ -632,19 +632,19 @@ export default function ProfileDetailPage() {
 
             {/* Contact Details (Premium Locked) */}
             <div className="glass-card animate-fade-in-up relative overflow-hidden" style={{ animationDelay: '0.2s', opacity: 0 }}>
-              <h2 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                 <Phone className="h-4 w-4 text-green-400" /> Contact Details
               </h2>
               {contactUnlocked && contactData ? (
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 rounded-xl bg-green-500/5 border border-green-500/15">
-                    <span className="text-[11px] text-purple-300/40">Contact Number</span>
+                    <span className="text-[11px] text-slate-300 dark:text-purple-300/40">Contact Number</span>
                     <a href={`tel:${contactData.phone}`} className="text-[11px] text-green-300 font-mono font-semibold">
                       {contactData.phone}
                     </a>
                   </div>
                   <div className="flex justify-between items-center p-3 rounded-xl bg-green-500/5 border border-green-500/15">
-                    <span className="text-[11px] text-purple-300/40">Email ID</span>
+                    <span className="text-[11px] text-slate-300 dark:text-purple-300/40">Email ID</span>
                     <a href={`mailto:${contactData.email}`} className="text-[11px] text-green-300 font-mono font-semibold">
                       {contactData.email}
                     </a>
@@ -657,14 +657,14 @@ export default function ProfileDetailPage() {
                 <>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center p-3 rounded-xl bg-white/[0.02] border border-purple-500/5">
-                      <span className="text-[11px] text-purple-300/40">Contact Number</span>
-                      <span className="text-[11px] text-white/30 font-mono flex items-center gap-1">
+                      <span className="text-[11px] text-slate-300 dark:text-purple-300/40">Contact Number</span>
+                      <span className="text-[11px] text-slate-800 dark:text-white/30 font-mono flex items-center gap-1">
                         <Lock className="h-3 w-3" /> +91 XXXXX XXXXX
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 rounded-xl bg-white/[0.02] border border-purple-500/5">
-                      <span className="text-[11px] text-purple-300/40">Email ID</span>
-                      <span className="text-[11px] text-white/30 font-mono flex items-center gap-1">
+                      <span className="text-[11px] text-slate-300 dark:text-purple-300/40">Email ID</span>
+                      <span className="text-[11px] text-slate-800 dark:text-white/30 font-mono flex items-center gap-1">
                         <Lock className="h-3 w-3" /> xxxxxxx@email.com
                       </span>
                     </div>
@@ -674,7 +674,7 @@ export default function ProfileDetailPage() {
                       <Lock className="h-4 w-4 text-amber-400" />
                       <span className="text-xs text-amber-200/70">Unlock contact details</span>
                     </div>
-                    <button onClick={handleViewContact} className="text-xs bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-1.5 rounded-full font-semibold hover:shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all">
+                    <button onClick={handleViewContact} className="text-xs bg-gradient-to-r from-amber-500 to-orange-500 text-slate-800 dark:text-white px-4 py-1.5 rounded-full font-semibold hover:shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all">
                       {user?.premium ? 'View Contact' : 'Go Premium →'}
                     </button>
                   </div>
@@ -684,7 +684,7 @@ export default function ProfileDetailPage() {
 
             {/* Family Details */}
             <div className="glass-card animate-fade-in-up" style={{ animationDelay: '0.25s', opacity: 0 }}>
-              <h2 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                 <Users className="h-4 w-4 text-pink-400" /> Family Details
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -696,8 +696,8 @@ export default function ProfileDetailPage() {
                   { label: 'Annual Family Income', value: extendedData.family.annualIncome },
                 ].map((item, i) => (
                   <div key={i} className="flex justify-between items-center p-2.5 rounded-xl bg-white/[0.02] border border-purple-500/5">
-                    <span className="text-[11px] text-purple-300/40">{item.label}</span>
-                    <span className="text-[11px] text-white font-medium text-right max-w-[60%]">{item.value}</span>
+                    <span className="text-[11px] text-slate-300 dark:text-purple-300/40">{item.label}</span>
+                    <span className="text-[11px] text-slate-800 dark:text-white font-medium text-right max-w-[60%]">{item.value}</span>
                   </div>
                 ))}
               </div>
@@ -705,7 +705,7 @@ export default function ProfileDetailPage() {
 
             {/* Career & Education */}
             <div className="glass-card animate-fade-in-up" style={{ animationDelay: '0.3s', opacity: 0 }}>
-              <h2 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                 <Briefcase className="h-4 w-4 text-indigo-400" /> Career & Education
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -719,8 +719,8 @@ export default function ProfileDetailPage() {
                   { label: 'College', value: extendedData.career.college },
                 ].map((item, i) => (
                   <div key={i} className="flex justify-between items-center p-2.5 rounded-xl bg-white/[0.02] border border-purple-500/5">
-                    <span className="text-[11px] text-purple-300/40">{item.label}</span>
-                    <span className="text-[11px] text-white font-medium text-right max-w-[60%]">{item.value}</span>
+                    <span className="text-[11px] text-slate-300 dark:text-purple-300/40">{item.label}</span>
+                    <span className="text-[11px] text-slate-800 dark:text-white font-medium text-right max-w-[60%]">{item.value}</span>
                   </div>
                 ))}
               </div>
@@ -728,15 +728,15 @@ export default function ProfileDetailPage() {
 
             {/* Her Preferences (You & Her Match) */}
             <div className="glass-card animate-fade-in-up" style={{ animationDelay: '0.35s', opacity: 0 }}>
-              <h2 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                 <Heart className="h-4 w-4 text-rose-400" /> {profile.name.split(' ')[0]}&apos;s Partner Preferences
               </h2>
-              <p className="text-[11px] text-purple-300/40 mb-3">See how you match with what she is looking for</p>
+              <p className="text-[11px] text-slate-300 dark:text-purple-300/40 mb-3">See how you match with what she is looking for</p>
               <div className="grid grid-cols-2 gap-3">
                 {Object.entries(extendedData.herPreferences).map(([key, value], i) => (
                   <div key={i} className="flex justify-between items-center p-2.5 rounded-xl bg-white/[0.02] border border-purple-500/5">
-                    <span className="text-[11px] text-purple-300/40 capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-                    <span className="text-[11px] text-white font-medium">{value}</span>
+                    <span className="text-[11px] text-slate-300 dark:text-purple-300/40 capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                    <span className="text-[11px] text-slate-800 dark:text-white font-medium">{value}</span>
                   </div>
                 ))}
               </div>
@@ -744,7 +744,7 @@ export default function ProfileDetailPage() {
 
             {/* Common Between Both */}
             <div className="glass-card animate-fade-in-up border-green-500/10" style={{ animationDelay: '0.4s', opacity: 0 }}>
-              <h2 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                 <Check className="h-4 w-4 text-green-400" /> Common Between You Both
               </h2>
               <div className="flex flex-wrap gap-2">
@@ -758,7 +758,7 @@ export default function ProfileDetailPage() {
 
             {/* Astrology & Kundli */}
             <div className="glass-card animate-fade-in-up" style={{ animationDelay: '0.45s', opacity: 0 }}>
-              <h2 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                 <Moon className="h-4 w-4 text-amber-400" /> Astrology & Kundli Match
               </h2>
               <div className="flex items-center gap-4 mb-4">
@@ -781,12 +781,12 @@ export default function ProfileDetailPage() {
           <div className="space-y-4">
             {/* Connect Section (Premium Gated) */}
             <div className="glass-card animate-fade-in-up border-purple-400/15" style={{ animationDelay: '0.1s', opacity: 0 }}>
-              <h3 className="text-xs font-semibold text-white mb-3 flex items-center gap-2">
-                <MessageCircle className="h-4 w-4 text-purple-400" /> Connect
+              <h3 className="text-xs font-semibold text-slate-800 dark:text-white mb-3 flex items-center gap-2">
+                <MessageCircle className="h-4 w-4 text-teal-600 dark:text-purple-400" /> Connect
                 {!user?.premium && <span className="text-[9px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full">Premium</span>}
               </h3>
               <div className="space-y-2">
-                <Link href={`/messages?chat=${profile.id}`} className="w-full flex items-center gap-2 p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-200 text-xs hover:bg-purple-500/20 transition-all">
+                <Link href={`/messages?chat=${profile.id}`} className="w-full flex items-center gap-2 p-3 rounded-xl bg-teal-50 dark:bg-purple-500/10 border border-teal-200/50 dark:border-purple-500/20 text-slate-700 dark:text-purple-200 text-xs hover:bg-teal-100/50 dark:bg-purple-500/20 transition-all">
                   <MessageCircle className="h-4 w-4" /> Chat Now
                 </Link>
                 <button 
@@ -815,32 +815,32 @@ export default function ProfileDetailPage() {
 
             {/* Online Status */}
             <div className="glass-card animate-fade-in-up" style={{ animationDelay: '0.15s', opacity: 0 }}>
-              <h3 className="text-xs font-semibold text-white mb-3">Activity</h3>
+              <h3 className="text-xs font-semibold text-slate-800 dark:text-white mb-3">Activity</h3>
               <div className="flex items-center gap-2 mb-2">
                 <div className={`w-2.5 h-2.5 rounded-full ${profile.online ? 'bg-green-400 animate-pulse' : 'bg-gray-500'}`} />
-                <span className="text-[11px] text-purple-200/60">{profile.online ? 'Online now' : `Last active: ${new Date(profile.lastActive).toLocaleDateString()}`}</span>
+                <span className="text-[11px] text-slate-500 dark:text-purple-200/60">{profile.online ? 'Online now' : `Last active: ${new Date(profile.lastActive).toLocaleDateString()}`}</span>
               </div>
             </div>
 
             {/* Quick Stats */}
             <div className="glass-card animate-fade-in-up" style={{ animationDelay: '0.2s', opacity: 0 }}>
-              <h3 className="text-xs font-semibold text-white mb-3">Profile Highlights</h3>
+              <h3 className="text-xs font-semibold text-slate-800 dark:text-white mb-3">Profile Highlights</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-green-400" />
-                  <span className="text-[11px] text-purple-200/60">Active today</span>
+                  <span className="text-[11px] text-slate-500 dark:text-purple-200/60">Active today</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-blue-400" />
-                  <span className="text-[11px] text-purple-200/60">ID Verified</span>
+                  <span className="text-[11px] text-slate-500 dark:text-purple-200/60">ID Verified</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-purple-400" />
-                  <span className="text-[11px] text-purple-200/60">Income: {profile.income}</span>
+                  <span className="text-[11px] text-slate-500 dark:text-purple-200/60">Income: {profile.income}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-pink-400" />
-                  <span className="text-[11px] text-purple-200/60">Mother Tongue: {profile.motherTongue}</span>
+                  <span className="text-[11px] text-slate-500 dark:text-purple-200/60">Mother Tongue: {profile.motherTongue}</span>
                 </div>
               </div>
             </div>
@@ -849,22 +849,22 @@ export default function ProfileDetailPage() {
             <div className="glass-card border-green-500/10 animate-fade-in-up" style={{ animationDelay: '0.3s', opacity: 0 }}>
               <div className="flex items-center gap-2 mb-2">
                 <Shield className="h-4 w-4 text-green-400" />
-                <h3 className="text-xs font-semibold text-white">Trust Score</h3>
+                <h3 className="text-xs font-semibold text-slate-800 dark:text-white">Trust Score</h3>
               </div>
               <div className="flex items-center gap-3">
-                <div className="flex-1 h-1.5 bg-purple-500/10 rounded-full overflow-hidden">
+                <div className="flex-1 h-1.5 bg-teal-50 dark:bg-purple-500/10 rounded-full overflow-hidden">
                   <div className="h-full w-[85%] bg-gradient-to-r from-green-500 to-emerald-400 rounded-full" />
                 </div>
                 <span className="text-xs font-bold text-green-400">85%</span>
               </div>
-              <p className="text-[10px] text-purple-300/40 mt-2">Profile verified with ID proof & phone number</p>
+              <p className="text-[10px] text-slate-300 dark:text-purple-300/40 mt-2">Profile verified with ID proof & phone number</p>
             </div>
 
             {/* Similar Profiles */}
             <div className="glass-card animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
-              <h3 className="text-xs font-semibold text-white mb-3">Similar Profiles</h3>
-              <p className="text-[11px] text-purple-300/40">More profiles like this await in your search results.</p>
-              <Link href="/search" className="mt-3 block text-xs text-purple-400 hover:text-purple-300 transition-colors">
+              <h3 className="text-xs font-semibold text-slate-800 dark:text-white mb-3">Similar Profiles</h3>
+              <p className="text-[11px] text-slate-300 dark:text-purple-300/40">More profiles like this await in your search results.</p>
+              <Link href="/search" className="mt-3 block text-xs text-teal-600 dark:text-purple-400 hover:text-slate-600 dark:text-purple-300 transition-colors">
                 Browse More →
               </Link>
             </div>
@@ -879,8 +879,8 @@ export default function ProfileDetailPage() {
             <div className="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
               <Crown className="h-8 w-8 text-amber-400" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">Premium Required</h3>
-            <p className="text-sm text-purple-200/50 mb-5">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Premium Required</h3>
+            <p className="text-sm text-slate-500 dark:text-purple-200/50 mb-5">
               Upgrade to Premium to {premiumAction}. Get unlimited access to contacts, calls, and more.
             </p>
             <div className="flex gap-3">
@@ -900,25 +900,25 @@ export default function ProfileDetailPage() {
             {reportSent ? (
               <div className="text-center py-8">
                 <Shield className="h-12 w-12 text-green-400 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold text-white mb-2">Report Submitted</h3>
-                <p className="text-sm text-purple-200/60">Our team will review this within 24 hours.</p>
+                <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">Report Submitted</h3>
+                <p className="text-sm text-slate-500 dark:text-purple-200/60">Our team will review this within 24 hours.</p>
               </div>
             ) : (
               <>
                 <div className="flex items-center justify-between mb-5">
-                  <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2">
                     <AlertTriangle className="h-5 w-5 text-red-400" /> Report Profile
                   </h3>
-                  <button onClick={() => setShowReport(false)} className="text-purple-300/40 hover:text-white">
+                  <button onClick={() => setShowReport(false)} className="text-slate-300 dark:text-purple-300/40 hover:text-slate-800 dark:text-white">
                     <X className="h-5 w-5" />
                   </button>
                 </div>
-                <p className="text-sm text-purple-200/60 mb-4">Why are you reporting {profile.name}?</p>
+                <p className="text-sm text-slate-500 dark:text-purple-200/60 mb-4">Why are you reporting {profile.name}?</p>
                 <div className="space-y-2 mb-4">
                   {['Fake profile', 'Inappropriate content', 'Harassment', 'Scam/Fraud', 'Already married', 'Other'].map(reason => (
                     <button key={reason} onClick={() => setReportReason(reason)}
                       className={`w-full text-left p-3 rounded-xl border text-sm transition-all ${
-                        reportReason === reason ? 'border-red-500/50 bg-red-500/10 text-red-200' : 'border-purple-500/10 text-purple-200/60 hover:bg-white/[0.03]'
+                        reportReason === reason ? 'border-red-500/50 bg-red-500/10 text-red-200' : 'border-teal-100 dark:border-purple-500/10 text-slate-500 dark:text-purple-200/60 hover:bg-white/[0.03]'
                       }`}>
                       {reason}
                     </button>
@@ -934,7 +934,7 @@ export default function ProfileDetailPage() {
                 <div className="flex gap-3">
                   <button onClick={() => setShowReport(false)} className="btn-secondary flex-1 py-2.5 text-sm">Cancel</button>
                   <button onClick={handleReport} disabled={!reportReason}
-                    className="flex-1 py-2.5 text-sm font-medium text-white bg-red-600/50 rounded-xl border border-red-500/30 hover:bg-red-600/70 transition-all disabled:opacity-40">
+                    className="flex-1 py-2.5 text-sm font-medium text-slate-800 dark:text-white bg-red-600/50 rounded-xl border border-red-500/30 hover:bg-red-600/70 transition-all disabled:opacity-40">
                     Submit Report
                   </button>
                 </div>

@@ -71,26 +71,26 @@ export default function CommunityPage() {
             <Globe className="h-4 w-4 text-blue-400" />
             <span className="text-xs text-blue-300">Connect with Like-minded People</span>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-3">Community Groups</h1>
-          <p className="text-purple-200/50 max-w-lg mx-auto">Join communities based on religion, region, profession, or interests to find matches faster</p>
+          <h1 className="text-4xl font-bold text-slate-800 dark:text-white mb-3">Community Groups</h1>
+          <p className="text-slate-500 dark:text-purple-200/50 max-w-lg mx-auto">Join communities based on religion, region, profession, or interests to find matches faster</p>
         </div>
 
         {/* My Groups Summary */}
         {joinedGroups.length > 0 && (
           <div className="glass-card p-5 mb-8 animate-fade-in-up" style={{ animationDelay: '0.05s', opacity: 0 }}>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-white flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-400" /> Your Groups ({joinedGroups.length})
               </h3>
-              <span className="text-xs text-purple-300/40">Active discussions</span>
+              <span className="text-xs text-slate-300 dark:text-purple-300/40">Active discussions</span>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-2">
               {joinedGroups.map(g => (
-                <div key={g.id} className="flex items-center gap-2 bg-white/[0.03] rounded-xl px-3 py-2 border border-purple-500/10 whitespace-nowrap flex-shrink-0">
+                <div key={g.id} className="flex items-center gap-2 bg-white/[0.03] rounded-xl px-3 py-2 border border-teal-100 dark:border-purple-500/10 whitespace-nowrap flex-shrink-0">
                   <span className="text-lg">{g.icon}</span>
                   <div>
-                    <p className="text-xs text-white font-medium">{g.name.length > 20 ? g.name.slice(0, 20) + '...' : g.name}</p>
-                    <p className="text-[10px] text-purple-300/40">{g.recentPosts} new posts</p>
+                    <p className="text-xs text-slate-800 dark:text-white font-medium">{g.name.length > 20 ? g.name.slice(0, 20) + '...' : g.name}</p>
+                    <p className="text-[10px] text-slate-300 dark:text-purple-300/40">{g.recentPosts} new posts</p>
                   </div>
                 </div>
               ))}
@@ -101,9 +101,9 @@ export default function CommunityPage() {
         {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s', opacity: 0 }}>
           <div className="flex-1 glass-card !p-3 flex items-center gap-3">
-            <Search className="h-4 w-4 text-purple-300/40" />
+            <Search className="h-4 w-4 text-slate-300 dark:text-purple-300/40" />
             <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Search communities..." className="flex-1 bg-transparent text-white text-sm placeholder-purple-300/30 focus:outline-none" />
+              placeholder="Search communities..." className="flex-1 bg-transparent text-slate-800 dark:text-white text-sm placeholder-purple-300/30 focus:outline-none" />
           </div>
         </div>
 
@@ -113,8 +113,8 @@ export default function CommunityPage() {
             <button key={cat.id} onClick={() => setSelectedCategory(cat.id)}
               className={`px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all border ${
                 selectedCategory === cat.id
-                  ? 'bg-purple-600/30 text-white border-purple-500/40'
-                  : 'bg-white/[0.02] text-purple-200/60 border-purple-500/10 hover:bg-white/[0.05]'
+                  ? 'bg-purple-600/30 text-slate-800 dark:text-white border-purple-500/40'
+                  : 'bg-white/[0.02] text-slate-500 dark:text-purple-200/60 border-teal-100 dark:border-purple-500/10 hover:bg-white/[0.05]'
               }`}>
               {cat.label}
             </button>
@@ -124,7 +124,7 @@ export default function CommunityPage() {
         {/* Groups Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((group, i) => (
-            <div key={group.id} className="glass-card group hover:border-purple-400/30 transition-all animate-fade-in-up"
+            <div key={group.id} className="glass-card group hover:border-teal-200/50 dark:border-purple-400/30 transition-all animate-fade-in-up"
               style={{ animationDelay: `${i * 0.04}s`, opacity: 0 }}>
               <div className="flex items-start gap-3 mb-3">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-fuchsia-500/10 flex items-center justify-center text-xl border border-purple-400/10 flex-shrink-0">
@@ -132,7 +132,7 @@ export default function CommunityPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <h3 className="text-sm font-semibold text-white truncate">{group.name}</h3>
+                    <h3 className="text-sm font-semibold text-slate-800 dark:text-white truncate">{group.name}</h3>
                     {group.verified && <CheckCircle className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />}
                   </div>
                   <div className="flex items-center gap-2 text-xs text-purple-200/40 mt-0.5">
@@ -143,14 +143,14 @@ export default function CommunityPage() {
                 </div>
               </div>
 
-              <p className="text-xs text-purple-200/50 mb-4 line-clamp-2">{group.description}</p>
+              <p className="text-xs text-slate-500 dark:text-purple-200/50 mb-4 line-clamp-2">{group.description}</p>
 
               <button
                 onClick={() => toggleJoin(group.id)}
                 className={`w-full py-2.5 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-2 ${
                   group.isJoined
                     ? 'bg-green-500/10 text-green-300 border border-green-500/20 hover:bg-red-500/10 hover:text-red-300 hover:border-red-500/20'
-                    : 'bg-purple-600/30 text-white border border-purple-500/30 hover:bg-purple-600/50'
+                    : 'bg-purple-600/30 text-slate-800 dark:text-white border border-teal-200 dark:border-purple-500/30 hover:bg-purple-600/50'
                 }`}
               >
                 {group.isJoined ? <><CheckCircle className="h-3.5 w-3.5" /> Joined</> : <><Plus className="h-3.5 w-3.5" /> Join Group</>}
@@ -162,8 +162,8 @@ export default function CommunityPage() {
         {/* Create Group CTA */}
         <div className="mt-10 glass-card p-8 text-center border-blue-500/20 animate-fade-in-up">
           <Users className="h-10 w-10 text-blue-400 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-white mb-2">Can&apos;t find your community?</h3>
-          <p className="text-sm text-purple-200/50 mb-5">Create a group for your community, profession, or region and invite members</p>
+          <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Can&apos;t find your community?</h3>
+          <p className="text-sm text-slate-500 dark:text-purple-200/50 mb-5">Create a group for your community, profession, or region and invite members</p>
           <button className="btn-primary text-sm py-2.5 px-6 flex items-center gap-2 mx-auto">
             <Plus className="h-4 w-4" /> Create Community Group
           </button>

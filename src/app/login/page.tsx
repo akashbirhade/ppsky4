@@ -35,14 +35,14 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-mesh flex items-center justify-center py-20 px-4">
-      <div className="absolute top-20 left-20 w-72 h-72 bg-purple-600/10 rounded-full blur-[80px] animate-float" />
+      <div className="absolute top-20 left-20 w-72 h-72 bg-teal-50 dark:bg-purple-600/10 rounded-full blur-[80px] animate-float" />
       <div className="absolute bottom-20 right-20 w-64 h-64 bg-fuchsia-600/8 rounded-full blur-[80px] animate-float-slow" />
 
       <div className="relative w-full max-w-md">
         <div className="text-center mb-8 animate-fade-in-up">
           <HalfHeart className="h-10 w-10 mx-auto mb-3 animate-heartbeat" />
-          <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
-          <p className="text-purple-300/50 mt-1">Continue your search for love</p>
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Welcome Back</h1>
+          <p className="text-slate-400 dark:text-purple-300/50 mt-1">Continue your search for love</p>
         </div>
 
         <div className="glass-card animate-fade-in-up delay-200" style={{opacity:0}}>
@@ -54,30 +54,30 @@ export default function LoginPage() {
             )}
 
             <div>
-              <label className="block text-sm text-purple-200/60 mb-1.5">Email</label>
+              <label className="block text-sm text-slate-500 dark:text-purple-200/60 mb-1.5">Email</label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-400/50" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-teal-600 dark:text-purple-400/50" />
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input-field pl-11" placeholder="Enter your email" required />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm text-purple-200/60 mb-1.5">Password</label>
+              <label className="block text-sm text-slate-500 dark:text-purple-200/60 mb-1.5">Password</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-400/50" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-teal-600 dark:text-purple-400/50" />
                 <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} className="input-field pl-11 pr-11" placeholder="Enter password" required />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-purple-400/50 hover:text-purple-300">
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-teal-600 dark:text-purple-400/50 hover:text-slate-600 dark:text-purple-300">
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
 
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 text-purple-300/50">
-                <input type="checkbox" className="rounded bg-white/5 border-purple-500/30" />
+              <label className="flex items-center gap-2 text-slate-400 dark:text-purple-300/50">
+                <input type="checkbox" className="rounded bg-white/5 border-teal-200 dark:border-purple-500/30" />
                 Remember me
               </label>
-              <a href="#" className="text-purple-400 hover:text-purple-300 transition-colors">Forgot Password?</a>
+              <a href="#" className="text-purple-400 hover:text-slate-600 dark:text-purple-300 transition-colors">Forgot Password?</a>
             </div>
 
             <button type="submit" disabled={loading} className="w-full btn-primary py-3.5 flex items-center justify-center gap-2 disabled:opacity-50">
@@ -86,10 +86,10 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center border-t border-purple-500/10 pt-5">
-            <p className="text-sm text-purple-300/50">
+          <div className="mt-6 text-center border-t border-teal-100 dark:border-purple-500/10 pt-5">
+            <p className="text-sm text-slate-400 dark:text-purple-300/50">
               New here?{' '}
-              <Link href="/register" className="text-purple-300 hover:text-white transition-colors font-medium">Create Account</Link>
+              <Link href="/register" className="text-slate-600 dark:text-purple-300 hover:text-slate-800 dark:text-white transition-colors font-medium">Create Account</Link>
             </p>
           </div>
         </div>

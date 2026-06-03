@@ -146,21 +146,21 @@ function OnboardingContent() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 animate-fade-in-up">
-          <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-1.5 mb-4">
-            <Sparkles className="h-4 w-4 text-purple-400" />
-            <span className="text-xs text-purple-300">Complete your profile for better matches</span>
+          <div className="inline-flex items-center gap-2 bg-teal-50 dark:bg-purple-500/10 border border-teal-200/50 dark:border-purple-500/20 rounded-full px-4 py-1.5 mb-4">
+            <Sparkles className="h-4 w-4 text-teal-600 dark:text-purple-400" />
+            <span className="text-xs text-slate-600 dark:text-purple-300">Complete your profile for better matches</span>
           </div>
-          <h1 className="text-3xl font-bold text-white">Let&apos;s set up your profile</h1>
-          <p className="text-purple-200/50 mt-2">Profiles with more details get 4x more responses</p>
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Let&apos;s set up your profile</h1>
+          <p className="text-slate-500 dark:text-purple-200/50 mt-2">Profiles with more details get 4x more responses</p>
         </div>
 
         {/* Progress Bar */}
         <div className="mb-8 animate-fade-in-up" style={{ animationDelay: '0.1s', opacity: 0 }}>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-purple-300/60">Step {step + 1} of {STEPS.length}</span>
-            <span className="text-xs text-purple-400 font-medium">{completionPercent()}% complete</span>
+            <span className="text-xs text-slate-400 dark:text-purple-300/60">Step {step + 1} of {STEPS.length}</span>
+            <span className="text-xs text-teal-600 dark:text-purple-400 font-medium">{completionPercent()}% complete</span>
           </div>
-          <div className="h-2 bg-white/5 rounded-full overflow-hidden border border-purple-500/10">
+          <div className="h-2 bg-white/5 rounded-full overflow-hidden border border-teal-100 dark:border-purple-500/10">
             <div
               className="h-full bg-gradient-to-r from-purple-600 to-fuchsia-500 rounded-full transition-all duration-700 ease-out"
               style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
@@ -177,11 +177,11 @@ function OnboardingContent() {
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                   i < step ? 'bg-green-500/30 border border-green-400/40' :
                   i === step ? 'bg-purple-600 border border-purple-400/50 shadow-[0_0_15px_rgba(147,51,234,0.4)]' :
-                  'bg-white/5 border border-purple-500/20'
+                  'bg-white/5 border border-teal-200/50 dark:border-purple-500/20'
                 }`}>
-                  {i < step ? <CheckCircle className="h-4 w-4 text-green-400" /> : <s.icon className="h-3.5 w-3.5 text-purple-200" />}
+                  {i < step ? <CheckCircle className="h-4 w-4 text-green-400" /> : <s.icon className="h-3.5 w-3.5 text-slate-700 dark:text-purple-200" />}
                 </div>
-                <span className="text-[10px] text-purple-300/50 hidden sm:block">{s.title}</span>
+                <span className="text-[10px] text-slate-400 dark:text-purple-300/50 hidden sm:block">{s.title}</span>
               </button>
             ))}
           </div>
@@ -190,10 +190,10 @@ function OnboardingContent() {
         {/* Step Content */}
         <div className="glass-card p-8 animate-fade-in-up" style={{ animationDelay: '0.2s', opacity: 0 }}>
           <div className="flex items-center gap-3 mb-6">
-            {(() => { const Icon = STEPS[step].icon; return <Icon className="h-6 w-6 text-purple-400" /> })()}
+            {(() => { const Icon = STEPS[step].icon; return <Icon className="h-6 w-6 text-teal-600 dark:text-purple-400" /> })()}
             <div>
-              <h2 className="text-xl font-semibold text-white">{STEPS[step].title}</h2>
-              <p className="text-sm text-purple-300/50">{STEPS[step].subtitle}</p>
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-white">{STEPS[step].title}</h2>
+              <p className="text-sm text-slate-400 dark:text-purple-300/50">{STEPS[step].subtitle}</p>
             </div>
           </div>
 
@@ -201,21 +201,21 @@ function OnboardingContent() {
           {step === 0 && (
             <div className="space-y-6">
               <div className="flex flex-col items-center gap-4">
-                <label htmlFor="photo-upload" className="w-32 h-32 rounded-full bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 border-2 border-dashed border-purple-400/30 flex items-center justify-center cursor-pointer hover:border-purple-400/60 transition-all group overflow-hidden">
+                <label htmlFor="photo-upload" className="w-32 h-32 rounded-full bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 border-2 border-dashed border-teal-200/50 dark:border-purple-400/30 flex items-center justify-center cursor-pointer hover:border-purple-400/60 transition-all group overflow-hidden">
                   {formData.photoUrl ? (
                     <img src={formData.photoUrl} alt="Profile" className="w-full h-full object-cover rounded-full" />
                   ) : (
                     <div className="text-center">
-                      <Camera className="h-8 w-8 text-purple-300/50 mx-auto group-hover:text-purple-200 transition-colors" />
-                      <span className="text-[10px] text-purple-300/40 mt-1 block">Upload Photo</span>
+                      <Camera className="h-8 w-8 text-slate-400 dark:text-purple-300/50 mx-auto group-hover:text-slate-700 dark:text-purple-200 transition-colors" />
+                      <span className="text-[10px] text-slate-300 dark:text-purple-300/40 mt-1 block">Upload Photo</span>
                     </div>
                   )}
                 </label>
                 <input id="photo-upload" type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
-                <p className="text-xs text-purple-300/40 text-center">
+                <p className="text-xs text-slate-300 dark:text-purple-300/40 text-center">
                   {formData.photoUrl ? '✓ Photo uploaded! Click to change' : 'Click to upload your photo (JPEG, PNG, WebP, max 5MB)'}
                 </p>
-                <p className="text-[10px] text-purple-400/60 text-center">Photos increase profile views by 10x</p>
+                <p className="text-[10px] text-teal-600 dark:text-purple-400/60 text-center">Photos increase profile views by 10x</p>
               </div>
             </div>
           )}
@@ -224,14 +224,14 @@ function OnboardingContent() {
           {step === 1 && (
             <div className="space-y-4">
               <div>
-                <label className="text-sm text-purple-200 mb-2 block">About Me *</label>
+                <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">About Me *</label>
                 <textarea name="about" value={formData.about} onChange={handleChange}
                   placeholder="Write a brief description about yourself, your hobbies, values..."
                   rows={4} className="input-field w-full resize-none" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm text-purple-200 mb-2 block">Religion *</label>
+                  <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Religion *</label>
                   <select name="religion" value={formData.religion} onChange={handleChange} className="input-field w-full">
                     <option value="">Select</option>
                     <option value="Hindu">Hindu</option>
@@ -244,14 +244,14 @@ function OnboardingContent() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-sm text-purple-200 mb-2 block">Caste</label>
+                  <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Caste</label>
                   <input type="text" name="caste" value={formData.caste} onChange={handleChange}
                     placeholder="Enter caste" className="input-field w-full" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm text-purple-200 mb-2 block">Mother Tongue *</label>
+                  <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Mother Tongue *</label>
                   <select name="motherTongue" value={formData.motherTongue} onChange={handleChange} className="input-field w-full">
                     <option value="">Select</option>
                     <option value="Hindi">Hindi</option>
@@ -268,7 +268,7 @@ function OnboardingContent() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-sm text-purple-200 mb-2 block">Height *</label>
+                  <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Height *</label>
                   <select name="height" value={formData.height} onChange={handleChange} className="input-field w-full">
                     <option value="">Select</option>
                     {["4'10\"","4'11\"","5'0\"","5'1\"","5'2\"","5'3\"","5'4\"","5'5\"","5'6\"","5'7\"","5'8\"","5'9\"","5'10\"","5'11\"","6'0\"","6'1\"","6'2\"","6'3\"","6'4\""].map(h => (
@@ -284,7 +284,7 @@ function OnboardingContent() {
           {step === 2 && (
             <div className="space-y-4">
               <div>
-                <label className="text-sm text-purple-200 mb-2 block">Highest Education *</label>
+                <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Highest Education *</label>
                 <select name="education" value={formData.education} onChange={handleChange} className="input-field w-full">
                   <option value="">Select</option>
                   <option value="High School">High School</option>
@@ -303,7 +303,7 @@ function OnboardingContent() {
                 </select>
               </div>
               <div>
-                <label className="text-sm text-purple-200 mb-2 block">Occupation *</label>
+                <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Occupation *</label>
                 <select name="occupation" value={formData.occupation} onChange={handleChange} className="input-field w-full">
                   <option value="">Select</option>
                   <option value="Software Engineer">Software Engineer</option>
@@ -321,7 +321,7 @@ function OnboardingContent() {
                 </select>
               </div>
               <div>
-                <label className="text-sm text-purple-200 mb-2 block">Annual Income *</label>
+                <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Annual Income *</label>
                 <select name="income" value={formData.income} onChange={handleChange} className="input-field w-full">
                   <option value="">Select</option>
                   <option value="Below 5 LPA">Below 5 LPA</option>
@@ -342,18 +342,18 @@ function OnboardingContent() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm text-purple-200 mb-2 block">City *</label>
+                  <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">City *</label>
                   <input type="text" name="city" value={formData.city} onChange={handleChange}
                     placeholder="e.g. Mumbai" className="input-field w-full" />
                 </div>
                 <div>
-                  <label className="text-sm text-purple-200 mb-2 block">State *</label>
+                  <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">State *</label>
                   <input type="text" name="state" value={formData.state} onChange={handleChange}
                     placeholder="e.g. Maharashtra" className="input-field w-full" />
                 </div>
               </div>
               <div>
-                <label className="text-sm text-purple-200 mb-2 block">Family Type</label>
+                <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Family Type</label>
                 <select name="familyType" value={formData.familyType} onChange={handleChange} className="input-field w-full">
                   <option value="">Select</option>
                   <option value="Joint Family">Joint Family</option>
@@ -363,7 +363,7 @@ function OnboardingContent() {
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="text-sm text-purple-200 mb-2 block">Diet</label>
+                  <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Diet</label>
                   <select name="diet" value={formData.diet} onChange={handleChange} className="input-field w-full">
                     <option value="">Select</option>
                     <option value="Vegetarian">Vegetarian</option>
@@ -373,7 +373,7 @@ function OnboardingContent() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-sm text-purple-200 mb-2 block">Smoke</label>
+                  <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Smoke</label>
                   <select name="smoke" value={formData.smoke} onChange={handleChange} className="input-field w-full">
                     <option value="">Select</option>
                     <option value="No">No</option>
@@ -382,7 +382,7 @@ function OnboardingContent() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-sm text-purple-200 mb-2 block">Drink</label>
+                  <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Drink</label>
                   <select name="drink" value={formData.drink} onChange={handleChange} className="input-field w-full">
                     <option value="">Select</option>
                     <option value="No">No</option>
@@ -399,18 +399,18 @@ function OnboardingContent() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm text-purple-200 mb-2 block">Preferred Age Min</label>
+                  <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Preferred Age Min</label>
                   <input type="number" name="prefAgeMin" value={formData.prefAgeMin} onChange={handleChange}
                     min="18" max="60" className="input-field w-full" />
                 </div>
                 <div>
-                  <label className="text-sm text-purple-200 mb-2 block">Preferred Age Max</label>
+                  <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Preferred Age Max</label>
                   <input type="number" name="prefAgeMax" value={formData.prefAgeMax} onChange={handleChange}
                     min="18" max="60" className="input-field w-full" />
                 </div>
               </div>
               <div>
-                <label className="text-sm text-purple-200 mb-2 block">Preferred Religion</label>
+                <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Preferred Religion</label>
                 <select name="prefReligion" value={formData.prefReligion} onChange={handleChange} className="input-field w-full">
                   <option value="">Any Religion</option>
                   <option value="Hindu">Hindu</option>
@@ -422,7 +422,7 @@ function OnboardingContent() {
                 </select>
               </div>
               <div>
-                <label className="text-sm text-purple-200 mb-2 block">Preferred Education</label>
+                <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Preferred Education</label>
                 <select name="prefEducation" value={formData.prefEducation} onChange={handleChange} className="input-field w-full">
                   <option value="">Any Education</option>
                   <option value="Graduate+">Graduate or above</option>
@@ -431,7 +431,7 @@ function OnboardingContent() {
                 </select>
               </div>
               <div>
-                <label className="text-sm text-purple-200 mb-2 block">Preferred City</label>
+                <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Preferred City</label>
                 <input type="text" name="prefCity" value={formData.prefCity} onChange={handleChange}
                   placeholder="Any city or specific preferences" className="input-field w-full" />
               </div>
@@ -439,10 +439,10 @@ function OnboardingContent() {
           )}
 
           {/* Navigation */}
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-purple-500/10">
+          <div className="flex items-center justify-between mt-8 pt-6 border-t border-teal-100 dark:border-purple-500/10">
             {step > 0 ? (
               <button onClick={() => setStep(s => s - 1)}
-                className="flex items-center gap-2 text-sm text-purple-300 hover:text-white transition-colors px-4 py-2.5 rounded-xl hover:bg-white/5">
+                className="flex items-center gap-2 text-sm text-slate-600 dark:text-purple-300 hover:text-slate-800 dark:text-white transition-colors px-4 py-2.5 rounded-xl hover:bg-white/5">
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>
             ) : <div />}
@@ -450,7 +450,7 @@ function OnboardingContent() {
             <div className="flex items-center gap-3">
               {canSkip && (
                 <button onClick={() => setStep(s => s + 1)}
-                  className="text-sm text-purple-300/50 hover:text-purple-200 transition-colors px-3 py-2">
+                  className="text-sm text-slate-400 dark:text-purple-300/50 hover:text-slate-700 dark:text-purple-200 transition-colors px-3 py-2">
                   Skip for now
                 </button>
               )}
@@ -471,10 +471,10 @@ function OnboardingContent() {
 
         {/* Tips */}
         <div className="mt-6 glass-card p-5 animate-fade-in-up" style={{ animationDelay: '0.3s', opacity: 0 }}>
-          <h3 className="text-sm font-semibold text-white flex items-center gap-2 mb-3">
-            <Moon className="h-4 w-4 text-purple-400" /> Profile Tips
+          <h3 className="text-sm font-semibold text-slate-800 dark:text-white flex items-center gap-2 mb-3">
+            <Moon className="h-4 w-4 text-teal-600 dark:text-purple-400" /> Profile Tips
           </h3>
-          <ul className="space-y-2 text-xs text-purple-200/60">
+          <ul className="space-y-2 text-xs text-slate-500 dark:text-purple-200/60">
             <li className="flex items-start gap-2"><CheckCircle className="h-3.5 w-3.5 text-green-400 mt-0.5 flex-shrink-0" /> Profiles with photos get 10x more views</li>
             <li className="flex items-start gap-2"><CheckCircle className="h-3.5 w-3.5 text-green-400 mt-0.5 flex-shrink-0" /> A detailed &apos;About Me&apos; increases interest by 5x</li>
             <li className="flex items-start gap-2"><CheckCircle className="h-3.5 w-3.5 text-green-400 mt-0.5 flex-shrink-0" /> Setting partner preferences helps AI find better matches</li>
@@ -488,7 +488,7 @@ function OnboardingContent() {
 
 export default function OnboardingPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-mesh flex items-center justify-center"><div className="text-purple-300">Loading...</div></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-mesh flex items-center justify-center"><div className="text-slate-600 dark:text-purple-300">Loading...</div></div>}>
       <OnboardingContent />
     </Suspense>
   )

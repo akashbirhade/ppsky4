@@ -131,22 +131,22 @@ export default function CoachPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-10 animate-fade-in-up">
-          <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-1.5 mb-4">
-            <Brain className="h-4 w-4 text-purple-400" />
-            <span className="text-xs text-purple-300">AI-Powered Guidance</span>
+          <div className="inline-flex items-center gap-2 bg-teal-50 dark:bg-purple-500/10 border border-teal-200/50 dark:border-purple-500/20 rounded-full px-4 py-1.5 mb-4">
+            <Brain className="h-4 w-4 text-teal-600 dark:text-purple-400" />
+            <span className="text-xs text-slate-600 dark:text-purple-300">AI-Powered Guidance</span>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-3">Relationship Coach</h1>
-          <p className="text-purple-200/50 max-w-lg mx-auto">Personalized advice to help you navigate your matchmaking journey with confidence</p>
+          <h1 className="text-4xl font-bold text-slate-800 dark:text-white mb-3">Relationship Coach</h1>
+          <p className="text-slate-500 dark:text-purple-200/50 max-w-lg mx-auto">Personalized advice to help you navigate your matchmaking journey with confidence</p>
         </div>
 
         {/* Daily Affirmation */}
-        <div className="glass-card p-6 mb-8 border-purple-500/20 text-center animate-fade-in-up" style={{ animationDelay: '0.1s', opacity: 0 }}>
+        <div className="glass-card p-6 mb-8 border-teal-200/50 dark:border-purple-500/20 text-center animate-fade-in-up" style={{ animationDelay: '0.1s', opacity: 0 }}>
           <div className="flex items-center justify-center gap-2 mb-3">
             <Sparkles className="h-4 w-4 text-yellow-400" />
-            <span className="text-xs text-purple-300/60 uppercase tracking-wider">Today&apos;s Affirmation</span>
+            <span className="text-xs text-slate-400 dark:text-purple-300/60 uppercase tracking-wider">Today&apos;s Affirmation</span>
             <Sparkles className="h-4 w-4 text-yellow-400" />
           </div>
-          <p className="text-lg text-purple-100 font-medium italic leading-relaxed">&ldquo;{affirmation}&rdquo;</p>
+          <p className="text-lg text-slate-800 dark:text-purple-100 font-medium italic leading-relaxed">&ldquo;{affirmation}&rdquo;</p>
         </div>
 
         {/* Quick Stats */}
@@ -159,8 +159,8 @@ export default function CoachPage() {
           ].map((stat, i) => (
             <div key={i} className="glass-card !p-4 text-center">
               <stat.icon className={`h-5 w-5 mx-auto mb-2 ${stat.color}`} />
-              <p className="text-lg font-bold text-white">{stat.value}</p>
-              <p className="text-[10px] text-purple-300/40">{stat.label}</p>
+              <p className="text-lg font-bold text-slate-800 dark:text-white">{stat.value}</p>
+              <p className="text-[10px] text-slate-300 dark:text-purple-300/40">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -178,25 +178,25 @@ export default function CoachPage() {
                   {topic.icon}
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-sm font-semibold text-white">{topic.title}</h3>
-                  <p className="text-xs text-purple-200/50">{topic.subtitle}</p>
+                  <h3 className="text-sm font-semibold text-slate-800 dark:text-white">{topic.title}</h3>
+                  <p className="text-xs text-slate-500 dark:text-purple-200/50">{topic.subtitle}</p>
                 </div>
                 {expandedTopic === topic.id ? (
-                  <ChevronUp className="h-5 w-5 text-purple-300/40" />
+                  <ChevronUp className="h-5 w-5 text-slate-300 dark:text-purple-300/40" />
                 ) : (
-                  <ChevronDown className="h-5 w-5 text-purple-300/40" />
+                  <ChevronDown className="h-5 w-5 text-slate-300 dark:text-purple-300/40" />
                 )}
               </button>
 
               {expandedTopic === topic.id && (
-                <div className="px-5 pb-5 pt-0 border-t border-purple-500/10">
+                <div className="px-5 pb-5 pt-0 border-t border-teal-100 dark:border-purple-500/10">
                   <div className="pl-16 space-y-3 mt-4">
                     {topic.tips.map((tip, j) => (
                       <div key={j} className="flex items-start gap-3 group">
-                        <div className="w-6 h-6 rounded-full bg-purple-500/10 flex items-center justify-center flex-shrink-0 mt-0.5 border border-purple-500/20 group-hover:bg-purple-500/20 transition-colors">
-                          <span className="text-[10px] font-bold text-purple-300">{j + 1}</span>
+                        <div className="w-6 h-6 rounded-full bg-teal-50 dark:bg-purple-500/10 flex items-center justify-center flex-shrink-0 mt-0.5 border border-teal-200/50 dark:border-purple-500/20 group-hover:bg-teal-100/50 dark:bg-purple-500/20 transition-colors">
+                          <span className="text-[10px] font-bold text-slate-600 dark:text-purple-300">{j + 1}</span>
                         </div>
-                        <p className="text-sm text-purple-200/70 leading-relaxed">{tip}</p>
+                        <p className="text-sm text-slate-500 dark:text-purple-200/70 leading-relaxed">{tip}</p>
                       </div>
                     ))}
                   </div>
@@ -207,11 +207,11 @@ export default function CoachPage() {
         </div>
 
         {/* CTA to Chat */}
-        <div className="mt-10 glass-card p-8 text-center border-purple-500/20 animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
-          <Brain className="h-10 w-10 text-purple-400 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-white mb-2">Have a specific question?</h3>
-          <p className="text-sm text-purple-200/50 mb-5 max-w-md mx-auto">Our AI assistant speaks Hindi, English & Marathi and can give you personalized advice anytime.</p>
-          <p className="text-xs text-purple-300/40">Click the chat icon in the bottom-right corner to start a conversation 💬</p>
+        <div className="mt-10 glass-card p-8 text-center border-teal-200/50 dark:border-purple-500/20 animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
+          <Brain className="h-10 w-10 text-teal-600 dark:text-purple-400 mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Have a specific question?</h3>
+          <p className="text-sm text-slate-500 dark:text-purple-200/50 mb-5 max-w-md mx-auto">Our AI assistant speaks Hindi, English & Marathi and can give you personalized advice anytime.</p>
+          <p className="text-xs text-slate-300 dark:text-purple-300/40">Click the chat icon in the bottom-right corner to start a conversation 💬</p>
         </div>
       </div>
     </div>
