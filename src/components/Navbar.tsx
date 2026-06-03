@@ -73,7 +73,7 @@ export default function Navbar() {
   }, [])
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-purple-500/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-teal-200/40 shadow-[0_4px_30px_rgba(20,184,166,0.06)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-14 lg:h-16">
           {/* Logo */}
@@ -100,15 +100,15 @@ export default function Navbar() {
 
                 {/* Help Dropdown */}
                 <div ref={helpRef} className="relative ml-3">
-                  <button onClick={() => setHelpOpen(!helpOpen)} className="flex items-center gap-1 text-purple-200/70 hover:text-white text-sm font-medium transition-colors">
+                  <button onClick={() => setHelpOpen(!helpOpen)} className="flex items-center gap-1 text-slate-600 hover:text-teal-700 text-sm font-medium transition-colors">
                     Help <ChevronDown className="h-3.5 w-3.5" />
                   </button>
                   {helpOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-dark-800 rounded-lg shadow-xl border border-purple-500/20 py-2 z-50 animate-fade-in-down">
-                      <a href="#" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10">Help Center</a>
-                      <a href="#" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10">Contact Us</a>
-                      <a href="#" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10">FAQs</a>
-                      <a href="#" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10">Safety Tips</a>
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-teal-200/40 py-2 z-50 animate-fade-in-down">
+                      <a href="#" className="block px-4 py-2 text-sm text-slate-700 hover:bg-teal-50">Help Center</a>
+                      <a href="#" className="block px-4 py-2 text-sm text-slate-700 hover:bg-teal-50">Contact Us</a>
+                      <a href="#" className="block px-4 py-2 text-sm text-slate-700 hover:bg-teal-50">FAQs</a>
+                      <a href="#" className="block px-4 py-2 text-sm text-slate-700 hover:bg-teal-50">Safety Tips</a>
                     </div>
                   )}
                 </div>
@@ -117,43 +117,43 @@ export default function Navbar() {
                 <div ref={userInfoRef} className="relative ml-3">
                   <button
                     onClick={() => setUserInfoOpen(!userInfoOpen)}
-                    className="relative w-9 h-9 flex items-center justify-center rounded-full bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all"
+                    className="relative w-9 h-9 flex items-center justify-center rounded-full bg-teal-50 border border-teal-200/50 hover:bg-teal-100 transition-all"
                     title="Notifications"
                   >
-                    <Bell className="h-4 w-4 text-purple-300" />
+                    <Bell className="h-4 w-4 text-teal-600" />
                     {notifCount > 0 && (
                       <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-pink-500 text-[9px] font-bold text-white rounded-full flex items-center justify-center">{notifCount}</span>
                     )}
                   </button>
                   {userInfoOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-80 bg-dark-800/95 backdrop-blur-md rounded-xl shadow-2xl border border-purple-500/20 z-50 animate-fade-in-down overflow-hidden">
-                      <div className="flex items-center justify-between px-4 py-3 border-b border-purple-500/10">
-                        <h3 className="text-sm font-semibold text-white">Notifications</h3>
-                        {notifCount > 0 && <span className="text-[10px] bg-pink-500/20 text-pink-300 px-2 py-0.5 rounded-full">{notifCount} new</span>}
+                    <div className="absolute right-0 top-full mt-2 w-80 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-teal-200/40 z-50 animate-fade-in-down overflow-hidden">
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-teal-100">
+                        <h3 className="text-sm font-semibold text-slate-800">Notifications</h3>
+                        {notifCount > 0 && <span className="text-[10px] bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full">{notifCount} new</span>}
                       </div>
                       <div className="max-h-72 overflow-y-auto">
                         {notifications.length > 0 ? notifications.map(n => (
                           <Link key={n.id} href={n.link || '/notifications'} onClick={() => setUserInfoOpen(false)}
-                            className={`flex items-start gap-3 px-4 py-3 hover:bg-purple-500/5 transition-colors border-b border-purple-500/5 ${!n.read ? 'bg-purple-500/[0.03]' : ''}`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${!n.read ? 'bg-pink-500/20' : 'bg-white/5'}`}>
-                              <Bell className={`h-3.5 w-3.5 ${!n.read ? 'text-pink-400' : 'text-purple-300/50'}`} />
+                            className={`flex items-start gap-3 px-4 py-3 hover:bg-teal-50 transition-colors border-b border-teal-50 ${!n.read ? 'bg-teal-50/50' : ''}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${!n.read ? 'bg-teal-100' : 'bg-slate-50'}`}>
+                              <Bell className={`h-3.5 w-3.5 ${!n.read ? 'text-teal-600' : 'text-slate-400'}`} />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className={`text-xs font-medium truncate ${!n.read ? 'text-white' : 'text-purple-200/70'}`}>{n.title}</p>
-                              <p className="text-[11px] text-purple-300/50 truncate">{n.message}</p>
-                              <p className="text-[9px] text-purple-300/30 mt-0.5">{n.time}</p>
+                              <p className={`text-xs font-medium truncate ${!n.read ? 'text-slate-800' : 'text-slate-500'}`}>{n.title}</p>
+                              <p className="text-[11px] text-slate-400 truncate">{n.message}</p>
+                              <p className="text-[9px] text-slate-300 mt-0.5">{n.time}</p>
                             </div>
-                            {!n.read && <span className="w-2 h-2 bg-pink-500 rounded-full mt-1.5 shrink-0"></span>}
+                            {!n.read && <span className="w-2 h-2 bg-teal-500 rounded-full mt-1.5 shrink-0"></span>}
                           </Link>
                         )) : (
                           <div className="px-4 py-8 text-center">
-                            <Bell className="h-6 w-6 text-purple-300/20 mx-auto mb-2" />
-                            <p className="text-xs text-purple-300/40">No notifications yet</p>
+                            <Bell className="h-6 w-6 text-slate-300 mx-auto mb-2" />
+                            <p className="text-xs text-slate-400">No notifications yet</p>
                           </div>
                         )}
                       </div>
                       <Link href="/notifications" onClick={() => setUserInfoOpen(false)}
-                        className="block text-center py-2.5 text-xs text-purple-400 hover:text-purple-300 border-t border-purple-500/10 transition-colors">
+                        className="block text-center py-2.5 text-xs text-teal-600 hover:text-teal-700 border-t border-teal-100 transition-colors">
                         View All Notifications
                       </Link>
                     </div>
@@ -163,7 +163,7 @@ export default function Navbar() {
                 {/* Profile Avatar Dropdown */}
                 <div ref={profileRef} className="relative ml-3">
                   <button onClick={() => setProfileOpen(!profileOpen)} className="flex items-center gap-1.5 group">
-                    <div className="w-9 h-9 rounded-full bg-purple-500/20 border-2 border-purple-400/30 flex items-center justify-center overflow-hidden group-hover:border-purple-300/50 transition-all">
+                    <div className="w-9 h-9 rounded-full bg-teal-50 border-2 border-teal-200/50 flex items-center justify-center overflow-hidden group-hover:border-teal-300 transition-all">
                       {user.photos && user.photos.length > 0 ? (
                         <img src={user.photos[0]} alt="" className="w-full h-full object-cover" />
                       ) : (
@@ -171,40 +171,40 @@ export default function Navbar() {
                         <img src={user.gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg'} alt="" className="w-full h-full object-cover" />
                       )}
                     </div>
-                    <ChevronDown className="h-3.5 w-3.5 text-purple-300/60" />
+                    <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
                   </button>
                   {profileOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-72 bg-dark-800 rounded-xl shadow-2xl border border-purple-500/20 z-50 animate-fade-in-down overflow-hidden">
+                    <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-2xl border border-teal-200/40 z-50 animate-fade-in-down overflow-hidden">
                       {/* Dropdown Menu Items */}
-                      <div className="grid grid-cols-2 gap-0 p-4 border-b border-purple-500/10">
-                        <Link href="/profile" className="flex items-center gap-2 p-2 rounded-lg hover:bg-purple-500/10 text-sm text-purple-200" onClick={() => setProfileOpen(false)}>
-                          <User className="h-4 w-4 text-purple-400" /> My Profile
+                      <div className="grid grid-cols-2 gap-0 p-4 border-b border-teal-100">
+                        <Link href="/profile" className="flex items-center gap-2 p-2 rounded-lg hover:bg-teal-50 text-sm text-slate-700" onClick={() => setProfileOpen(false)}>
+                          <User className="h-4 w-4 text-teal-600" /> My Profile
                         </Link>
-                        <Link href="/notifications" className="flex items-center gap-2 p-2 rounded-lg hover:bg-purple-500/10 text-sm text-purple-200" onClick={() => setProfileOpen(false)}>
-                          <Mail className="h-4 w-4 text-purple-400" /> Alerts
+                        <Link href="/notifications" className="flex items-center gap-2 p-2 rounded-lg hover:bg-teal-50 text-sm text-slate-700" onClick={() => setProfileOpen(false)}>
+                          <Mail className="h-4 w-4 text-teal-600" /> Alerts
                         </Link>
-                        <Link href="/settings" className="flex items-center gap-2 p-2 rounded-lg hover:bg-purple-500/10 text-sm text-purple-200" onClick={() => setProfileOpen(false)}>
-                          <Settings className="h-4 w-4 text-purple-400" /> Settings
+                        <Link href="/settings" className="flex items-center gap-2 p-2 rounded-lg hover:bg-teal-50 text-sm text-slate-700" onClick={() => setProfileOpen(false)}>
+                          <Settings className="h-4 w-4 text-teal-600" /> Settings
                         </Link>
-                        <Link href="/settings" className="flex items-center gap-2 p-2 rounded-lg hover:bg-purple-500/10 text-sm text-purple-200" onClick={() => setProfileOpen(false)}>
-                          <Shield className="h-4 w-4 text-purple-400" /> Privacy
+                        <Link href="/settings" className="flex items-center gap-2 p-2 rounded-lg hover:bg-teal-50 text-sm text-slate-700" onClick={() => setProfileOpen(false)}>
+                          <Shield className="h-4 w-4 text-teal-600" /> Privacy
                         </Link>
-                        <Link href="/search" className="flex items-center gap-2 p-2 rounded-lg hover:bg-purple-500/10 text-sm text-purple-200" onClick={() => setProfileOpen(false)}>
-                          <SlidersHorizontal className="h-4 w-4 text-purple-400" /> Filters
+                        <Link href="/search" className="flex items-center gap-2 p-2 rounded-lg hover:bg-teal-50 text-sm text-slate-700" onClick={() => setProfileOpen(false)}>
+                          <SlidersHorizontal className="h-4 w-4 text-teal-600" /> Filters
                         </Link>
-                        <button onClick={() => { logout(); setProfileOpen(false) }} className="flex items-center gap-2 p-2 rounded-lg hover:bg-red-500/10 text-sm text-red-300">
-                          <LogOut className="h-4 w-4 text-red-400" /> Logout
+                        <button onClick={() => { logout(); setProfileOpen(false) }} className="flex items-center gap-2 p-2 rounded-lg hover:bg-red-50 text-sm text-red-600">
+                          <LogOut className="h-4 w-4 text-red-500" /> Logout
                         </button>
                       </div>
                       {/* Account Type */}
                       <div className="p-4 text-center">
-                        <p className="text-sm text-purple-300/60 mb-2">Account Type: <span className="font-semibold text-purple-200">{user.premium ? user.premiumPlan || 'Premium' : 'Free'}</span></p>
+                        <p className="text-sm text-slate-500 mb-2">Account Type: <span className="font-semibold text-slate-800">{user.premium ? user.premiumPlan || 'Premium' : 'Free'}</span></p>
                         {!user.premium && (
                           <>
                             <Link href="/premium" className="block w-full btn-gold py-2.5 px-4 text-sm" onClick={() => setProfileOpen(false)}>
                               Upgrade Now
                             </Link>
-                            <Link href="/premium" className="block mt-2 text-purple-400 text-sm hover:underline" onClick={() => setProfileOpen(false)}>
+                            <Link href="/premium" className="block mt-2 text-teal-600 text-sm hover:underline" onClick={() => setProfileOpen(false)}>
                               Compare memberships
                             </Link>
                           </>
@@ -225,7 +225,7 @@ export default function Navbar() {
 
           {/* Mobile menu button */}
           <div className="lg:hidden flex items-center">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-purple-300 p-2">
+            <button onClick={() => setIsOpen(!isOpen)} className="text-teal-600 p-2">
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
@@ -233,7 +233,7 @@ export default function Navbar() {
 
         {/* Sub Navigation (only when logged in) */}
         {user && (
-          <div className={`hidden lg:flex items-center gap-6 h-10 border-t border-purple-500/10 -mx-4 px-4 transition-all duration-300 overflow-hidden ${showSubNav ? 'max-h-10 opacity-100' : 'max-h-0 opacity-0 border-t-0'}`}>
+          <div className={`hidden lg:flex items-center gap-6 h-10 border-t border-teal-100 -mx-4 px-4 transition-all duration-300 overflow-hidden ${showSubNav ? 'max-h-10 opacity-100' : 'max-h-0 opacity-0 border-t-0'}`}>
             <SubNavLink href="/dashboard" label="Dashboard" />
             <SubNavLink href="/profile" label="My Profile" />
             <SubNavLink href="/meeting" label="Meeting Planner" />
@@ -245,7 +245,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="lg:hidden absolute top-14 left-0 right-0 bg-dark-900/95 backdrop-blur-xl border-b border-purple-500/10 z-50 animate-fade-in-down">
+        <div className="lg:hidden absolute top-14 left-0 right-0 bg-white/95 backdrop-blur-xl border-b border-teal-200/40 z-50 animate-fade-in-down">
           <div className="flex flex-col p-4 space-y-1">
             {user ? (
               <>
@@ -257,8 +257,8 @@ export default function Navbar() {
                 <MobileLink href="/notifications" label="Alerts" onClick={() => setIsOpen(false)} />
                 <MobileLink href="/settings" label="Settings" onClick={() => setIsOpen(false)} />
                 <MobileLink href="/premium" label="Upgrade Now" onClick={() => setIsOpen(false)} />
-                <hr className="border-purple-500/10 my-2" />
-                <button onClick={() => { logout(); setIsOpen(false) }} className="text-left text-red-400 py-3 px-4 rounded-lg hover:bg-red-500/10 font-medium">
+                <hr className="border-teal-100 my-2" />
+                <button onClick={() => { logout(); setIsOpen(false) }} className="text-left text-red-500 py-3 px-4 rounded-lg hover:bg-red-50 font-medium">
                   Logout
                 </button>
               </>
@@ -280,10 +280,10 @@ export default function Navbar() {
 
 function NavLink({ href, label, badge }: { href: string; label: string; badge?: number }) {
   return (
-    <Link href={href} className="relative flex items-center text-purple-200/70 hover:text-white px-4 py-2 text-sm font-semibold transition-colors rounded-xl hover:bg-white/5">
+    <Link href={href} className="relative flex items-center text-slate-600 hover:text-teal-700 px-4 py-2 text-sm font-semibold transition-colors rounded-xl hover:bg-teal-50">
       {label}
       {badge && badge > 0 && (
-        <span className="ml-1.5 min-w-[18px] h-[18px] bg-pink-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+        <span className="ml-1.5 min-w-[18px] h-[18px] bg-teal-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
           {badge > 99 ? '99+' : badge}
         </span>
       )}
@@ -293,7 +293,7 @@ function NavLink({ href, label, badge }: { href: string; label: string; badge?: 
 
 function SubNavLink({ href, label }: { href: string; label: string }) {
   return (
-    <Link href={href} className="text-purple-300/50 hover:text-purple-200 text-xs font-medium transition-colors">
+    <Link href={href} className="text-slate-400 hover:text-teal-600 text-xs font-medium transition-colors">
       {label}
     </Link>
   )
@@ -301,7 +301,7 @@ function SubNavLink({ href, label }: { href: string; label: string }) {
 
 function MobileLink({ href, label, onClick }: { href: string; label: string; onClick: () => void }) {
   return (
-    <Link href={href} onClick={onClick} className="text-purple-200 py-3 px-4 rounded-lg hover:bg-purple-500/10 font-medium text-sm">
+    <Link href={href} onClick={onClick} className="text-slate-700 py-3 px-4 rounded-lg hover:bg-teal-50 font-medium text-sm">
       {label}
     </Link>
   )
