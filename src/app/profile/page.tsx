@@ -73,7 +73,7 @@ export default function ProfilePage() {
   const completionScore = Math.round((completionFields.filter(Boolean).length / completionFields.length) * 100)
 
   return (
-    <div className="min-h-screen bg-mesh pt-24 pb-12 px-4">
+    <div className="min-h-screen bg-mesh pt-[104px] pb-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Profile Header */}
         <div className="glass-card mb-6 p-8 relative overflow-hidden animate-fade-in-up">

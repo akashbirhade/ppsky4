@@ -126,7 +126,7 @@ function CheckoutContent() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-mesh pt-24 pb-12 px-4 flex items-center justify-center">
+      <div className="min-h-screen bg-mesh pt-[104px] pb-12 px-4 flex items-center justify-center">
         <div className="glass-card max-w-md w-full text-center animate-scale-in">
           <div className="w-20 h-20 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="h-10 w-10 text-green-400" />
@@ -157,7 +157,7 @@ function CheckoutContent() {
   }
 
   return (
-    <div className="min-h-screen bg-mesh pt-24 pb-12 px-4">
+    <div className="min-h-screen bg-mesh pt-[104px] pb-12 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Back */}
         <Link href="/premium" className="inline-flex items-center gap-2 text-sm text-slate-400 dark:text-purple-300/50 hover:text-slate-700 dark:text-purple-200 mb-6 transition-colors">
@@ -392,7 +392,7 @@ function CheckoutContent() {
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-mesh pt-24 flex items-center justify-center"><div className="w-8 h-8 border-2 border-teal-200 dark:border-purple-500/30 border-t-purple-400 rounded-full animate-spin" /></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-mesh pt-[104px] flex items-center justify-center"><div className="w-8 h-8 border-2 border-teal-200 dark:border-purple-500/30 border-t-purple-400 rounded-full animate-spin" /></div>}>
       <CheckoutContent />
     </Suspense>
   )

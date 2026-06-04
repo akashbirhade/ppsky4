@@ -159,7 +159,7 @@ export default function SearchPage() {
   const activeFilterCount = Object.entries(filters).filter(([, v]) => typeof v === 'boolean' ? v : v !== '').length
 
   return (
-    <div className="min-h-screen bg-mesh pt-24 pb-12">
+    <div className="min-h-screen bg-mesh pt-[104px] pb-12">
       <div className="relative py-4 border-b border-teal-100 dark:border-purple-500/10">
         <div className="max-w-7xl mx-auto px-4">
           {/* Filter Tabs */}

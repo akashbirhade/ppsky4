@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/context/ThemeContext'
 import { ToastProvider } from '@/components/Toast'
 import Navbar from '@/components/Navbar'
 import ChatSidebar from '@/components/ChatSidebar'
+import { ChatSidebarProvider } from '@/context/ChatSidebarContext'
 import PageTransition from '@/components/PageTransition'
 import AIChatBot from '@/components/AIChatBot'
 import ServiceWorkerRegistration from '@/components/ServiceWorker'
@@ -25,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#7c3aed" />
@@ -41,6 +42,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} min-h-screen transition-colors duration-300`}>
         <ThemeProvider>
+        <ChatSidebarProvider>
         <AuthProvider>
           <LanguageProvider>
             <ToastProvider>
@@ -68,6 +70,7 @@ export default function RootLayout({
             </ToastProvider>
           </LanguageProvider>
         </AuthProvider>
+        </ChatSidebarProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -57,7 +57,7 @@ export default function PreferencesPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-mesh pt-24 pb-12 px-4">
+    <div className="min-h-screen bg-mesh pt-[104px] pb-12 px-4">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6 animate-fade-in-up">

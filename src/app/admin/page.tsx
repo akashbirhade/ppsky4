@@ -74,7 +74,7 @@ export default function AdminPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-mesh pt-24 pb-12 px-4">
+    <div className="min-h-screen bg-mesh pt-[104px] pb-12 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 animate-fade-in-up">

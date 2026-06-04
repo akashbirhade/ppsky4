@@ -142,7 +142,7 @@ function OnboardingContent() {
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-mesh pt-24 pb-12 px-4">
+    <div className="min-h-screen bg-mesh pt-[104px] pb-12 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 animate-fade-in-up">

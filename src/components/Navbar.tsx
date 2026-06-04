@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/context/AuthContext'
-import { Menu, X, User, LogOut, Search, MessageCircle, Crown, Users, Settings, Bell, Mail, Shield, SlidersHorizontal, ChevronDown, HelpCircle } from 'lucide-react'
+import { useTheme } from '@/context/ThemeContext'
+import { Menu, X, User, LogOut, Search, MessageCircle, Crown, Users, Settings, Bell, Mail, Shield, SlidersHorizontal, ChevronDown, HelpCircle, Sun, Moon } from 'lucide-react'
 import HalfHeart from './HalfHeart'
 
 export default function Navbar() {
@@ -18,6 +19,7 @@ export default function Navbar() {
   const [showSubNav, setShowSubNav] = useState(true)
   const lastScrollY = useRef(0)
   const { user, logout } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const profileRef = useRef<HTMLDivElement>(null)
   const helpRef = useRef<HTMLDivElement>(null)
 
@@ -137,6 +139,15 @@ export default function Navbar() {
                     </div>
                   )}
                 </div>
+
+                {/* Theme Toggle */}
+                <button
+                  onClick={toggleTheme}
+                  className="ml-3 w-9 h-9 flex items-center justify-center rounded-full bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all"
+                  title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                >
+                  {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-purple-400" />}
+                </button>
 
                 {/* User Info Icon */}
                 <div ref={userInfoRef} className="relative ml-3">

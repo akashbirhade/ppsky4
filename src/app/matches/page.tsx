@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Eye, Heart, Users, Star, MapPin, Clock, Send, Inbox, HandHeart, Bookmark, Brain, Sparkles, Crown, Check, X, User, BadgeCheck } from 'lucide-react'
 import { useProfileSlide } from '@/hooks/useGsap'
+import { useChatSidebar } from '@/context/ChatSidebarContext'
 
 interface ProfileItem {
   profile: { id: string; name: string; age: number; city: string; state: string; education: string; occupation: string; height: string; verified: boolean; premium: boolean; gender: string; photos?: string[]; about?: string; religion?: string; motherTongue?: string; income?: string; maritalStatus?: string }
@@ -16,6 +17,7 @@ interface ProfileItem {
 export default function MatchesPage() {
   const { user } = useAuth()
   const router = useRouter()
+  const { isOpen: chatSidebarOpen } = useChatSidebar()
   const [activeTab, setActiveTab] = useState('daily')
   const [data, setData] = useState<ProfileItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -25,6 +27,7 @@ export default function MatchesPage() {
   const [shortlistCount, setShortlistCount] = useState(0)
   const { ref: profileSlideRef, animateSlide } = useProfileSlide()
   const [connectPopup, setConnectPopup] = useState<{ profileId: string; rippling: boolean } | null>(null)
+  const [likedProfiles, setLikedProfiles] = useState<Set<string>>(new Set())
   const [timeLeft, setTimeLeft] = useState('')
 
   useEffect(() => { if (!user) router.push('/login') }, [user, router])
@@ -140,7 +143,10 @@ export default function MatchesPage() {
 
   const handleConnectClick = (profileId: string) => {
     setConnectPopup({ profileId, rippling: true })
-    setTimeout(() => setConnectPopup({ profileId, rippling: false }), 500)
+    setTimeout(() => {
+      setConnectPopup(null)
+      setLikedProfiles(prev => new Set(prev).add(profileId))
+    }, 500)
   }
   const handleShortlist = async (profileId: string) => {
     await fetch('/api/activity/shortlist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user!.id, profileId }) })
@@ -171,7 +177,7 @@ export default function MatchesPage() {
 
   return (
     <div className="min-h-screen bg-mesh pt-[104px] pb-12">
-      <div className="max-w-6xl mx-auto px-4 xl:pr-80">
+      <div className={`max-w-6xl mx-auto px-4 transition-all duration-300 ${chatSidebarOpen ? 'xl:pr-80' : ''}`}>
         {/* Sub Navigation Tabs */}
         <div className="flex items-center gap-6 border-b border-purple-500/10 mb-6 glass-card !rounded-b-none !p-0 px-6 py-0">
           {tabs.map(tab => (
@@ -181,7 +187,7 @@ export default function MatchesPage() {
               className={`relative py-4 text-sm font-medium transition-colors whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'text-purple-300 border-b-2 border-purple-400'
-                  : 'text-purple-300/40 hover:text-purple-200'
+                  : 'text-purple-300/60 hover:text-purple-200'
               }`}
             >
               {tab.label}
@@ -192,12 +198,12 @@ export default function MatchesPage() {
               )}
             </button>
           ))}
-          <button className="text-purple-300/30 text-sm hover:text-purple-200 ml-auto">More Matches</button>
+          <button className="text-purple-300/50 text-sm hover:text-purple-200 ml-auto">More Matches</button>
         </div>
 
         {/* Header Text */}
         <div className="text-center mb-6">
-          <h2 className="text-lg font-medium text-purple-200/60">
+          <h2 className="text-lg font-medium text-purple-200/80">
             Here are Today&apos;s top Matches for you. Connect with them now!
           </h2>
         </div>
@@ -218,14 +224,14 @@ export default function MatchesPage() {
             {/* Time & Navigation */}
             <div className="flex items-center justify-between px-6 py-3 border-b border-purple-500/10 bg-white/[0.02]">
               <div className="flex items-center gap-3">
-                <span className="text-xs text-purple-300/40">Time left to Connect</span>
+                <span className="text-xs text-purple-300/60">Time left to Connect</span>
                 <span className="text-sm font-mono text-pink-400 font-medium">{timeLeft}</span>
               </div>
               <div className="flex items-center gap-2">
                 <button 
                   onClick={handlePrev}
                   disabled={currentIndex === 0}
-                  className="text-purple-300/40 hover:text-purple-200 disabled:opacity-30 text-sm"
+                  className="text-purple-300/60 hover:text-purple-200 disabled:opacity-30 text-sm"
                 >
                   ← Prev
                 </button>
@@ -259,7 +265,7 @@ export default function MatchesPage() {
                     <BadgeCheck className="h-5 w-5 text-green-400" />
                     <div>
                       <p className="text-xs font-medium text-green-300">Verified profile</p>
-                      <p className="text-[10px] text-purple-300/40">Selfie verified with Profile Photo</p>
+                      <p className="text-[10px] text-purple-300/60">Selfie verified with Profile Photo</p>
                     </div>
                   </div>
                 )}
@@ -273,7 +279,7 @@ export default function MatchesPage() {
                       {currentProfile.name}
                       {currentProfile.premium && <Crown className="h-4 w-4 text-amber-400" />}
                     </h2>
-                    <div className="flex items-center gap-3 mt-1 text-sm text-purple-300/50">
+                    <div className="flex items-center gap-3 mt-1 text-sm text-purple-300/70">
                       <span className="flex items-center gap-1">
                         <span className={`w-2 h-2 rounded-full ${currentProfile.gender ? 'bg-green-500' : 'bg-gray-400'}`}></span> {currentProfile.gender ? 'Online' : 'Offline'}
                       </span>
@@ -282,97 +288,67 @@ export default function MatchesPage() {
                     </div>
                   </div>
                   {/* Like / Connect Button */}
-                  <div className="text-center relative">
-                    <p className="text-xs text-purple-300/40 mb-1">Like this profile?</p>
-                    <div className="relative inline-block">
-                      <button
-                        onClick={() => handleConnectClick(currentProfile.id)}
-                        className="relative w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center text-white hover:bg-purple-700 transition-colors shadow-[0_0_20px_rgba(147,51,234,0.4)] overflow-hidden"
-                      >
-                        <Heart className="h-6 w-6 relative z-10" />
-                        {connectPopup?.profileId === currentProfile.id && connectPopup.rippling && (
-                          <span className="absolute inset-0 rounded-full animate-ping bg-purple-400/60" />
-                        )}
-                      </button>
-
-                      {/* Connect Options Popup */}
-                      {connectPopup?.profileId === currentProfile.id && !connectPopup.rippling && (
-                        <div className="absolute bottom-full right-0 mb-3 flex flex-col gap-1.5 items-end animate-fade-in-up z-50">
-                          {/* Close */}
-                          <button
-                            onClick={() => setConnectPopup(null)}
-                            className="self-end w-5 h-5 bg-white/10 rounded-full flex items-center justify-center text-purple-300/60 hover:text-white hover:bg-white/20 transition-colors mb-0.5"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-
-                          {/* WhatsApp */}
-                          <button
-                            onClick={() => {
-                              const msg = encodeURIComponent(`Hi ${currentProfile.name}! I found your profile on Soulmate Sync and would love to connect. 💜`)
-                              window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank')
-                              setConnectPopup(null)
-                            }}
-                            className="flex items-center gap-2.5 pl-2.5 pr-4 py-1.5 bg-[#25D366] hover:bg-[#20b957] text-white text-xs font-semibold rounded-full shadow-lg transition-all hover:scale-105 whitespace-nowrap"
-                          >
-                            {/* WhatsApp SVG logo */}
-                            <svg viewBox="0 0 32 32" className="w-5 h-5 shrink-0" xmlns="http://www.w3.org/2000/svg">
-                              <circle cx="16" cy="16" r="16" fill="#25D366"/>
-                              <path d="M23.5 8.5A10.45 10.45 0 0 0 16 5.5C10.2 5.5 5.5 10.2 5.5 16c0 1.85.48 3.65 1.4 5.24L5.5 26.5l5.4-1.38A10.46 10.46 0 0 0 16 26.5c5.8 0 10.5-4.7 10.5-10.5 0-2.8-1.09-5.43-3.0-7.5zm-7.5 16.1c-1.57 0-3.1-.42-4.44-1.2l-.32-.19-3.2.82.85-3.1-.21-.33A8.63 8.63 0 0 1 7.37 16c0-4.76 3.87-8.63 8.63-8.63 2.3 0 4.47.9 6.1 2.53a8.58 8.58 0 0 1 2.52 6.1c0 4.76-3.87 8.6-8.62 8.6zm4.72-6.45c-.26-.13-1.53-.75-1.77-.84-.23-.09-.4-.13-.57.13-.17.26-.65.84-.8 1.01-.14.17-.29.19-.55.06-.26-.13-1.1-.4-2.09-1.28-.77-.68-1.3-1.53-1.45-1.79-.15-.26-.02-.4.11-.53.12-.12.26-.3.4-.46.13-.16.17-.26.26-.43.09-.17.04-.32-.02-.45-.06-.13-.57-1.37-.78-1.88-.2-.49-.41-.42-.57-.43h-.48c-.17 0-.44.06-.67.32-.23.26-.87.85-.87 2.07s.89 2.4 1.02 2.57c.12.17 1.75 2.67 4.25 3.74.59.26 1.06.41 1.42.52.6.19 1.14.16 1.57.1.48-.07 1.47-.6 1.68-1.18.2-.57.2-1.07.14-1.17-.06-.1-.23-.16-.49-.29z" fill="white"/>
-                            </svg>
-                            WhatsApp
-                          </button>
-
-                          {/* Chat */}
-                          <button
-                            onClick={() => { router.push('/messages'); setConnectPopup(null) }}
-                            className="flex items-center gap-2.5 pl-2.5 pr-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-full shadow-lg transition-all hover:scale-105 whitespace-nowrap"
-                          >
-                            {/* Chat bubble icon */}
-                            <svg viewBox="0 0 32 32" className="w-5 h-5 shrink-0" xmlns="http://www.w3.org/2000/svg">
-                              <circle cx="16" cy="16" r="16" fill="#7c3aed"/>
-                              <path d="M8 10.5A1.5 1.5 0 0 1 9.5 9h13A1.5 1.5 0 0 1 24 10.5v9A1.5 1.5 0 0 1 22.5 21H18l-3.5 3-3.5-3H9.5A1.5 1.5 0 0 1 8 19.5v-9z" fill="white"/>
-                              <rect x="11" y="13" width="10" height="1.5" rx="0.75" fill="#7c3aed"/>
-                              <rect x="11" y="16" width="7" height="1.5" rx="0.75" fill="#7c3aed"/>
-                            </svg>
-                            Chat Now
-                          </button>
-
-                          {/* Video Call */}
-                          <button
-                            onClick={() => { router.push(`/call?type=video&name=${encodeURIComponent(currentProfile.name)}`); setConnectPopup(null) }}
-                            className="flex items-center gap-2.5 pl-2.5 pr-4 py-1.5 bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white text-xs font-semibold rounded-full shadow-lg transition-all hover:scale-105 whitespace-nowrap"
-                          >
-                            {/* Video camera icon */}
-                            <svg viewBox="0 0 32 32" className="w-5 h-5 shrink-0" xmlns="http://www.w3.org/2000/svg">
-                              <circle cx="16" cy="16" r="16" fill="#c026d3"/>
-                              <rect x="7" y="11.5" width="12" height="9" rx="2" fill="white"/>
-                              <path d="M19 14.2l6-3.2v10l-6-3.2v-3.6z" fill="white"/>
-                            </svg>
-                            Video Call
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                  <div className="text-center">
+                    {likedProfiles.has(currentProfile.id) ? (
+                      <div className="flex items-center gap-2 animate-fade-in-up">
+                        {/* WhatsApp */}
+                        <button
+                          onClick={() => { const msg = encodeURIComponent(`Hi ${currentProfile.name}! I found your profile on Soulmate Sync and would love to connect. 💜`); window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank') }}
+                          className="w-11 h-11 rounded-full bg-[#25D366] hover:bg-[#20b957] flex items-center justify-center text-white shadow-lg transition-all hover:scale-110"
+                          title="WhatsApp"
+                        >
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        </button>
+                        {/* Call */}
+                        <button
+                          onClick={() => router.push(`/call?type=audio&target=${currentProfile.id}&name=${encodeURIComponent(currentProfile.name)}`)}
+                          className="w-11 h-11 rounded-full bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/40 flex items-center justify-center text-blue-300 shadow-lg transition-all hover:scale-110"
+                          title="Call"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                        </button>
+                        {/* Chat */}
+                        <button
+                          onClick={() => router.push(`/messages?chat=${currentProfile.id}`)}
+                          className="w-11 h-11 rounded-full bg-purple-500/20 border border-purple-500/30 hover:bg-purple-500/40 flex items-center justify-center text-purple-300 shadow-lg transition-all hover:scale-110"
+                          title="Chat"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="relative inline-block">
+                        <p className="text-xs text-purple-300/60 mb-1">Like this profile?</p>
+                        <button
+                          onClick={() => handleConnectClick(currentProfile.id)}
+                          className="relative w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center text-white hover:bg-purple-700 transition-colors shadow-[0_0_20px_rgba(147,51,234,0.4)] overflow-hidden"
+                        >
+                          <Heart className="h-6 w-6 relative z-10" />
+                          {connectPopup?.profileId === currentProfile.id && connectPopup.rippling && (
+                            <span className="absolute inset-0 rounded-full animate-ping bg-purple-400/60" />
+                          )}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Profile Info Grid */}
                 <div className="mt-5 grid grid-cols-2 gap-y-3 gap-x-8 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-purple-300/50">{currentProfile.age} yrs, {currentProfile.height || '5\' 6"'}</span>
+                    <span className="text-purple-300/70">{currentProfile.age} yrs, {currentProfile.height || '5\' 6"'}</span>
                     <span className="text-purple-200">{currentProfile.maritalStatus || 'Never Married'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-purple-300/50">{currentProfile.motherTongue || 'Hindi'}</span>
+                    <span className="text-purple-300/70">{currentProfile.motherTongue || 'Hindi'}</span>
                     <span className="text-purple-200">{currentProfile.state || 'Maharashtra'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-purple-300/50">{currentProfile.religion || 'Hindu'}</span>
+                    <span className="text-purple-300/70">{currentProfile.religion || 'Hindu'}</span>
                     <span className="text-purple-200">{currentProfile.occupation || 'Professional'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-purple-300/50">{currentProfile.education || 'Graduate'}</span>
+                    <span className="text-purple-300/70">{currentProfile.education || 'Graduate'}</span>
                     <span className="text-purple-200">{currentProfile.income || 'Not specified'}</span>
                   </div>
                 </div>
@@ -381,17 +357,17 @@ export default function MatchesPage() {
                 <div className="mt-6 border-t border-purple-500/10 pt-4">
                   <div className="flex gap-6 border-b border-purple-500/10">
                     <button className="pb-2 text-sm font-medium text-purple-300 border-b-2 border-purple-400">Detailed Profile</button>
-                    <button className="pb-2 text-sm font-medium text-purple-300/30 hover:text-purple-200">Partner Preferences</button>
+                    <button className="pb-2 text-sm font-medium text-purple-300/50 hover:text-purple-200">Partner Preferences</button>
                   </div>
                   <div className="mt-4">
                     <h3 className="text-sm font-bold text-purple-200 flex items-center gap-2">
                       <span className="text-purple-400/30 text-lg">&ldquo;</span> About {currentProfile.name}
                     </h3>
-                    <p className="text-sm text-purple-300/60 mt-2 leading-relaxed">
+                    <p className="text-sm text-purple-300/80 mt-2 leading-relaxed">
                       {currentProfile.about || `${currentProfile.name} is a ${currentProfile.education || 'well-educated'} professional from ${currentProfile.city || 'India'}. Looking for a compatible life partner.`}
                     </p>
                     <div className="flex items-center gap-3 mt-3">
-                      <span className="text-[10px] bg-white/5 text-purple-300/50 px-2 py-1 rounded-full border border-purple-500/10">ID: SM{currentProfile.id.slice(0, 8).toUpperCase()}</span>
+                      <span className="text-[10px] bg-white/5 text-purple-300/70 px-2 py-1 rounded-full border border-purple-500/10">ID: SM{currentProfile.id.slice(0, 8).toUpperCase()}</span>
                     </div>
                   </div>
                 </div>
@@ -402,7 +378,7 @@ export default function MatchesPage() {
           <div className="glass-card text-center py-16">
             <User className="h-12 w-12 text-purple-400/20 mx-auto mb-3" />
             <h3 className="text-base font-semibold text-white mb-1">No results yet</h3>
-            <p className="text-sm text-purple-300/40 mb-4">
+            <p className="text-sm text-purple-300/60 mb-4">
               {activeTab === 'daily' ? 'Check back tomorrow for new recommendations!' :
                activeTab === 'nearby' ? 'No profiles found in your area' :
                'Start browsing profiles to see activity here'}

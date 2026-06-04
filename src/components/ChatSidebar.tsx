@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/context/AuthContext'
+import { useChatSidebar } from '@/context/ChatSidebarContext'
 import Link from 'next/link'
 import { Volume2, VolumeX, MessageCircle, Minus, Search, ChevronDown, CheckCircle2, Circle } from 'lucide-react'
 
@@ -65,8 +66,10 @@ function ChatAvatar({ name, photo, gender, online, verified }: { name: string; p
 
 export default function ChatSidebar() {
   const { user } = useAuth()
+  const { isOpen, setIsOpen } = useChatSidebar()
   const [activeTab, setActiveTab] = useState<'alerts' | 'chats' | 'active'>('alerts')
-  const [isMinimized, setIsMinimized] = useState(false)
+  const isMinimized = !isOpen
+  const setIsMinimized = (val: boolean) => setIsOpen(!val)
   const [isMuted, setIsMuted] = useState(false)
   const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>('online')
   const [showStatusMenu, setShowStatusMenu] = useState(false)
@@ -76,16 +79,30 @@ export default function ChatSidebar() {
 
   useEffect(() => {
     if (!user) return
-    setChatUsers([
-      { id: '1', name: 'Priya Sharma',    photo: '/uploads/priya1.jpg',      gender: 'female', message: 'Hello, I liked your profile...', time: '28/05/2026', unread: 1, online: true,  verified: true  },
-      { id: '2', name: 'Jyoti B',         photo: '/uploads/jyoti1.jpg',       gender: 'female', message: 'Has messaged you',               time: '28/05/2026', unread: 1, online: false, verified: false },
-      { id: '3', name: 'Archita Bankar',  photo: '/uploads/archita1.jpg',     gender: 'female', message: 'Hello, I liked your profile...', time: '28/05/2026', unread: 1, online: true,  verified: true  },
-      { id: '4', name: 'Dipali Nikam',    photo: '/uploads/dipali1.jpg',      gender: 'female', message: 'Can we talk on whtsapp',         time: '27/05/2026', unread: 2, online: false, verified: false },
-      { id: '5', name: 'Tilotama Kamble', photo: '/uploads/tilotama1.jpg',    gender: 'female', message: 'Tumhi kuthe rahta ??',           time: '27/05/2026', unread: 2, online: true,  verified: false },
-      { id: '6', name: 'Aishwarya Phul',  photo: '/uploads/aishwarya1.jpg',   gender: 'female', message: 'Hello, I went through your...', time: '26/05/2026', unread: 1, online: false, verified: true  },
-      { id: '7', name: 'Vidhya J',        photo: '/uploads/vidhya1.jpg',      gender: 'female', message: 'Has messaged you',               time: '23/05/2026', unread: 1, online: false, verified: false },
-      { id: '8', name: 'Tanuja T',        photo: '/uploads/tanuja1.jpg',      gender: 'female', message: 'Has messaged you',               time: '20/05/2026', unread: 1, online: false, verified: true  },
-    ])
+    const fetchChats = async () => {
+      try {
+        const res = await fetch(`/api/messages?userId=${user.id}`)
+        const data = await res.json()
+        const convos = data.conversations || []
+        const mapped: ChatUser[] = convos.map((c: any) => ({
+          id: c.user?.id || '',
+          name: c.user?.name || 'Unknown',
+          photo: c.user?.photos?.[0] || undefined,
+          gender: c.user?.gender?.toLowerCase() === 'female' ? 'female' : 'male',
+          message: c.lastMessage?.content || 'No messages yet',
+          time: c.lastMessage?.timestamp ? new Date(c.lastMessage.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '',
+          unread: c.unreadCount || 0,
+          online: Math.random() > 0.5,
+          verified: c.user?.verified || false,
+        }))
+        setChatUsers(mapped)
+      } catch (err) {
+        console.error('Failed to fetch chats:', err)
+      }
+    }
+    fetchChats()
+    const interval = setInterval(fetchChats, 15000)
+    return () => clearInterval(interval)
   }, [user])
 
   // Close status dropdown when clicking outside
@@ -135,7 +152,7 @@ export default function ChatSidebar() {
         <div className="relative flex-1" ref={statusMenuRef}>
           <button
             onClick={() => setShowStatusMenu(v => !v)}
-            className="flex items-center gap-1.5 hover:bg-teal-50 dark:bg-purple-500/10 rounded-md px-1 py-0.5 transition-colors w-full"
+            className="flex items-center gap-1.5 hover:bg-teal-50 dark:hover:bg-purple-500/10 rounded-md px-1 py-0.5 transition-colors w-full"
           >
             <span className={`w-2 h-2 rounded-full shrink-0 ${status.dotClass}`} />
             <span className="text-xs font-medium text-slate-700 dark:text-purple-200 flex-1 text-left">{status.label}</span>
@@ -148,7 +165,7 @@ export default function ChatSidebar() {
                 <button
                   key={key}
                   onClick={() => { setOnlineStatus(key); setShowStatusMenu(false) }}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-teal-50 dark:bg-purple-500/10 transition-colors ${onlineStatus === key ? 'text-purple-200' : 'text-slate-400 dark:text-purple-300/50'}`}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-teal-50 dark:hover:bg-purple-500/10 transition-colors ${onlineStatus === key ? 'text-slate-800 dark:text-purple-200' : 'text-slate-500 dark:text-purple-300/50'}`}
                 >
                   <span className={`w-2 h-2 rounded-full ${cfg.dotClass}`} />
                   {cfg.label}
@@ -162,7 +179,7 @@ export default function ChatSidebar() {
         {/* Mute Toggle */}
         <button
           onClick={() => setIsMuted(v => !v)}
-          className={`p-1 rounded-full transition-colors ${isMuted ? 'text-red-400 hover:bg-red-500/10' : 'text-purple-400/40 hover:bg-teal-50 dark:bg-purple-500/10'}`}
+          className={`p-1 rounded-full transition-colors ${isMuted ? 'text-red-400 hover:bg-red-500/10' : 'text-slate-400 dark:text-purple-400/40 hover:bg-teal-50 dark:hover:bg-purple-500/10'}`}
           title={isMuted ? 'Unmute notifications' : 'Mute notifications'}
         >
           {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
@@ -171,7 +188,7 @@ export default function ChatSidebar() {
         {/* Minimize */}
         <button
           onClick={() => setIsMinimized(true)}
-          className="p-1 hover:bg-teal-100/50 dark:bg-purple-500/20 rounded-full transition-colors"
+          className="p-1 hover:bg-teal-100/50 dark:hover:bg-purple-500/20 rounded-full transition-colors"
           title="Minimize"
         >
           <Minus className="h-3.5 w-3.5 text-teal-600 dark:text-purple-400/60" />
@@ -179,18 +196,18 @@ export default function ChatSidebar() {
       </div>
 
       {/* Search Bar */}
-      <div className="px-3 py-2 border-b border-purple-500/5">
-        <div className="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1.5 border border-teal-100 dark:border-purple-500/10 focus-within:border-purple-500/30 transition-colors">
+      <div className="px-3 py-2 border-b border-teal-100/50 dark:border-purple-500/5">
+        <div className="flex items-center gap-2 bg-teal-50/50 dark:bg-white/5 rounded-full px-3 py-1.5 border border-teal-100 dark:border-purple-500/10 focus-within:border-teal-400 dark:focus-within:border-purple-500/30 transition-colors">
           <Search className="h-3.5 w-3.5 text-teal-600 dark:text-purple-400/40 shrink-0" />
           <input
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder="Search chats..."
-            className="flex-1 bg-transparent text-xs text-purple-100 placeholder-purple-300/30 focus:outline-none"
+            className="flex-1 bg-transparent text-xs text-slate-700 dark:text-purple-100 placeholder-slate-400 dark:placeholder-purple-300/30 focus:outline-none"
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery('')} className="text-purple-400/40 hover:text-slate-600 dark:text-purple-300 text-xs leading-none">✕</button>
+            <button onClick={() => setSearchQuery('')} className="text-slate-400 dark:text-purple-400/40 hover:text-slate-600 dark:hover:text-purple-300 text-xs leading-none">✕</button>
           )}
         </div>
       </div>
@@ -198,7 +215,7 @@ export default function ChatSidebar() {
       {/* Chat List */}
       <div className="flex-1 overflow-y-auto">
         {displayedUsers.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-24 text-purple-300/30 text-xs gap-1">
+          <div className="flex flex-col items-center justify-center h-24 text-slate-400 dark:text-purple-300/30 text-xs gap-1">
             <MessageCircle className="h-5 w-5" />
             <span>No results found</span>
           </div>
@@ -207,20 +224,20 @@ export default function ChatSidebar() {
             <Link
               key={chatUser.id}
               href="/messages"
-              className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-white/5 border-b border-purple-500/5 transition-colors group"
+              className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-teal-50 dark:hover:bg-white/5 border-b border-teal-100/50 dark:border-purple-500/5 transition-colors group"
             >
               <ChatAvatar name={chatUser.name} photo={chatUser.photo} gender={chatUser.gender} online={chatUser.online} verified={chatUser.verified} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-1">
-                  <span className="text-sm font-semibold text-purple-100 truncate group-hover:text-slate-800 dark:text-white transition-colors">
+                  <span className="text-sm font-semibold text-slate-800 dark:text-purple-100 truncate group-hover:text-teal-700 dark:group-hover:text-white transition-colors">
                     {chatUser.name}
                   </span>
-                  <span className="text-[10px] text-slate-300 dark:text-purple-300/40 whitespace-nowrap shrink-0">{chatUser.time}</span>
+                  <span className="text-[10px] text-slate-500 dark:text-purple-300/50 whitespace-nowrap shrink-0">{chatUser.time}</span>
                 </div>
-                <p className="text-xs text-slate-300 dark:text-purple-300/40 truncate mt-0.5">{chatUser.message}</p>
+                <p className="text-xs text-slate-500 dark:text-purple-300/50 truncate mt-0.5">{chatUser.message}</p>
               </div>
               {chatUser.unread > 0 && (
-                <span className="shrink-0 min-w-[18px] h-[18px] bg-green-500 text-slate-800 dark:text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                <span className="shrink-0 min-w-[18px] h-[18px] bg-green-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                   {chatUser.unread}
                 </span>
               )}
@@ -233,19 +250,19 @@ export default function ChatSidebar() {
       <div className="flex border-t border-teal-100 dark:border-purple-500/10 bg-white/[0.02]">
         <button
           onClick={() => setActiveTab('alerts')}
-          className={`flex-1 py-2 text-[10px] font-medium text-center transition-colors ${activeTab === 'alerts' ? 'text-slate-600 dark:text-purple-300 border-t-2 border-purple-400' : 'text-purple-300/30 hover:text-purple-300/60'}`}
+          className={`flex-1 py-2 text-[10px] font-medium text-center transition-colors ${activeTab === 'alerts' ? 'text-teal-700 dark:text-purple-300 border-t-2 border-teal-500 dark:border-purple-400' : 'text-slate-400 dark:text-purple-300/30 hover:text-slate-600 dark:hover:text-purple-300/60'}`}
         >
-          Alerts (31)
+          Alerts ({chatUsers.reduce((sum, u) => sum + u.unread, 0)})
         </button>
         <button
           onClick={() => setActiveTab('chats')}
-          className={`flex-1 py-2 text-[10px] font-medium text-center transition-colors ${activeTab === 'chats' ? 'text-slate-600 dark:text-purple-300 border-t-2 border-purple-400' : 'text-purple-300/30 hover:text-purple-300/60'}`}
+          className={`flex-1 py-2 text-[10px] font-medium text-center transition-colors ${activeTab === 'chats' ? 'text-teal-700 dark:text-purple-300 border-t-2 border-teal-500 dark:border-purple-400' : 'text-slate-400 dark:text-purple-300/30 hover:text-slate-600 dark:hover:text-purple-300/60'}`}
         >
-          Chats (46)
+          Chats ({chatUsers.length})
         </button>
         <button
           onClick={() => setActiveTab('active')}
-          className={`flex-1 py-2 text-[10px] font-medium text-center transition-colors ${activeTab === 'active' ? 'text-slate-600 dark:text-purple-300 border-t-2 border-purple-400' : 'text-purple-300/30 hover:text-purple-300/60'}`}
+          className={`flex-1 py-2 text-[10px] font-medium text-center transition-colors ${activeTab === 'active' ? 'text-teal-700 dark:text-purple-300 border-t-2 border-teal-500 dark:border-purple-400' : 'text-slate-400 dark:text-purple-300/30 hover:text-slate-600 dark:hover:text-purple-300/60'}`}
         >
           Active ({activeUsers.length})
         </button>
