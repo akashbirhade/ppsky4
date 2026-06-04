@@ -640,3 +640,87 @@ model DailyStats {
 
   @@map("daily_stats")
 }
+
+// ─── HOST MANAGEMENT ────────────────────────────────────────────────────────
+
+enum HostStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+model Host {
+  id           String     @id @default(cuid())
+  name         String
+  profilePhoto String?
+  mobile       String     @unique
+  email        String     @unique
+  region       String
+  district     String
+  city         String
+  community    String?
+  status       HostStatus @default(ACTIVE)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Relations
+  members      HostMember[]
+  events       HostEvent[]
+  interests    HostInterest[]
+
+  @@index([region])
+  @@index([district])
+  @@index([city])
+  @@index([status])
+  @@map("hosts")
+}
+
+model HostMember {
+  id        String   @id @default(cuid())
+  hostId    String
+  host      Host     @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  userId    String
+  joinedAt  DateTime @default(now())
+
+  @@unique([hostId, userId])
+  @@index([hostId])
+  @@index([userId])
+  @@map("host_members")
+}
+
+model HostEvent {
+  id               String   @id @default(cuid())
+  hostId           String
+  host             Host     @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  title            String
+  description      String?
+  date             DateTime
+  venue            String
+  fee              Decimal? @db.Decimal(10, 2)
+  maxParticipants  Int?
+  participantCount Int      @default(0)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([hostId])
+  @@index([date])
+  @@map("host_events")
+}
+
+model HostInterest {
+  id          String   @id @default(cuid())
+  hostId      String
+  host        Host     @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  fromUserId  String
+  toUserId    String
+  status      String   @default("pending") // pending, verified, shared, rejected
+  note        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([hostId, fromUserId, toUserId])
+  @@index([hostId])
+  @@index([status])
+  @@map("host_interests")
+}

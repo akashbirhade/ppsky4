@@ -205,14 +205,14 @@ function MessagesInner() {
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-mesh pt-20">
-      <div className="max-w-6xl mx-auto h-[calc(100vh-5rem)]">
+    <div className="min-h-screen bg-mesh pt-[104px]">
+      <div className="max-w-6xl mx-auto h-[calc(100vh-6.5rem)]">
         <div className="glass-card h-full !p-0 !rounded-none sm:!rounded-3xl overflow-hidden flex">
 
           {/* ── Sidebar ── */}
-          <div className={`w-full sm:w-80 lg:w-96 border-r border-purple-500/10 flex flex-col ${selectedId ? 'hidden sm:flex' : 'flex'}`}>
-            <div className="p-4 border-b border-purple-500/10">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-3">
+          <div className={`w-full sm:w-80 lg:w-96 border-r border-slate-200 dark:border-purple-500/10 flex flex-col bg-white dark:bg-transparent ${selectedId ? 'hidden sm:flex' : 'flex'}`}>
+            <div className="p-4 border-b border-slate-200 dark:border-purple-500/10">
+              <h2 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2 mb-3">
                 <MessageCircle className="h-5 w-5 text-purple-400" /> Messages
               </h2>
               <div className="relative">
@@ -222,8 +222,8 @@ function MessagesInner() {
               </div>
             </div>
 
-            <div className="px-4 py-2 border-b border-purple-500/10">
-              <Link href="/search" className="flex items-center gap-2 text-xs text-purple-400/60 hover:text-purple-300 transition-colors">
+            <div className="px-4 py-2 border-b border-slate-200 dark:border-purple-500/10">
+              <Link href="/search" className="flex items-center gap-2 text-xs text-teal-600 dark:text-purple-400/60 hover:text-teal-700 dark:hover:text-purple-300 transition-colors">
                 <Plus className="h-3.5 w-3.5" />
                 Start new conversation from Search
               </Link>
@@ -280,9 +280,9 @@ function MessagesInner() {
             {selectedId && selectedUser ? (
               <>
                 {/* Header */}
-                <div className="px-4 py-3 border-b border-purple-500/10 flex items-center gap-3 bg-white/[0.02]">
+                <div className="px-4 py-3 border-b border-slate-200 dark:border-purple-500/10 flex items-center gap-3 bg-white dark:bg-white/[0.02]">
                   <button onClick={() => { setSelectedId(null); setSelectedUser(null); window.history.replaceState(null, '', '/messages') }}
-                    className="sm:hidden text-purple-300/50">
+                    className="sm:hidden text-slate-500 dark:text-purple-300/50">
                     <ArrowLeft className="h-5 w-5" />
                   </button>
                   <div className="relative">
@@ -292,37 +292,36 @@ function MessagesInner() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-white truncate">{selectedUser.name}</h3>
+                    <h3 className="text-sm font-semibold text-slate-800 dark:text-white truncate">{selectedUser.name}</h3>
                     <div className="flex items-center gap-3">
-                      <p className={`text-[10px] ${selectedUser.online ? 'text-green-400' : 'text-purple-300/40'}`}>
+                      <p className={`text-[10px] ${selectedUser.online ? 'text-green-500' : 'text-slate-400 dark:text-purple-300/40'}`}>
                         {selectedUser.online ? 'Online now' : 'Last seen recently'}
                       </p>
                       {selectedUser.age && (
-                        <span className="text-[10px] text-purple-300/40">{selectedUser.age}y · {selectedUser.city}</span>
+                        <span className="text-[10px] text-slate-400 dark:text-purple-300/40">{selectedUser.age}y · {selectedUser.city}</span>
                       )}
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
                     <Link href={`/profile/${selectedId}`}
-                      className="p-2 rounded-xl hover:bg-purple-500/10 text-purple-300/50 transition-colors" title="View profile">
+                      className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-purple-500/10 text-slate-500 dark:text-purple-300/50 transition-colors" title="View profile">
                       <User className="h-4 w-4" />
                     </Link>
-                    <button className="p-2 rounded-xl hover:bg-purple-500/10 text-purple-300/50 transition-colors">
+                    <button className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-purple-500/10 text-slate-500 dark:text-purple-300/50 transition-colors">
                       <Phone className="h-4 w-4" />
                     </button>
-                    <button className="p-2 rounded-xl hover:bg-purple-500/10 text-purple-300/50 transition-colors">
+                    <button className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-purple-500/10 text-slate-500 dark:text-purple-300/50 transition-colors">
                       <Video className="h-4 w-4" />
                     </button>
                     <Link href={`/profile/${selectedId}`}
-                      className="p-2 rounded-xl hover:bg-purple-500/10 text-purple-300/50 transition-colors" title="Full profile">
+                      className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-purple-500/10 text-slate-500 dark:text-purple-300/50 transition-colors" title="Full profile">
                       <ExternalLink className="h-4 w-4" />
                     </Link>
                   </div>
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto px-4 py-3 space-y-1"
-                  style={{ background: 'linear-gradient(180deg, rgba(15,10,30,0.98) 0%, rgba(20,12,40,0.98) 100%)' }}>
+                <div className="flex-1 overflow-y-auto px-4 py-3 space-y-1 bg-slate-50 dark:bg-[linear-gradient(180deg,rgba(15,10,30,0.98)_0%,rgba(20,12,40,0.98)_100%)]">
                   {loadingMsgs ? (
                     <div className="flex items-center justify-center py-12">
                       <Loader2 className="h-6 w-6 text-purple-400/40 animate-spin" />
@@ -344,7 +343,7 @@ function MessagesInner() {
                         <div key={msg.id}>
                           {showDate && (
                             <div className="flex justify-center my-4">
-                              <span className="text-[10px] text-purple-300/40 bg-purple-500/5 px-4 py-1 rounded-full border border-purple-500/10">
+                              <span className="text-[10px] text-slate-500 dark:text-purple-300/40 bg-slate-100 dark:bg-purple-500/5 px-4 py-1 rounded-full border border-slate-200 dark:border-purple-500/10">
                                 {formatDate(msg.timestamp)}
                               </span>
                             </div>
@@ -353,12 +352,12 @@ function MessagesInner() {
                             {!isMe && <Avatar user={selectedUser} size={7} />}
                             <div className={`max-w-[70%] px-3.5 py-2.5 text-[13px] leading-relaxed rounded-2xl ${
                               isMe
-                                ? 'bg-purple-600/80 text-white rounded-br-md shadow-[0_2px_8px_rgba(147,51,234,0.25)]'
-                                : 'bg-white/[0.06] text-purple-100 border border-purple-500/10 rounded-bl-md'
+                                ? 'bg-purple-600 text-white rounded-br-md shadow-[0_2px_8px_rgba(147,51,234,0.25)]'
+                                : 'bg-slate-100 dark:bg-white/[0.06] text-slate-800 dark:text-purple-100 border border-slate-200 dark:border-purple-500/10 rounded-bl-md'
                             }`}>
                               <p>{msg.content}</p>
                               <div className={`flex items-center gap-1 mt-1 ${isMe ? 'justify-end' : ''}`}>
-                                <span className={`text-[9px] ${isMe ? 'text-purple-200/50' : 'text-purple-400/40'}`}>
+                                <span className={`text-[9px] ${isMe ? 'text-purple-200/70' : 'text-slate-400 dark:text-purple-400/40'}`}>
                                   {formatTime(msg.timestamp)}
                                 </span>
                                 {isMe && (
@@ -380,13 +379,13 @@ function MessagesInner() {
                 </div>
 
                 {/* Input */}
-                <form onSubmit={sendMsg} className="px-3 py-3 border-t border-purple-500/10 bg-white/[0.02]">
+                <form onSubmit={sendMsg} className="px-3 py-3 border-t border-slate-200 dark:border-purple-500/10 bg-white dark:bg-white/[0.02]">
                   <div className="flex items-center gap-2">
                     <div className="flex-1 relative">
                       <input value={input} onChange={e => setInput(e.target.value)}
                         placeholder={`Message ${selectedUser.name}…`}
                         autoFocus
-                        className="w-full px-4 py-2.5 bg-white/[0.04] rounded-full text-sm text-white placeholder-purple-300/30 focus:outline-none focus:ring-1 focus:ring-purple-500/30 border border-purple-500/10 transition-all" />
+                        className="w-full px-4 py-2.5 bg-slate-100 dark:bg-white/[0.04] rounded-full text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-purple-300/30 focus:outline-none focus:ring-1 focus:ring-purple-500/30 border border-slate-200 dark:border-purple-500/10 transition-all" />
                     </div>
                     <button type="submit" disabled={!input.trim() || sending}
                       className="w-9 h-9 bg-gradient-to-r from-purple-600 to-fuchsia-600 disabled:from-purple-900 disabled:to-purple-900 rounded-full flex items-center justify-center hover:shadow-[0_0_15px_rgba(147,51,234,0.4)] transition-all disabled:opacity-40 shrink-0">

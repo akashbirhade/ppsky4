@@ -283,6 +283,7 @@ export default function Navbar() {
           <div className={`hidden lg:flex items-center gap-6 h-10 border-t border-purple-500/10 -mx-4 px-4 transition-all duration-300 overflow-hidden ${showSubNav ? 'max-h-10 opacity-100' : 'max-h-0 opacity-0 border-t-0'}`}>
             <SubNavLink href="/dashboard" label="Dashboard" />
             <SubNavLink href="/profile" label="My Profile" />
+            <SubNavLink href="/hosts" label="Hosts" />
             <SubNavLink href="/meeting" label="Meeting Planner" />
             <SubNavLink href="/preferences" label="Partner Preferences" />
             <SubNavLink href="/settings" label="Settings" />

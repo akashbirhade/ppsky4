@@ -20,6 +20,7 @@ import matchRoutes from '@routes/match.routes';
 import chatRoutes from '@routes/chat.routes';
 import callRoutes from '@routes/call.routes';
 import adminRoutes from '@routes/admin.routes';
+import hostRoutes from '@routes/host.routes';
 
 // Notification routes inline
 import { NotificationService } from '@services/notification.service';
@@ -101,6 +102,7 @@ app.use(`${apiPrefix}/matches`, matchRoutes);
 app.use(`${apiPrefix}/chats`, chatRoutes);
 app.use(`${apiPrefix}/calls`, callRoutes);
 app.use(`${apiPrefix}/admin`, adminRoutes);
+app.use(`${apiPrefix}/hosts`, hostRoutes);
 
 // Notification routes
 app.use(`${apiPrefix}/notifications`, authenticate, (async (req, res, next) => {

@@ -8,10 +8,12 @@ import { Star, Crown, MapPin, Briefcase, GraduationCap, Search, SlidersHorizonta
 import HalfHeart from '@/components/HalfHeart'
 import { UserProfile } from '@/lib/database'
 import { useSlideIn, useStaggerCards } from '@/hooks/useGsap'
+import { useChatSidebar } from '@/context/ChatSidebarContext'
 
 export default function DashboardPage() {
   const { user } = useAuth()
   const router = useRouter()
+  const { isOpen: chatOpen } = useChatSidebar()
   const [profiles, setProfiles] = useState<UserProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
@@ -123,22 +125,22 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-mesh pt-[104px] pb-12">
-      <div className="max-w-7xl mx-auto px-4 xl:pr-80">
+      <div className={`max-w-7xl mx-auto px-4 transition-all duration-300 ${chatOpen ? 'xl:pr-80' : 'xl:pr-4'}`}>
         
         {/* Header - What they're looking for */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6" ref={headerRef}>
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
               <Users className="h-6 w-6 text-purple-400" />
               Find Your {lookingFor}
             </h1>
-            <p className="text-sm text-purple-300/50 mt-1">
+            <p className="text-sm text-slate-500 dark:text-purple-300/50 mt-1">
               {profiles.length} {lookingFor === 'Bride' ? 'women' : 'men'} matching your preferences
             </p>
           </div>
           <button 
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2.5 glass-card !p-0 !px-4 !py-2.5 text-sm text-purple-200 hover:bg-white/10 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 glass-card !p-0 !px-4 !py-2.5 text-sm text-slate-700 dark:text-purple-200 hover:bg-white/10 transition-colors"
           >
             <SlidersHorizontal className="h-4 w-4" />
             Filters
@@ -152,29 +154,29 @@ export default function DashboardPage() {
             <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mx-auto mb-2">
               <Eye className="h-4 w-4 text-purple-400" />
             </div>
-            <p className="text-xl font-bold text-white">{stats.profileViews}</p>
-            <p className="text-[10px] text-purple-300/40">Profile Views</p>
+            <p className="text-xl font-bold text-slate-800 dark:text-white">{stats.profileViews}</p>
+            <p className="text-[10px] text-slate-500 dark:text-purple-300/40">Profile Views</p>
           </div>
           <div className="glass-card !p-4 text-center">
             <div className="w-9 h-9 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mx-auto mb-2">
               <HalfHeart className="h-4 w-4" />
             </div>
-            <p className="text-xl font-bold text-white">{stats.interestsReceived}</p>
-            <p className="text-[10px] text-purple-300/40">Interests Received</p>
+            <p className="text-xl font-bold text-slate-800 dark:text-white">{stats.interestsReceived}</p>
+            <p className="text-[10px] text-slate-500 dark:text-purple-300/40">Interests Received</p>
           </div>
           <div className="glass-card !p-4 text-center">
             <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mx-auto mb-2">
               <MessageCircle className="h-4 w-4 text-blue-400" />
             </div>
-            <p className="text-xl font-bold text-white">{stats.conversations}</p>
-            <p className="text-[10px] text-purple-300/40">Conversations</p>
+            <p className="text-xl font-bold text-slate-800 dark:text-white">{stats.conversations}</p>
+            <p className="text-[10px] text-slate-500 dark:text-purple-300/40">Conversations</p>
           </div>
           <div className="glass-card !p-4 text-center">
             <div className="w-9 h-9 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center mx-auto mb-2">
               <TrendingUp className="h-4 w-4 text-green-400" />
             </div>
-            <p className="text-xl font-bold text-white">{stats.profileScore}%</p>
-            <p className="text-[10px] text-purple-300/40">Profile Score</p>
+            <p className="text-xl font-bold text-slate-800 dark:text-white">{stats.profileScore}%</p>
+            <p className="text-[10px] text-slate-500 dark:text-purple-300/40">Profile Score</p>
           </div>
         </div>
 
@@ -198,26 +200,26 @@ export default function DashboardPage() {
         {showFilters && (
           <div className="glass-card mb-6 animate-fade-in-up" ref={filtersRef}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-white">Filter Profiles</h3>
-              <button onClick={() => setShowFilters(false)} className="text-purple-300/50 hover:text-white">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-white">Filter Profiles</h3>
+              <button onClick={() => setShowFilters(false)} className="text-slate-400 dark:text-purple-300/50 hover:text-slate-700 dark:hover:text-white">
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               <div>
-                <label className="text-[10px] text-purple-300/50 uppercase tracking-wider">Age From</label>
+                <label className="text-[10px] text-slate-500 dark:text-purple-300/50 uppercase tracking-wider">Age From</label>
                 <input type="number" value={filters.ageMin} onChange={e => setFilters({...filters, ageMin: e.target.value})}
-                  className="w-full mt-1 bg-white/5 border border-purple-500/20 rounded-lg px-3 py-2 text-sm text-white focus:border-purple-400 outline-none" />
+                  className="w-full mt-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white focus:border-purple-400 outline-none" />
               </div>
               <div>
-                <label className="text-[10px] text-purple-300/50 uppercase tracking-wider">Age To</label>
+                <label className="text-[10px] text-slate-500 dark:text-purple-300/50 uppercase tracking-wider">Age To</label>
                 <input type="number" value={filters.ageMax} onChange={e => setFilters({...filters, ageMax: e.target.value})}
-                  className="w-full mt-1 bg-white/5 border border-purple-500/20 rounded-lg px-3 py-2 text-sm text-white focus:border-purple-400 outline-none" />
+                  className="w-full mt-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white focus:border-purple-400 outline-none" />
               </div>
               <div>
-                <label className="text-[10px] text-purple-300/50 uppercase tracking-wider">Religion</label>
+                <label className="text-[10px] text-slate-500 dark:text-purple-300/50 uppercase tracking-wider">Religion</label>
                 <select value={filters.religion} onChange={e => setFilters({...filters, religion: e.target.value})}
-                  className="w-full mt-1 bg-white/5 border border-purple-500/20 rounded-lg px-3 py-2 text-sm text-white focus:border-purple-400 outline-none">
+                  className="w-full mt-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white focus:border-purple-400 outline-none">
                   <option value="">Any</option>
                   <option value="Hindu">Hindu</option>
                   <option value="Muslim">Muslim</option>
@@ -228,14 +230,14 @@ export default function DashboardPage() {
                 </select>
               </div>
               <div>
-                <label className="text-[10px] text-purple-300/50 uppercase tracking-wider">City</label>
+                <label className="text-[10px] text-slate-500 dark:text-purple-300/50 uppercase tracking-wider">City</label>
                 <input type="text" value={filters.city} onChange={e => setFilters({...filters, city: e.target.value})} placeholder="Any city"
-                  className="w-full mt-1 bg-white/5 border border-purple-500/20 rounded-lg px-3 py-2 text-sm text-white placeholder:text-purple-300/30 focus:border-purple-400 outline-none" />
+                  className="w-full mt-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-purple-300/30 focus:border-purple-400 outline-none" />
               </div>
               <div>
-                <label className="text-[10px] text-purple-300/50 uppercase tracking-wider">Education</label>
+                <label className="text-[10px] text-slate-500 dark:text-purple-300/50 uppercase tracking-wider">Education</label>
                 <select value={filters.education} onChange={e => setFilters({...filters, education: e.target.value})}
-                  className="w-full mt-1 bg-white/5 border border-purple-500/20 rounded-lg px-3 py-2 text-sm text-white focus:border-purple-400 outline-none">
+                  className="w-full mt-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white focus:border-purple-400 outline-none">
                   <option value="">Any</option>
                   <option value="B.Tech">B.Tech / B.E.</option>
                   <option value="MBBS">MBBS / MD</option>

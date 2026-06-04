@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
 import {
   Menu, X, User, Edit, Download, Share2, Crown, Moon, MessageCircle, Inbox,
-  Settings, SlidersHorizontal, Phone, HelpCircle, Shield, Star, FileText, LogOut, Sparkles, Users, Zap
+  Settings, SlidersHorizontal, Phone, HelpCircle, Shield, Star, FileText, LogOut, Sparkles, Users, Zap, UserCheck, Calendar
 } from 'lucide-react'
 import HalfHeart from './HalfHeart'
 
@@ -72,6 +72,8 @@ export default function SideDrawer() {
           <DrawerLink href="/matches" icon={<HalfHeart className="h-4 w-4" />} label="Matches" onClick={() => setIsOpen(false)} />
           <DrawerLink href="/notifications" icon={<Inbox className="h-4 w-4 text-blue-400" />} label="Inbox" badge="3" onClick={() => setIsOpen(false)} />
           <DrawerLink href="/messages" icon={<MessageCircle className="h-4 w-4 text-green-400" />} label="Chat" onClick={() => setIsOpen(false)} />
+          <DrawerLink href="/hosts" icon={<UserCheck className="h-4 w-4 text-teal-400" />} label="Hosts" onClick={() => setIsOpen(false)} />
+          <DrawerLink href="/hosts/login" icon={<Calendar className="h-4 w-4 text-orange-400" />} label="Host Portal" onClick={() => setIsOpen(false)} />
           <DrawerLink href="/meeting" icon={<HalfHeart className="h-4 w-4" />} label="Meeting Planner" onClick={() => setIsOpen(false)} />
         </div>
 

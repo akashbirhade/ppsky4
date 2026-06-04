@@ -1,0 +1,192 @@
+[
+  {
+    "id": "host1",
+    "name": "Ramesh Patil",
+    "email": "ramesh.host@soulmatesync.com",
+    "password": "$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS",
+    "mobile": "+91 98001 10001",
+    "profilePhoto": "/avatars/male.svg",
+    "region": "Maharashtra",
+    "district": "Pune",
+    "city": "Pune",
+    "community": "Maratha",
+    "status": "ACTIVE",
+    "createdAt": "2024-06-01T10:00:00Z",
+    "members": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"],
+    "events": [
+      { "id": "evt1", "title": "Pune Matrimony Meet", "description": "Meet eligible brides and grooms in Pune region", "date": "2026-06-15T10:00:00Z", "venue": "Hotel Blue Diamond, Pune", "fee": 500, "maxParticipants": 100, "participantCount": 45 },
+      { "id": "evt2", "title": "Maratha Community Gathering", "description": "Exclusive gathering for Maratha community members", "date": "2026-07-20T11:00:00Z", "venue": "Shivaji Mandap, Kothrud", "fee": 300, "maxParticipants": 80, "participantCount": 32 }
+    ]
+  },
+  {
+    "id": "host2",
+    "name": "Sunita Deshmukh",
+    "email": "sunita.host@soulmatesync.com",
+    "password": "$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS",
+    "mobile": "+91 98001 10002",
+    "profilePhoto": "/avatars/female.svg",
+    "region": "Maharashtra",
+    "district": "Mumbai",
+    "city": "Mumbai",
+    "community": "Brahmin",
+    "status": "ACTIVE",
+    "createdAt": "2024-05-15T10:00:00Z",
+    "members": ["21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40"],
+    "events": [
+      { "id": "evt3", "title": "Mumbai Premium Meet", "description": "Premium matchmaking event for verified profiles", "date": "2026-06-22T10:00:00Z", "venue": "Taj Lands End, Bandra", "fee": 1000, "maxParticipants": 60, "participantCount": 28 },
+      { "id": "evt4", "title": "Brahmin Families Networking", "description": "Family-oriented meet for Brahmin community", "date": "2026-08-10T10:30:00Z", "venue": "ISKCON Hall, Juhu", "fee": 500, "maxParticipants": 100, "participantCount": 55 }
+    ]
+  },
+  {
+    "id": "host3",
+    "name": "Vikram Singh Rathore",
+    "email": "vikram.host@soulmatesync.com",
+    "password": "$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS",
+    "mobile": "+91 98001 10003",
+    "profilePhoto": "/avatars/male.svg",
+    "region": "Rajasthan",
+    "district": "Jaipur",
+    "city": "Jaipur",
+    "community": "Rajput",
+    "status": "ACTIVE",
+    "createdAt": "2024-04-20T10:00:00Z",
+    "members": ["41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60"],
+    "events": [
+      { "id": "evt5", "title": "Rajput Royal Matchmaking", "description": "Exclusive event for Rajput families", "date": "2026-06-28T11:00:00Z", "venue": "Rambagh Palace, Jaipur", "fee": 1500, "maxParticipants": 50, "participantCount": 38 },
+      { "id": "evt6", "title": "Jaipur Singles Meet", "description": "Casual meet and greet for singles", "date": "2026-07-15T16:00:00Z", "venue": "Marriott Resort, Jaipur", "fee": 800, "maxParticipants": 70, "participantCount": 42 }
+    ]
+  },
+  {
+    "id": "host4",
+    "name": "Anjali Mehta",
+    "email": "anjali.host@soulmatesync.com",
+    "password": "$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS",
+    "mobile": "+91 98001 10004",
+    "profilePhoto": "/avatars/female.svg",
+    "region": "Gujarat",
+    "district": "Ahmedabad",
+    "city": "Ahmedabad",
+    "community": "Patel",
+    "status": "ACTIVE",
+    "createdAt": "2024-03-10T10:00:00Z",
+    "members": ["61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "80"],
+    "events": [
+      { "id": "evt7", "title": "Patel Parivar Milan", "description": "Community gathering for Patel families", "date": "2026-06-30T10:00:00Z", "venue": "GMDC Ground, Ahmedabad", "fee": 400, "maxParticipants": 150, "participantCount": 98 },
+      { "id": "evt8", "title": "Gujarat NRI Meet", "description": "Meet NRI candidates from Gujarat", "date": "2026-08-05T10:00:00Z", "venue": "Hyatt Regency, Ahmedabad", "fee": 2000, "maxParticipants": 40, "participantCount": 22 }
+    ]
+  },
+  {
+    "id": "host5",
+    "name": "Rajesh Kumar Sharma",
+    "email": "rajesh.host@soulmatesync.com",
+    "password": "$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS",
+    "mobile": "+91 98001 10005",
+    "profilePhoto": "/avatars/male.svg",
+    "region": "Delhi NCR",
+    "district": "New Delhi",
+    "city": "Delhi",
+    "community": "Agarwal",
+    "status": "ACTIVE",
+    "createdAt": "2024-02-28T10:00:00Z",
+    "members": ["81", "82", "83", "84", "85", "86", "87", "88", "89", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "100"],
+    "events": [
+      { "id": "evt9", "title": "Delhi Elite Matchmaking", "description": "Premium event for Delhi professionals", "date": "2026-07-05T11:00:00Z", "venue": "The Oberoi, New Delhi", "fee": 2500, "maxParticipants": 50, "participantCount": 35 },
+      { "id": "evt10", "title": "NCR Agarwal Sammelan", "description": "Agarwal community matrimony sammelan", "date": "2026-07-25T10:00:00Z", "venue": "Pragati Maidan, Delhi", "fee": 600, "maxParticipants": 200, "participantCount": 120 }
+    ]
+  },
+  {
+    "id": "host6",
+    "name": "Kavitha Nair",
+    "email": "kavitha.host@soulmatesync.com",
+    "password": "$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS",
+    "mobile": "+91 98001 10006",
+    "profilePhoto": "/avatars/female.svg",
+    "region": "Kerala",
+    "district": "Ernakulam",
+    "city": "Kochi",
+    "community": "Nair",
+    "status": "ACTIVE",
+    "createdAt": "2024-04-05T10:00:00Z",
+    "members": ["101", "102", "103", "104", "105", "106", "107", "108", "109", "110", "111", "112", "113", "114", "115", "116", "117", "118", "119", "120"],
+    "events": [
+      { "id": "evt11", "title": "Kerala Matrimony Meet", "description": "Meet eligible matches from Kerala", "date": "2026-07-10T10:00:00Z", "venue": "Le Meridien, Kochi", "fee": 700, "maxParticipants": 80, "participantCount": 52 },
+      { "id": "evt12", "title": "Nair Community Gathering", "description": "Exclusive for Nair community members", "date": "2026-08-15T10:30:00Z", "venue": "Gokulam Convention Center", "fee": 500, "maxParticipants": 100, "participantCount": 65 }
+    ]
+  },
+  {
+    "id": "host7",
+    "name": "Suresh Reddy",
+    "email": "suresh.host@soulmatesync.com",
+    "password": "$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS",
+    "mobile": "+91 98001 10007",
+    "profilePhoto": "/avatars/male.svg",
+    "region": "Telangana",
+    "district": "Hyderabad",
+    "city": "Hyderabad",
+    "community": "Reddy",
+    "status": "ACTIVE",
+    "createdAt": "2024-03-22T10:00:00Z",
+    "members": ["121", "122", "123", "124", "125", "126", "127", "128", "129", "130", "131", "132", "133", "134", "135", "136", "137", "138", "139", "140"],
+    "events": [
+      { "id": "evt13", "title": "Hyderabad Grand Meet", "description": "Largest matrimony meet in Hyderabad", "date": "2026-06-20T10:00:00Z", "venue": "HICC, Hyderabad", "fee": 800, "maxParticipants": 200, "participantCount": 145 },
+      { "id": "evt14", "title": "Reddy Parivar Sammelan", "description": "Reddy community exclusive event", "date": "2026-08-20T10:00:00Z", "venue": "Novotel, Hyderabad", "fee": 600, "maxParticipants": 100, "participantCount": 72 }
+    ]
+  },
+  {
+    "id": "host8",
+    "name": "Priyanka Banerjee",
+    "email": "priyanka.host@soulmatesync.com",
+    "password": "$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS",
+    "mobile": "+91 98001 10008",
+    "profilePhoto": "/avatars/female.svg",
+    "region": "West Bengal",
+    "district": "Kolkata",
+    "city": "Kolkata",
+    "community": "Bengali",
+    "status": "ACTIVE",
+    "createdAt": "2024-05-01T10:00:00Z",
+    "members": ["141", "142", "143", "144", "145", "146", "147", "148", "149", "150", "151", "152", "153", "154", "155", "156", "157", "158", "159", "160"],
+    "events": [
+      { "id": "evt15", "title": "Kolkata Cultural Meet", "description": "Matchmaking with Bengali cultural evening", "date": "2026-07-12T16:00:00Z", "venue": "ITC Royal Bengal, Kolkata", "fee": 900, "maxParticipants": 80, "participantCount": 58 },
+      { "id": "evt16", "title": "Bong Connection Meetup", "description": "Casual networking for Bengali singles", "date": "2026-08-25T15:00:00Z", "venue": "Science City Auditorium", "fee": 400, "maxParticipants": 120, "participantCount": 85 }
+    ]
+  },
+  {
+    "id": "host9",
+    "name": "Arun Iyer",
+    "email": "arun.host@soulmatesync.com",
+    "password": "$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS",
+    "mobile": "+91 98001 10009",
+    "profilePhoto": "/avatars/male.svg",
+    "region": "Tamil Nadu",
+    "district": "Chennai",
+    "city": "Chennai",
+    "community": "Iyer",
+    "status": "ACTIVE",
+    "createdAt": "2024-04-15T10:00:00Z",
+    "members": ["161", "162", "163", "164", "165", "166", "167", "168", "169", "170", "171", "172", "173", "174", "175", "176", "177", "178", "179", "180"],
+    "events": [
+      { "id": "evt17", "title": "Chennai Tamil Matrimony", "description": "Premium Tamil matrimony event", "date": "2026-07-18T10:00:00Z", "venue": "Hilton Chennai", "fee": 1000, "maxParticipants": 60, "participantCount": 40 },
+      { "id": "evt18", "title": "Iyer-Iyengar Grand Meet", "description": "Brahmin community special gathering", "date": "2026-09-01T10:00:00Z", "venue": "Kalaivanar Arangam", "fee": 700, "maxParticipants": 150, "participantCount": 110 }
+    ]
+  },
+  {
+    "id": "host10",
+    "name": "Harpreet Kaur",
+    "email": "harpreet.host@soulmatesync.com",
+    "password": "$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS",
+    "mobile": "+91 98001 10010",
+    "profilePhoto": "/avatars/female.svg",
+    "region": "Punjab",
+    "district": "Chandigarh",
+    "city": "Chandigarh",
+    "community": "Sikh",
+    "status": "ACTIVE",
+    "createdAt": "2024-03-01T10:00:00Z",
+    "members": ["181", "182", "183", "184", "185", "186", "187", "188", "189", "190", "191", "192", "193", "194", "195", "196", "197", "198", "199", "200"],
+    "events": [
+      { "id": "evt19", "title": "Punjab Rishtey Milan", "description": "Traditional Sikh matrimony gathering", "date": "2026-07-08T10:00:00Z", "venue": "JW Marriott, Chandigarh", "fee": 600, "maxParticipants": 100, "participantCount": 78 },
+      { "id": "evt20", "title": "NRI Sikh Matchmaking", "description": "Connect with NRI Sikh candidates", "date": "2026-08-30T10:00:00Z", "venue": "Hyatt Regency, Chandigarh", "fee": 2000, "maxParticipants": 40, "participantCount": 25 }
+    ]
+  }
+]
