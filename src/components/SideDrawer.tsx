@@ -20,7 +20,7 @@ export default function SideDrawer() {
   return (
     <>
       {/* Trigger Button */}
-      <button onClick={() => setIsOpen(true)} className="lg:hidden fixed top-[18px] left-4 z-[60] p-2 rounded-xl bg-white/5 border border-teal-100 dark:border-purple-500/10 text-slate-600 dark:text-purple-300">
+      <button onClick={() => setIsOpen(true)} className="lg:hidden fixed top-[14px] left-3 z-[60] p-2 rounded-xl bg-white/80 dark:bg-dark-900/80 border border-teal-100 dark:border-purple-500/10 text-slate-600 dark:text-purple-300 backdrop-blur-sm">
         <Menu className="h-5 w-5" />
       </button>
 
@@ -37,7 +37,7 @@ export default function SideDrawer() {
         <div className="p-5 border-b border-teal-100 dark:border-purple-500/10">
           <div className="flex items-center justify-between mb-4">
             <span className="text-lg font-bold gradient-text">Soulmate Sync</span>
-            <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg text-slate-300 dark:text-purple-300/40 hover:text-slate-800 dark:text-white hover:bg-white/5 transition-all">
+            <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg text-slate-600 dark:text-purple-300/40 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all">
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -52,7 +52,7 @@ export default function SideDrawer() {
             </div>
             <div>
               <p className="text-sm font-semibold text-slate-800 dark:text-white">{user.name}</p>
-              <p className="text-[10px] text-slate-300 dark:text-purple-300/40">ID: {profileId}</p>
+              <p className="text-[10px] text-slate-500 dark:text-purple-300/40">ID: {profileId}</p>
             </div>
           </div>
         </div>
@@ -68,7 +68,7 @@ export default function SideDrawer() {
 
         {/* Discover Your Match */}
         <div className="p-3 border-b border-teal-100 dark:border-purple-500/10">
-          <p className="text-[10px] font-semibold text-purple-300/30 uppercase tracking-wider px-3 mb-2">Discover Your Match</p>
+          <p className="text-[10px] font-semibold text-slate-500 dark:text-purple-300/60 uppercase tracking-wider px-3 mb-2">Discover Your Match</p>
           <DrawerLink href="/matches" icon={<HalfHeart className="h-4 w-4" />} label="Matches" onClick={() => setIsOpen(false)} />
           <DrawerLink href="/notifications" icon={<Inbox className="h-4 w-4 text-blue-400" />} label="Inbox" badge="3" onClick={() => setIsOpen(false)} />
           <DrawerLink href="/messages" icon={<MessageCircle className="h-4 w-4 text-green-400" />} label="Chat" onClick={() => setIsOpen(false)} />
@@ -77,7 +77,7 @@ export default function SideDrawer() {
 
         {/* Options & Settings */}
         <div className="p-3 border-b border-teal-100 dark:border-purple-500/10">
-          <p className="text-[10px] font-semibold text-purple-300/30 uppercase tracking-wider px-3 mb-2">Options & Settings</p>
+          <p className="text-[10px] font-semibold text-slate-500 dark:text-purple-300/60 uppercase tracking-wider px-3 mb-2">Options & Settings</p>
           <DrawerLink href="/preferences" icon={<SlidersHorizontal className="h-4 w-4" />} label="Partner Preferences" onClick={() => setIsOpen(false)} />
           <DrawerLink href="/settings" icon={<Phone className="h-4 w-4" />} label="Contact Filters" onClick={() => setIsOpen(false)} />
           <DrawerLink href="/settings" icon={<Settings className="h-4 w-4" />} label="Account Settings" onClick={() => setIsOpen(false)} />
@@ -89,7 +89,7 @@ export default function SideDrawer() {
         {/* Footer */}
         <div className="p-3">
           <DrawerButton icon={<FileText className="h-4 w-4" />} label="Terms & Conditions" onClick={() => setIsOpen(false)} />
-          <button onClick={() => { logout(); setIsOpen(false) }} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-300 hover:bg-red-500/10 transition-all text-sm">
+          <button onClick={() => { logout(); setIsOpen(false) }} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-600 dark:text-red-300 hover:bg-red-500/10 transition-all text-sm">
             <LogOut className="h-4 w-4" /> Logout
           </button>
 
@@ -101,7 +101,7 @@ export default function SideDrawer() {
               <span className="text-xs font-semibold text-slate-800 dark:text-white">Upgrade Now</span>
               <span className="text-[9px] bg-red-500 text-slate-800 dark:text-white px-1.5 py-0.5 rounded-full font-bold">70% OFF</span>
             </div>
-            <p className="text-[10px] text-amber-200/50 mt-1 pl-6">Unlock all premium features</p>
+            <p className="text-[10px] text-amber-700 dark:text-amber-200/50 mt-1 pl-6">Unlock all premium features</p>
           </Link>
         </div>
       </div>
@@ -111,7 +111,7 @@ export default function SideDrawer() {
 
 function DrawerLink({ href, icon, label, badge, onClick }: { href: string; icon: React.ReactNode; label: string; badge?: string; onClick: () => void }) {
   return (
-    <Link href={href} onClick={onClick} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-500 dark:text-purple-200/70 hover:text-slate-800 dark:text-white hover:bg-teal-50 dark:bg-purple-500/10 transition-all text-sm">
+    <Link href={href} onClick={onClick} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-purple-200/70 hover:text-slate-900 dark:hover:text-white hover:bg-teal-50 dark:hover:bg-purple-500/10 transition-all text-sm">
       {icon}
       <span className="flex-1">{label}</span>
       {badge && (
@@ -125,7 +125,7 @@ function DrawerLink({ href, icon, label, badge, onClick }: { href: string; icon:
 
 function DrawerButton({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-500 dark:text-purple-200/70 hover:text-slate-800 dark:text-white hover:bg-teal-50 dark:bg-purple-500/10 transition-all text-sm text-left">
+    <button onClick={onClick} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-purple-200/70 hover:text-slate-900 dark:hover:text-white hover:bg-teal-50 dark:hover:bg-purple-500/10 transition-all text-sm text-left">
       {icon}
       <span>{label}</span>
     </button>

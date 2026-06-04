@@ -102,9 +102,9 @@ export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-dark-900/90 backdrop-blur-xl border-b border-teal-100/60 dark:border-purple-500/10 shadow-sm dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-14 lg:h-16">
-          {/* Logo */}
-          <div className="flex items-center">
+        <div className="flex justify-center lg:justify-between items-center h-14 lg:h-16 relative">
+          {/* Logo - centered on mobile, left on desktop */}
+          <div className="flex items-center lg:flex-none">
             <Link href="/" className="flex items-center space-x-2 group">
               <HalfHeart className="h-7 w-7 group-hover:scale-110 transition-transform" />
               <span className="text-xl font-bold gradient-text tracking-tight">Soulmate Sync</span>
@@ -259,12 +259,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="lg:hidden flex items-center">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-purple-300 p-2">
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
+
         </div>
 
         {/* Sub Navigation (only when logged in) */}
@@ -279,37 +274,7 @@ export default function Navbar() {
         )}
       </div>
 
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="lg:hidden absolute top-14 left-0 right-0 bg-dark-900/95 backdrop-blur-xl border-b border-purple-500/10 z-50 animate-fade-in-down">
-          <div className="flex flex-col p-4 space-y-1">
-            {user ? (
-              <>
-                <MobileLink href="/dashboard" label="My Matches" onClick={() => setIsOpen(false)} />
-                <MobileLink href="/matches" label="Matches" onClick={() => setIsOpen(false)} />
-                <MobileLink href="/search" label="Search" onClick={() => setIsOpen(false)} />
-                <MobileLink href="/messages" label="Inbox" onClick={() => setIsOpen(false)} />
-                <MobileLink href="/profile" label="My Profile" onClick={() => setIsOpen(false)} />
-                <MobileLink href="/notifications" label="Alerts" onClick={() => setIsOpen(false)} />
-                <MobileLink href="/settings" label="Settings" onClick={() => setIsOpen(false)} />
-                <MobileLink href="/premium" label="Upgrade Now" onClick={() => setIsOpen(false)} />
-                <hr className="border-purple-500/10 my-2" />
-                <button onClick={() => { logout(); setIsOpen(false) }} className="text-left text-red-400 py-3 px-4 rounded-lg hover:bg-red-500/10 font-medium">
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <MobileLink href="/search" label="Browse Profiles" onClick={() => setIsOpen(false)} />
-                <MobileLink href="/login" label="Login" onClick={() => setIsOpen(false)} />
-                <Link href="/register" className="mt-2 block text-center btn-primary py-3" onClick={() => setIsOpen(false)}>
-                  Register Free
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+
     </nav>
   )
 }

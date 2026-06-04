@@ -180,16 +180,16 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <div className="flex gap-3 mb-6 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-          <Link href="/search" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-200 hover:bg-purple-500/20 transition-all whitespace-nowrap">
+          <Link href="/search" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-700 dark:text-purple-200 hover:bg-purple-500/20 transition-all whitespace-nowrap">
             <Search className="h-3.5 w-3.5" /> Search Profiles
           </Link>
-          <Link href="/meeting" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-pink-500/10 border border-pink-500/20 text-xs text-pink-200 hover:bg-pink-500/20 transition-all whitespace-nowrap">
+          <Link href="/meeting" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-pink-500/10 border border-pink-500/20 text-xs text-pink-700 dark:text-pink-200 hover:bg-pink-500/20 transition-all whitespace-nowrap">
             <Calendar className="h-3.5 w-3.5" /> Schedule Meeting
           </Link>
-          <Link href="/premium" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200 hover:bg-amber-500/20 transition-all whitespace-nowrap">
+          <Link href="/premium" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700 dark:text-amber-200 hover:bg-amber-500/20 transition-all whitespace-nowrap">
             <Crown className="h-3.5 w-3.5" /> Go Premium
           </Link>
-          <Link href="/verify" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-green-500/10 border border-green-500/20 text-xs text-green-200 hover:bg-green-500/20 transition-all whitespace-nowrap">
+          <Link href="/verify" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-green-500/10 border border-green-500/20 text-xs text-green-700 dark:text-green-200 hover:bg-green-500/20 transition-all whitespace-nowrap">
             <BadgeCheck className="h-3.5 w-3.5" /> Get Verified
           </Link>
         </div>
