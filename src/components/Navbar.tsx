@@ -13,8 +13,8 @@ export default function Navbar() {
   const [userInfoOpen, setUserInfoOpen] = useState(false)
   const [notifCount, setNotifCount] = useState(0)
   const [notifications, setNotifications] = useState<{ id: string; type: string; title: string; message: string; time: string; read: boolean; link?: string }[]>([])
-  const [inboxCount, setInboxCount] = useState(3)
-  const [matchCount, setMatchCount] = useState(20)
+  const [inboxCount, setInboxCount] = useState(0)
+  const [matchCount, setMatchCount] = useState(0)
   const [showSubNav, setShowSubNav] = useState(true)
   const lastScrollY = useRef(0)
   const { user, logout } = useAuth()
@@ -58,6 +58,31 @@ export default function Navbar() {
     return () => clearInterval(interval)
   }, [user])
 
+  // Fetch dynamic inbox and match counts
+  useEffect(() => {
+    if (!user) return
+    const fetchCounts = async () => {
+      try {
+        const [msgRes, matchRes] = await Promise.all([
+          fetch(`/api/messages?userId=${user.id}`),
+          fetch(`/api/activity/matches?userId=${user.id}&type=counts`)
+        ])
+        if (msgRes.ok) {
+          const msgData = await msgRes.json()
+          const unread = (msgData.conversations || []).reduce((acc: number, c: any) => acc + (c.unreadCount || 0), 0)
+          setInboxCount(unread)
+        }
+        if (matchRes.ok) {
+          const matchData = await matchRes.json()
+          setMatchCount(matchData.counts?.interestsReceived || 0)
+        }
+      } catch {}
+    }
+    fetchCounts()
+    const interval = setInterval(fetchCounts, 30000)
+    return () => clearInterval(interval)
+  }, [user])
+
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY
@@ -73,7 +98,7 @@ export default function Navbar() {
   }, [])
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-purple-500/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-dark-900/90 backdrop-blur-xl border-b border-teal-100/60 dark:border-purple-500/10 shadow-sm dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-14 lg:h-16">
           {/* Logo */}

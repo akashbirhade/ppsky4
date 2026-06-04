@@ -20,6 +20,7 @@ export default function DashboardPage() {
 
   const [sentInterests, setSentInterests] = useState<Set<string>>(new Set())
   const [shortlisted, setShortlisted] = useState<Set<string>>(new Set())
+  const [stats, setStats] = useState({ profileViews: 0, interestsReceived: 0, conversations: 0, profileScore: 0 })
 
   const lookingFor = user?.gender === 'Male' ? 'Bride' : 'Groom'
 
@@ -63,6 +64,25 @@ export default function DashboardPage() {
         }
       })
       .catch(() => {})
+    // Load dynamic stats
+    fetch(`/api/activity/matches?userId=${user.id}&type=counts`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.counts) {
+          setStats(prev => ({ ...prev, profileViews: data.counts.profileViews, interestsReceived: data.counts.interestsReceived }))
+        }
+      })
+      .catch(() => {})
+    fetch(`/api/messages?userId=${user.id}`)
+      .then(r => r.json())
+      .then(data => {
+        setStats(prev => ({ ...prev, conversations: data.conversations?.length || 0 }))
+      })
+      .catch(() => {})
+    // Profile completeness score
+    const fields = [user.name, user.email, user.gender, user.age, (user as any).religion, (user as any).city, (user as any).education, (user as any).occupation, (user as any).about]
+    const filled = fields.filter(Boolean).length
+    setStats(prev => ({ ...prev, profileScore: Math.round((filled / fields.length) * 100) }))
   }, [user, router, fetchProfiles])
 
   const handleSendInterest = async (e: React.MouseEvent, profileId: string) => {
@@ -132,28 +152,28 @@ export default function DashboardPage() {
             <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mx-auto mb-2">
               <Eye className="h-4 w-4 text-purple-400" />
             </div>
-            <p className="text-xl font-bold text-white">47</p>
+            <p className="text-xl font-bold text-white">{stats.profileViews}</p>
             <p className="text-[10px] text-purple-300/40">Profile Views</p>
           </div>
           <div className="glass-card !p-4 text-center">
             <div className="w-9 h-9 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mx-auto mb-2">
               <HalfHeart className="h-4 w-4" />
             </div>
-            <p className="text-xl font-bold text-white">12</p>
+            <p className="text-xl font-bold text-white">{stats.interestsReceived}</p>
             <p className="text-[10px] text-purple-300/40">Interests Received</p>
           </div>
           <div className="glass-card !p-4 text-center">
             <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mx-auto mb-2">
               <MessageCircle className="h-4 w-4 text-blue-400" />
             </div>
-            <p className="text-xl font-bold text-white">8</p>
+            <p className="text-xl font-bold text-white">{stats.conversations}</p>
             <p className="text-[10px] text-purple-300/40">Conversations</p>
           </div>
           <div className="glass-card !p-4 text-center">
             <div className="w-9 h-9 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center mx-auto mb-2">
               <TrendingUp className="h-4 w-4 text-green-400" />
             </div>
-            <p className="text-xl font-bold text-white">85%</p>
+            <p className="text-xl font-bold text-white">{stats.profileScore}%</p>
             <p className="text-[10px] text-purple-300/40">Profile Score</p>
           </div>
         </div>

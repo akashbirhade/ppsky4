@@ -20,14 +20,32 @@ export default function MatchesPage() {
   const [data, setData] = useState<ProfileItem[]>([])
   const [loading, setLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [matchCount, setMatchCount] = useState(20)
+  const [matchCount, setMatchCount] = useState(0)
   const [counts, setCounts] = useState({ profileViews: 0, interestsReceived: 0, interestsSent: 0, shortlistedBy: 0, mutualMatches: 0, recentVisitors: 0 })
   const [shortlistCount, setShortlistCount] = useState(0)
   const { ref: profileSlideRef, animateSlide } = useProfileSlide()
   const [connectPopup, setConnectPopup] = useState<{ profileId: string; rippling: boolean } | null>(null)
+  const [timeLeft, setTimeLeft] = useState('')
 
   useEffect(() => { if (!user) router.push('/login') }, [user, router])
   useEffect(() => { if (user) { fetchCounts(); fetchData() } }, [user, activeTab])
+
+  // Countdown timer - resets daily at midnight
+  useEffect(() => {
+    const updateTimer = () => {
+      const now = new Date()
+      const end = new Date(now)
+      end.setHours(23, 59, 59, 999)
+      const diff = end.getTime() - now.getTime()
+      const h = Math.floor(diff / 3600000)
+      const m = Math.floor((diff % 3600000) / 60000)
+      const s = Math.floor((diff % 60000) / 1000)
+      setTimeLeft(`${h}h : ${String(m).padStart(2, '0')}m : ${String(s).padStart(2, '0')}s`)
+    }
+    updateTimer()
+    const interval = setInterval(updateTimer, 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   const handleNext = () => {
     if (currentIndex >= data.length - 1) return
@@ -61,7 +79,9 @@ export default function MatchesPage() {
         case 'daily':
           res = await fetch(`/api/activity/matches?userId=${user!.id}&type=daily`)
           const daily = await res.json()
-          setData((daily.profiles || []).map((p: any) => ({ profile: p })))
+          const dailyProfiles = (daily.profiles || []).map((p: any) => ({ profile: p }))
+          setData(dailyProfiles)
+          setMatchCount(dailyProfiles.length)
           break
         case 'viewed':
           res = await fetch(`/api/activity/views?userId=${user!.id}&type=viewed`)
@@ -199,7 +219,7 @@ export default function MatchesPage() {
             <div className="flex items-center justify-between px-6 py-3 border-b border-purple-500/10 bg-white/[0.02]">
               <div className="flex items-center gap-3">
                 <span className="text-xs text-purple-300/40">Time left to Connect</span>
-                <span className="text-sm font-mono text-pink-400 font-medium">22h : 44m : 22s</span>
+                <span className="text-sm font-mono text-pink-400 font-medium">{timeLeft}</span>
               </div>
               <div className="flex items-center gap-2">
                 <button 
@@ -255,9 +275,9 @@ export default function MatchesPage() {
                     </h2>
                     <div className="flex items-center gap-3 mt-1 text-sm text-purple-300/50">
                       <span className="flex items-center gap-1">
-                        <span className="w-2 h-2 bg-green-500 rounded-full"></span> Online
+                        <span className={`w-2 h-2 rounded-full ${currentProfile.gender ? 'bg-green-500' : 'bg-gray-400'}`}></span> {currentProfile.gender ? 'Online' : 'Offline'}
                       </span>
-                      <span>You & Her</span>
+                      <span>You & {currentProfile.gender === 'Female' ? 'Her' : 'Him'}</span>
                       <span className="text-amber-400">⭐ Astro</span>
                     </div>
                   </div>

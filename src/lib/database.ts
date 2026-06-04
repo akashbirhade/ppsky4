@@ -824,7 +824,7 @@ export function getDailyRecommendations(userId: string): UserProfile[] {
   return users
     .filter(u => u.id !== userId && u.gender === oppositeGender && u.profileComplete)
     .sort(() => 0.5 - Math.random())
-    .slice(0, 5)
+    .slice(0, 20)
 }
 
 // Activity counts for dashboard

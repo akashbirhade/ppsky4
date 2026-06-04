@@ -263,3 +263,80 @@ body {
 .dark .profile-hover:hover {
   box-shadow: 0 20px 60px rgba(147,51,234,0.2);
 }
+
+/* ============ LIGHT MODE OVERRIDES ============ */
+/* These override dark-specific inline classes when NOT in dark mode */
+/* This ensures all components written with dark-mode colors work in light mode */
+
+@layer utilities {
+  /* Background overrides for light mode */
+  html:not(.dark) .bg-dark-900\/90,
+  html:not(.dark) .bg-dark-900 { background-color: rgba(255, 255, 255, 0.9) !important; }
+  html:not(.dark) .bg-dark-800\/95,
+  html:not(.dark) .bg-dark-800 { background-color: rgba(248, 250, 252, 0.95) !important; }
+  html:not(.dark) .bg-dark-700 { background-color: #f1f5f9 !important; }
+
+  /* Text color overrides */
+  html:not(.dark) .text-white { color: #1e293b !important; }
+  html:not(.dark) .text-purple-200,
+  html:not(.dark) .text-purple-200\/70,
+  html:not(.dark) .text-purple-200\/60 { color: #475569 !important; }
+  html:not(.dark) .text-purple-300,
+  html:not(.dark) .text-purple-300\/60,
+  html:not(.dark) .text-purple-300\/50,
+  html:not(.dark) .text-purple-300\/40,
+  html:not(.dark) .text-purple-300\/30 { color: #64748b !important; }
+  html:not(.dark) .text-purple-400 { color: #0d9488 !important; }
+  html:not(.dark) .text-pink-400 { color: #e11d48 !important; }
+  html:not(.dark) .text-amber-400 { color: #d97706 !important; }
+  html:not(.dark) .text-amber-300 { color: #b45309 !important; }
+  html:not(.dark) .text-green-300,
+  html:not(.dark) .text-green-400 { color: #059669 !important; }
+  html:not(.dark) .text-blue-300,
+  html:not(.dark) .text-blue-400 { color: #2563eb !important; }
+  html:not(.dark) .text-red-300 { color: #dc2626 !important; }
+  html:not(.dark) .text-fuchsia-400 { color: #c026d3 !important; }
+
+  /* Border overrides */
+  html:not(.dark) .border-purple-500\/10,
+  html:not(.dark) .border-purple-500\/15,
+  html:not(.dark) .border-purple-500\/20,
+  html:not(.dark) .border-purple-500\/30,
+  html:not(.dark) .border-purple-400\/20,
+  html:not(.dark) .border-purple-400\/30 { border-color: rgba(20, 184, 166, 0.15) !important; }
+  html:not(.dark) .border-white\/\[0\.08\] { border-color: rgba(20, 184, 166, 0.1) !important; }
+
+  /* Background utility overrides */
+  html:not(.dark) .bg-purple-500\/10,
+  html:not(.dark) .bg-purple-500\/20 { background-color: rgba(20, 184, 166, 0.08) !important; }
+  html:not(.dark) .bg-purple-600,
+  html:not(.dark) .bg-purple-600\/80 { background-color: #0d9488 !important; }
+  html:not(.dark) .bg-white\/5,
+  html:not(.dark) .bg-white\/10,
+  html:not(.dark) .bg-white\/\[0\.02\],
+  html:not(.dark) .bg-white\/\[0\.03\],
+  html:not(.dark) .bg-white\/\[0\.04\] { background-color: rgba(241, 245, 249, 0.8) !important; }
+  html:not(.dark) .bg-pink-500\/20 { background-color: rgba(236, 72, 153, 0.1) !important; }
+  html:not(.dark) .bg-green-500\/10 { background-color: rgba(16, 185, 129, 0.1) !important; }
+  html:not(.dark) .bg-blue-500\/10,
+  html:not(.dark) .bg-blue-500\/20 { background-color: rgba(59, 130, 246, 0.1) !important; }
+  html:not(.dark) .bg-amber-500\/10,
+  html:not(.dark) .bg-amber-500\/20 { background-color: rgba(245, 158, 11, 0.1) !important; }
+  html:not(.dark) .bg-green-600\/80 { background-color: #059669 !important; }
+
+  /* Shadow overrides */
+  html:not(.dark) .shadow-\[0_4px_30px_rgba\(0\,0\,0\,0\.3\)\] { box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important; }
+  html:not(.dark) .shadow-purple-500\/30 { --tw-shadow-color: rgba(20, 184, 166, 0.2) !important; }
+
+  /* Gradient text in light */
+  html:not(.dark) .drop-shadow-lg { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)) !important; }
+
+  /* Hover states */
+  html:not(.dark) .hover\:bg-white\/10:hover,
+  html:not(.dark) .hover\:bg-white\/20:hover { background-color: rgba(241, 245, 249, 1) !important; }
+  html:not(.dark) .hover\:bg-purple-500\/10:hover { background-color: rgba(20, 184, 166, 0.12) !important; }
+  html:not(.dark) .hover\:text-white:hover,
+  html:not(.dark) .hover\:text-purple-200:hover { color: #0f172a !important; }
+  html:not(.dark) .hover\:border-purple-300\/50:hover,
+  html:not(.dark) .hover\:border-purple-400\/40:hover { border-color: rgba(20, 184, 166, 0.4) !important; }
+}
