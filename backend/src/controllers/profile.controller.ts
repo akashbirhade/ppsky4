@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import prisma from '@config/prisma';
 import { AppError } from '@middleware/error.middleware';
 import { config } from '@config/index';
+import { sendProfileUpdateAlert, sendPhotoUploadAlert } from '@services/alert.service';
 
 // ─── GET MY PROFILE ──────────────────────────────────────────────────────────
 
@@ -100,6 +101,21 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
       },
     });
 
+    // Send email + SMS notification
+    const userRecord = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, mobile: true, username: true },
+    });
+    if (userRecord) {
+      const updatedFields = Object.keys(data).filter(k => k !== 'profileCompletionPercentage');
+      sendProfileUpdateAlert({
+        email: userRecord.email,
+        phone: userRecord.mobile ?? undefined,
+        userName: userRecord.username,
+        updatedFields,
+      }).catch(() => {}); // fire-and-forget
+    }
+
     res.json({ success: true, message: 'Profile updated', data: updated });
   } catch (err) { next(err); }
 };
@@ -130,6 +146,20 @@ export const uploadPhoto = async (req: Request, res: Response, next: NextFunctio
     });
 
     res.status(201).json({ success: true, data: photo });
+
+    // Send email + SMS notification (after response sent)
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, mobile: true, username: true },
+    }).then(userRecord => {
+      if (userRecord) {
+        sendPhotoUploadAlert({
+          email: userRecord.email,
+          phone: userRecord.mobile ?? undefined,
+          userName: userRecord.username,
+        }).catch(() => {});
+      }
+    }).catch(() => {});
   } catch (err) { next(err); }
 };
 

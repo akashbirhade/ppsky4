@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
-import { User, Save, Camera, Upload, BadgeCheck, MapPin, GraduationCap, Briefcase, Heart, Globe, BookOpen, Sparkles, TrendingUp, Star, Video } from 'lucide-react'
+import { User, Save, Camera, Upload, BadgeCheck, MapPin, GraduationCap, Briefcase, Heart, Globe, BookOpen, Sparkles, TrendingUp, Star, Video, Share2 } from 'lucide-react'
 
 export default function ProfilePage() {
   const { user } = useAuth()
@@ -156,6 +156,24 @@ export default function ProfilePage() {
               <p className="text-lg font-bold text-slate-800 dark:text-white">5</p>
               <p className="text-[10px] text-slate-300 dark:text-purple-300/40">Shortlisted</p>
             </div>
+          </div>
+
+          {/* Share Profile */}
+          <div className="mt-4 flex gap-3">
+            <button
+              onClick={() => {
+                const profileUrl = `${window.location.origin}/profile/${user?.id}`
+                if (navigator.share) {
+                  navigator.share({ title: `${user?.name} - Soulmate Sync`, text: 'Check out my profile on Soulmate Sync!', url: profileUrl })
+                } else {
+                  navigator.clipboard.writeText(profileUrl)
+                  alert('Profile link copied to clipboard!')
+                }
+              }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-50 dark:bg-purple-500/10 border border-teal-200/50 dark:border-purple-500/20 text-sm text-teal-700 dark:text-purple-200 hover:bg-teal-100 dark:hover:bg-purple-500/20 transition-all"
+            >
+              <Share2 className="h-4 w-4" /> Share Profile
+            </button>
           </div>
         </div>
 

@@ -131,7 +131,7 @@ export default function ChatSidebar() {
     return (
       <button
         onClick={() => setIsMinimized(false)}
-        className="hidden xl:flex fixed bottom-6 right-6 z-40 items-center gap-2 px-4 py-2.5 bg-white dark:bg-dark-900/95 backdrop-blur-xl border border-teal-200/50 dark:border-purple-500/20 rounded-full shadow-[0_4px_24px_rgba(147,51,234,0.2)] hover:border-purple-500/40 hover:scale-105 transition-all duration-300"
+        className="hidden xl:flex fixed top-[112px] right-4 z-40 items-center gap-2 px-4 py-2.5 bg-white dark:bg-dark-900/95 backdrop-blur-xl border border-teal-200/50 dark:border-purple-500/20 rounded-full shadow-[0_4px_24px_rgba(147,51,234,0.2)] hover:border-purple-500/40 hover:scale-105 transition-all duration-300"
       >
         <MessageCircle className="h-4 w-4 text-teal-600 dark:text-purple-400" />
         <span className="text-sm font-medium text-slate-700 dark:text-purple-200">Chats</span>

@@ -160,6 +160,40 @@ const EMAIL_TEMPLATES = {
       Team Soulmate Sync
     `
   },
+  profile_updated: {
+    subject: '✅ Your Soulmate Sync profile has been updated',
+    body: (data: any) => `
+      Hi ${data.userName},
+      
+      Your profile on Soulmate Sync has been successfully updated.
+      
+      What was updated: ${data.updatedFields || 'Profile information'}
+      Updated at: ${data.updatedAt || new Date().toLocaleString()}
+      
+      If you did not make this change, please secure your account immediately.
+      
+      Visit your profile: https://soulmatesync.com/profile
+      Change password: https://soulmatesync.com/settings
+      
+      Best wishes,
+      Team Soulmate Sync
+    `
+  },
+  profile_photo_uploaded: {
+    subject: '📸 New photo added to your Soulmate Sync profile',
+    body: (data: any) => `
+      Hi ${data.userName},
+      
+      A new photo has been added to your Soulmate Sync profile.
+      
+      Profiles with photos get up to 5x more responses!
+      
+      View your profile: https://soulmatesync.com/profile
+      
+      Best wishes,
+      Team Soulmate Sync
+    `
+  },
 }
 
 // POST - Send email notification

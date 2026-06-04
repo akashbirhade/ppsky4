@@ -104,21 +104,21 @@ export default function AIChatBot() {
           <div className="bg-gradient-to-r from-purple-900 via-purple-800 to-fuchsia-900 p-4 border-b border-teal-200/50 dark:border-purple-500/20">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-purple-500/30 rounded-full flex items-center justify-center border border-purple-400/30">
-                <Bot className="h-5 w-5 text-slate-700 dark:text-purple-200" />
+                <Bot className="h-5 w-5 text-purple-200" />
               </div>
               <div>
-                <h3 className="font-semibold text-slate-800 dark:text-white text-sm">AI Match Assistant</h3>
-                <p className="text-xs text-slate-600 dark:text-purple-300 flex items-center gap-1.5">
+                <h3 className="font-semibold text-white text-sm">AI Match Assistant</h3>
+                <p className="text-xs text-purple-200 flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
                   Online • {detectedLang === 'hi' ? 'हिंदी' : detectedLang === 'mr' ? 'मराठी' : 'English'}
                 </p>
               </div>
               <button
                 onClick={() => setIsMinimized(true)}
-                className="ml-auto p-1.5 hover:bg-teal-100/50 dark:bg-purple-500/20 rounded-full transition-colors"
+                className="ml-auto p-1.5 hover:bg-purple-500/20 rounded-full transition-colors"
                 title="Minimize"
               >
-                <Minus className="h-4 w-4 text-slate-600 dark:text-purple-300" />
+                <Minus className="h-4 w-4 text-purple-200" />
               </button>
               <HalfHeart className="h-4 w-4 animate-heartbeat" />
             </div>
@@ -132,12 +132,12 @@ export default function AIChatBot() {
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
                     msg.role === 'user' ? 'bg-purple-500/30' : 'bg-fuchsia-500/20'
                   }`}>
-                    {msg.role === 'user' ? <User className="h-3 w-3 text-slate-600 dark:text-purple-300" /> : <Bot className="h-3 w-3 text-fuchsia-300" />}
+                    {msg.role === 'user' ? <User className="h-3 w-3 text-purple-300" /> : <Bot className="h-3 w-3 text-fuchsia-400" />}
                   </div>
                   <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                     msg.role === 'user'
-                      ? 'bg-purple-600/40 text-slate-800 dark:text-white border border-teal-200/50 dark:border-purple-500/20 rounded-br-sm'
-                      : 'bg-white/5 text-purple-100 border border-purple-400/10 rounded-bl-sm'
+                      ? 'bg-purple-600 text-white border border-purple-500/50 rounded-br-sm'
+                      : 'bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-purple-100 border border-slate-200 dark:border-purple-400/10 rounded-bl-sm'
                   }`}>
                     <div className="whitespace-pre-wrap">{msg.content}</div>
                   </div>
@@ -161,11 +161,11 @@ export default function AIChatBot() {
           {/* Quick Actions */}
           {messages.length <= 1 && (
             <div className="px-3 py-2 bg-white dark:bg-dark-900/90 border-t border-teal-100 dark:border-purple-500/10">
-              <p className="text-[9px] text-purple-300/30 uppercase tracking-wider mb-2 px-1">Quick Actions</p>
+              <p className="text-[9px] text-slate-400 dark:text-purple-300/60 uppercase tracking-wider mb-2 px-1">Quick Actions</p>
               <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
                 {["Find matches", "Profile tips", "AI Bio Writer", "Compatibility check", "Red flag alerts", "Reply suggestions", "Kundali matching", "कुंडली मिलान"].map((a, i) => (
                   <button key={i} onClick={() => sendMessage(a)}
-                    className="text-xs bg-teal-50 dark:bg-purple-500/10 text-slate-600 dark:text-purple-300 px-3 py-1.5 rounded-full whitespace-nowrap hover:bg-teal-100/50 dark:bg-purple-500/20 border border-teal-200/50 dark:border-purple-500/20 transition-all">
+                    className="text-xs bg-slate-100 dark:bg-purple-500/10 text-slate-700 dark:text-purple-300 px-3 py-1.5 rounded-full whitespace-nowrap hover:bg-slate-200 dark:hover:bg-purple-500/20 border border-slate-200 dark:border-purple-500/20 transition-all">
                     {a}
                   </button>
                 ))}
@@ -182,7 +182,7 @@ export default function AIChatBot() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
                 placeholder={detectedLang === 'hi' ? 'कुछ भी पूछें...' : detectedLang === 'mr' ? 'काहीही विचारा...' : 'Ask in English, Hindi, or Marathi...'}
-                className="flex-1 px-4 py-2.5 bg-white/5 rounded-full text-sm text-slate-800 dark:text-white placeholder-purple-300/40 focus:outline-none focus:ring-1 focus:ring-purple-500/50 border border-purple-400/10 transition-all"
+                className="flex-1 px-4 py-2.5 bg-slate-100 dark:bg-white/5 rounded-full text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-purple-300/40 focus:outline-none focus:ring-1 focus:ring-purple-500/50 border border-slate-200 dark:border-purple-400/10 transition-all"
               />
               <button
                 onClick={() => sendMessage()}

@@ -103,6 +103,15 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-dark-900/90 backdrop-blur-xl border-b border-teal-100/60 dark:border-purple-500/10 shadow-sm dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-center lg:justify-between items-center h-14 lg:h-16 relative">
+          {/* Theme toggle - mobile only, right side */}
+          <button
+            onClick={toggleTheme}
+            className="lg:hidden absolute right-0 w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 dark:bg-purple-500/10 border border-slate-200 dark:border-purple-500/20 hover:bg-slate-200 dark:hover:bg-purple-500/20 transition-all"
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-purple-600" />}
+          </button>
+
           {/* Logo - centered on mobile, left on desktop */}
           <div className="flex items-center lg:flex-none">
             <Link href="/" className="flex items-center space-x-2 group">
@@ -253,6 +262,13 @@ export default function Navbar() {
             ) : (
               <>
                 <NavLink href="/search" label="Browse" />
+                <button
+                  onClick={toggleTheme}
+                  className="ml-3 w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 dark:bg-purple-500/10 border border-slate-200 dark:border-purple-500/20 hover:bg-slate-200 dark:hover:bg-purple-500/20 transition-all"
+                  title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                >
+                  {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-purple-600" />}
+                </button>
                 <Link href="/login" className="ml-3 btn-secondary text-sm py-2 px-5">Login</Link>
                 <Link href="/register" className="ml-2 btn-primary text-xs py-1.5 px-3">Register Free</Link>
               </>
@@ -281,10 +297,10 @@ export default function Navbar() {
 
 function NavLink({ href, label, badge }: { href: string; label: string; badge?: number }) {
   return (
-    <Link href={href} className="relative flex items-center text-purple-200/70 hover:text-white px-4 py-2 text-sm font-semibold transition-colors rounded-xl hover:bg-white/5">
+    <Link href={href} className="relative flex items-center text-slate-700 dark:text-purple-200/70 hover:text-slate-900 dark:hover:text-white px-4 py-2 text-sm font-semibold transition-colors rounded-xl hover:bg-slate-100 dark:hover:bg-white/5">
       {label}
-      {badge && badge > 0 && (
-        <span className="ml-1.5 min-w-[18px] h-[18px] bg-pink-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+      {badge !== undefined && badge > 0 && (
+        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
           {badge > 99 ? '99+' : badge}
         </span>
       )}

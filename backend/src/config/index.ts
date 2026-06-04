@@ -51,9 +51,9 @@ export const config = {
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT || '587', 10),
     secure: process.env.SMTP_SECURE === 'true',
-    user: process.env.SMTP_USER || '',
+    user: process.env.SMTP_USER || 'skybusinessmoney@gmail.com',
     pass: process.env.SMTP_PASS || '',
-    from: process.env.EMAIL_FROM || 'Soulmate Sync <noreply@soulmatesync.com>',
+    from: process.env.EMAIL_FROM || 'Soulmate Sync <skybusinessmoney@gmail.com>',
   },
 
   twilio: {
