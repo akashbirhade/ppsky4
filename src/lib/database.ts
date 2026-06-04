@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import fs from 'fs'
 import path from 'path'
 
-// ============ FILE-BASED PERSISTENCE ============
+// ============ HYBRID PERSISTENCE (File + In-Memory for Vercel) ============
 const DATA_DIR = path.join(process.cwd(), 'data')
 const USERS_FILE = path.join(DATA_DIR, 'users.json')
 const MESSAGES_FILE = path.join(DATA_DIR, 'messages.json')
@@ -10,25 +10,46 @@ const ACTIVITIES_FILE = path.join(DATA_DIR, 'activities.json')
 const SUBSCRIPTIONS_FILE = path.join(DATA_DIR, 'subscriptions.json')
 const COUPONS_FILE = path.join(DATA_DIR, 'coupons.json')
 
+// In-memory cache for serverless environments (Vercel)
+const memoryStore: Record<string, any> = {}
+
 function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true })
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true })
+    }
+  } catch {
+    // Read-only filesystem (Vercel) - use memory only
   }
 }
 
 function readJSON<T>(filePath: string, fallback: T): T {
-  ensureDataDir()
+  // Return from memory cache first (has latest state)
+  if (memoryStore[filePath] !== undefined) {
+    return memoryStore[filePath] as T
+  }
   try {
+    ensureDataDir()
     if (fs.existsSync(filePath)) {
-      return JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+      memoryStore[filePath] = data
+      return data
     }
   } catch (e) { console.error(`Error reading ${filePath}:`, e) }
+  memoryStore[filePath] = fallback
   return fallback
 }
 
 function writeJSON(filePath: string, data: any) {
-  ensureDataDir()
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
+  // Always update memory cache
+  memoryStore[filePath] = data
+  // Try to write to filesystem (works locally, fails gracefully on Vercel)
+  try {
+    ensureDataDir()
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
+  } catch {
+    // Read-only filesystem - data stays in memory for this invocation
+  }
 }
 
 export interface UserProfile {
@@ -128,7 +149,7 @@ const SEED_USERS: UserProfile[] = [
     id: '1',
     name: 'Priya Sharma',
     email: 'priya@example.com',
-    password: '$2a$10$UECcKMABBCQrmtw8XVT87edj2DEq8HX70eLT7uoLIpfmA99ieie4K',
+    password: '$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS',
     phone: '+91 98765 43210',
     gender: 'Female',
     dateOfBirth: '1995-03-15',
@@ -163,7 +184,7 @@ const SEED_USERS: UserProfile[] = [
     id: '2',
     name: 'Rahul Verma',
     email: 'rahul@example.com',
-    password: '$2a$10$UECcKMABBCQrmtw8XVT87edj2DEq8HX70eLT7uoLIpfmA99ieie4K',
+    password: '$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS',
     phone: '+91 98765 43211',
     gender: 'Male',
     dateOfBirth: '1992-07-20',
@@ -198,7 +219,7 @@ const SEED_USERS: UserProfile[] = [
     id: '3',
     name: 'Ananya Patel',
     email: 'ananya@example.com',
-    password: '$2a$10$UECcKMABBCQrmtw8XVT87edj2DEq8HX70eLT7uoLIpfmA99ieie4K',
+    password: '$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS',
     phone: '+91 98765 43212',
     gender: 'Female',
     dateOfBirth: '1996-11-08',
@@ -233,7 +254,7 @@ const SEED_USERS: UserProfile[] = [
     id: '4',
     name: 'Vikram Singh',
     email: 'vikram@example.com',
-    password: '$2a$10$UECcKMABBCQrmtw8XVT87edj2DEq8HX70eLT7uoLIpfmA99ieie4K',
+    password: '$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS',
     phone: '+91 98765 43213',
     gender: 'Male',
     dateOfBirth: '1990-05-25',
@@ -268,7 +289,7 @@ const SEED_USERS: UserProfile[] = [
     id: '5',
     name: 'Sneha Reddy',
     email: 'sneha@example.com',
-    password: '$2a$10$UECcKMABBCQrmtw8XVT87edj2DEq8HX70eLT7uoLIpfmA99ieie4K',
+    password: '$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS',
     phone: '+91 98765 43214',
     gender: 'Female',
     dateOfBirth: '1994-09-12',
@@ -303,7 +324,7 @@ const SEED_USERS: UserProfile[] = [
     id: '6',
     name: 'Arjun Mehta',
     email: 'arjun@example.com',
-    password: '$2a$10$UECcKMABBCQrmtw8XVT87edj2DEq8HX70eLT7uoLIpfmA99ieie4K',
+    password: '$2a$10$ZARVRNII7u1DF/IIvc1Eg.rcwwvQziLk6P3h2WGJBlTECfZPx7mcS',
     phone: '+91 98765 43215',
     gender: 'Male',
     dateOfBirth: '1991-12-03',

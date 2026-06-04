@@ -47,12 +47,12 @@ export default function RegisterPage() {
     if (formData.password.length < 6) { setError('Password must be at least 6 characters'); return }
     
     setLoading(true)
-    const success = await register({
+    const result = await register({
       name: formData.name, email: formData.email,
       password: formData.password, gender: formData.gender, dateOfBirth: formData.dateOfBirth
     })
-    if (success) router.push('/onboarding')
-    else setError('Registration failed. Email might already be registered.')
+    if (result.success) router.push('/onboarding')
+    else setError(result.error || 'Registration failed. Please try again.')
     setLoading(false)
   }
 

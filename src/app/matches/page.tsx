@@ -153,31 +153,31 @@ export default function MatchesPage() {
     <div className="min-h-screen bg-mesh pt-[104px] pb-12">
       <div className="max-w-6xl mx-auto px-4 xl:pr-80">
         {/* Sub Navigation Tabs */}
-        <div className="flex items-center gap-6 border-b border-teal-100 dark:border-purple-500/10 mb-6 glass-card !rounded-b-none !p-0 px-6 py-0">
+        <div className="flex items-center gap-6 border-b border-purple-500/10 mb-6 glass-card !rounded-b-none !p-0 px-6 py-0">
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`relative py-4 text-sm font-medium transition-colors whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'text-slate-600 dark:text-purple-300 border-b-2 border-purple-400'
-                  : 'text-slate-300 dark:text-purple-300/40 hover:text-teal-600 dark:hover:text-purple-200'
+                  ? 'text-purple-300 border-b-2 border-purple-400'
+                  : 'text-purple-300/40 hover:text-purple-200'
               }`}
             >
               {tab.label}
               {tab.count > 0 && (
                 <span className={`ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                  activeTab === tab.id ? 'bg-purple-500/30 text-purple-200' : 'bg-white/5 text-slate-400 dark:text-purple-300/50'
+                  activeTab === tab.id ? 'bg-purple-500/30 text-purple-200' : 'bg-white/5 text-purple-300/50'
                 }`}>{tab.count}</span>
               )}
             </button>
           ))}
-          <button className="text-slate-300 dark:text-purple-300/30 text-sm hover:text-slate-700 dark:text-purple-200 ml-auto">More Matches</button>
+          <button className="text-purple-300/30 text-sm hover:text-purple-200 ml-auto">More Matches</button>
         </div>
 
         {/* Header Text */}
         <div className="text-center mb-6">
-          <h2 className="text-lg font-medium text-slate-500 dark:text-purple-200/60">
+          <h2 className="text-lg font-medium text-purple-200/60">
             Here are Today&apos;s top Matches for you. Connect with them now!
           </h2>
         </div>
@@ -185,34 +185,34 @@ export default function MatchesPage() {
         {loading ? (
           <div className="glass-card p-8 animate-pulse">
             <div className="flex gap-6">
-              <div className="w-80 h-96 bg-teal-50 dark:bg-purple-500/10 rounded-xl" />
+              <div className="w-80 h-96 bg-purple-500/10 rounded-xl" />
               <div className="flex-1 space-y-4">
-                <div className="h-6 bg-teal-50 dark:bg-purple-500/10 rounded w-1/3" />
-                <div className="h-4 bg-teal-50 dark:bg-purple-500/10 rounded w-1/2" />
-                <div className="h-4 bg-teal-50 dark:bg-purple-500/10 rounded w-2/3" />
+                <div className="h-6 bg-purple-500/10 rounded w-1/3" />
+                <div className="h-4 bg-purple-500/10 rounded w-1/2" />
+                <div className="h-4 bg-purple-500/10 rounded w-2/3" />
               </div>
             </div>
           </div>
         ) : data.length > 0 && currentProfile ? (
           <div className="glass-card !p-0 overflow-hidden">
             {/* Time & Navigation */}
-            <div className="flex items-center justify-between px-6 py-3 border-b border-teal-100 dark:border-purple-500/10 bg-white/[0.02]">
+            <div className="flex items-center justify-between px-6 py-3 border-b border-purple-500/10 bg-white/[0.02]">
               <div className="flex items-center gap-3">
-                <span className="text-xs text-slate-300 dark:text-purple-300/40">Time left to Connect</span>
+                <span className="text-xs text-purple-300/40">Time left to Connect</span>
                 <span className="text-sm font-mono text-pink-400 font-medium">22h : 44m : 22s</span>
               </div>
               <div className="flex items-center gap-2">
                 <button 
                   onClick={handlePrev}
                   disabled={currentIndex === 0}
-                  className="text-slate-300 dark:text-purple-300/40 hover:text-slate-700 dark:text-purple-200 disabled:opacity-30 text-sm"
+                  className="text-purple-300/40 hover:text-purple-200 disabled:opacity-30 text-sm"
                 >
                   ← Prev
                 </button>
                 <button 
                   onClick={handleNext}
                   disabled={currentIndex >= data.length - 1}
-                  className="text-purple-400 hover:text-slate-600 dark:text-purple-300 font-medium text-sm flex items-center gap-1"
+                  className="text-purple-400 hover:text-purple-300 font-medium text-sm flex items-center gap-1"
                 >
                   Next →
                 </button>
@@ -230,7 +230,7 @@ export default function MatchesPage() {
                     <img src={currentProfile.gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg'} alt={currentProfile.name} className="w-full h-80 object-cover rounded-xl" />
                   )}
                   {currentProfile.verified && (
-                    <span className="absolute top-3 left-3 bg-green-500 text-slate-800 dark:text-white text-[10px] font-bold px-2 py-1 rounded">VIP</span>
+                    <span className="absolute top-3 left-3 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded">VIP</span>
                   )}
                 </div>
                 {/* Verification Badge */}
@@ -239,7 +239,7 @@ export default function MatchesPage() {
                     <BadgeCheck className="h-5 w-5 text-green-400" />
                     <div>
                       <p className="text-xs font-medium text-green-300">Verified profile</p>
-                      <p className="text-[10px] text-slate-300 dark:text-purple-300/40">Selfie verified with Profile Photo</p>
+                      <p className="text-[10px] text-purple-300/40">Selfie verified with Profile Photo</p>
                     </div>
                   </div>
                 )}
@@ -249,11 +249,11 @@ export default function MatchesPage() {
               <div className="flex-1 p-6">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <h2 className="text-xl font-bold text-white flex items-center gap-2">
                       {currentProfile.name}
                       {currentProfile.premium && <Crown className="h-4 w-4 text-amber-400" />}
                     </h2>
-                    <div className="flex items-center gap-3 mt-1 text-sm text-slate-400 dark:text-purple-300/50">
+                    <div className="flex items-center gap-3 mt-1 text-sm text-purple-300/50">
                       <span className="flex items-center gap-1">
                         <span className="w-2 h-2 bg-green-500 rounded-full"></span> Online
                       </span>
@@ -263,11 +263,11 @@ export default function MatchesPage() {
                   </div>
                   {/* Like / Connect Button */}
                   <div className="text-center relative">
-                    <p className="text-xs text-slate-300 dark:text-purple-300/40 mb-1">Like this profile?</p>
+                    <p className="text-xs text-purple-300/40 mb-1">Like this profile?</p>
                     <div className="relative inline-block">
                       <button
                         onClick={() => handleConnectClick(currentProfile.id)}
-                        className="relative w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center text-slate-800 dark:text-white hover:bg-purple-700 transition-colors shadow-[0_0_20px_rgba(147,51,234,0.4)] overflow-hidden"
+                        className="relative w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center text-white hover:bg-purple-700 transition-colors shadow-[0_0_20px_rgba(147,51,234,0.4)] overflow-hidden"
                       >
                         <Heart className="h-6 w-6 relative z-10" />
                         {connectPopup?.profileId === currentProfile.id && connectPopup.rippling && (
@@ -281,7 +281,7 @@ export default function MatchesPage() {
                           {/* Close */}
                           <button
                             onClick={() => setConnectPopup(null)}
-                            className="self-end w-5 h-5 bg-white/10 rounded-full flex items-center justify-center text-slate-400 dark:text-purple-300/60 hover:text-slate-800 dark:text-white hover:bg-white/20 transition-colors mb-0.5"
+                            className="self-end w-5 h-5 bg-white/10 rounded-full flex items-center justify-center text-purple-300/60 hover:text-white hover:bg-white/20 transition-colors mb-0.5"
                           >
                             <X className="w-3 h-3" />
                           </button>
@@ -293,7 +293,7 @@ export default function MatchesPage() {
                               window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank')
                               setConnectPopup(null)
                             }}
-                            className="flex items-center gap-2.5 pl-2.5 pr-4 py-1.5 bg-[#25D366] hover:bg-[#20b957] text-slate-800 dark:text-white text-xs font-semibold rounded-full shadow-lg transition-all hover:scale-105 whitespace-nowrap"
+                            className="flex items-center gap-2.5 pl-2.5 pr-4 py-1.5 bg-[#25D366] hover:bg-[#20b957] text-white text-xs font-semibold rounded-full shadow-lg transition-all hover:scale-105 whitespace-nowrap"
                           >
                             {/* WhatsApp SVG logo */}
                             <svg viewBox="0 0 32 32" className="w-5 h-5 shrink-0" xmlns="http://www.w3.org/2000/svg">
@@ -306,7 +306,7 @@ export default function MatchesPage() {
                           {/* Chat */}
                           <button
                             onClick={() => { router.push('/messages'); setConnectPopup(null) }}
-                            className="flex items-center gap-2.5 pl-2.5 pr-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-slate-800 dark:text-white text-xs font-semibold rounded-full shadow-lg transition-all hover:scale-105 whitespace-nowrap"
+                            className="flex items-center gap-2.5 pl-2.5 pr-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-full shadow-lg transition-all hover:scale-105 whitespace-nowrap"
                           >
                             {/* Chat bubble icon */}
                             <svg viewBox="0 0 32 32" className="w-5 h-5 shrink-0" xmlns="http://www.w3.org/2000/svg">
@@ -321,7 +321,7 @@ export default function MatchesPage() {
                           {/* Video Call */}
                           <button
                             onClick={() => { router.push(`/call?type=video&name=${encodeURIComponent(currentProfile.name)}`); setConnectPopup(null) }}
-                            className="flex items-center gap-2.5 pl-2.5 pr-4 py-1.5 bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-slate-800 dark:text-white text-xs font-semibold rounded-full shadow-lg transition-all hover:scale-105 whitespace-nowrap"
+                            className="flex items-center gap-2.5 pl-2.5 pr-4 py-1.5 bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white text-xs font-semibold rounded-full shadow-lg transition-all hover:scale-105 whitespace-nowrap"
                           >
                             {/* Video camera icon */}
                             <svg viewBox="0 0 32 32" className="w-5 h-5 shrink-0" xmlns="http://www.w3.org/2000/svg">
@@ -340,38 +340,38 @@ export default function MatchesPage() {
                 {/* Profile Info Grid */}
                 <div className="mt-5 grid grid-cols-2 gap-y-3 gap-x-8 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-slate-400 dark:text-purple-300/50">{currentProfile.age} yrs, {currentProfile.height || '5\' 6"'}</span>
-                    <span className="text-slate-700 dark:text-purple-200">{currentProfile.maritalStatus || 'Never Married'}</span>
+                    <span className="text-purple-300/50">{currentProfile.age} yrs, {currentProfile.height || '5\' 6"'}</span>
+                    <span className="text-purple-200">{currentProfile.maritalStatus || 'Never Married'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400 dark:text-purple-300/50">{currentProfile.motherTongue || 'Hindi'}</span>
-                    <span className="text-slate-700 dark:text-purple-200">{currentProfile.state || 'Maharashtra'}</span>
+                    <span className="text-purple-300/50">{currentProfile.motherTongue || 'Hindi'}</span>
+                    <span className="text-purple-200">{currentProfile.state || 'Maharashtra'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400 dark:text-purple-300/50">{currentProfile.religion || 'Hindu'}</span>
-                    <span className="text-slate-700 dark:text-purple-200">{currentProfile.occupation || 'Professional'}</span>
+                    <span className="text-purple-300/50">{currentProfile.religion || 'Hindu'}</span>
+                    <span className="text-purple-200">{currentProfile.occupation || 'Professional'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400 dark:text-purple-300/50">{currentProfile.education || 'Graduate'}</span>
-                    <span className="text-slate-700 dark:text-purple-200">{currentProfile.income || 'Not specified'}</span>
+                    <span className="text-purple-300/50">{currentProfile.education || 'Graduate'}</span>
+                    <span className="text-purple-200">{currentProfile.income || 'Not specified'}</span>
                   </div>
                 </div>
 
                 {/* Tabs: Detailed Profile / Partner Preferences */}
-                <div className="mt-6 border-t border-teal-100 dark:border-purple-500/10 pt-4">
-                  <div className="flex gap-6 border-b border-teal-100 dark:border-purple-500/10">
-                    <button className="pb-2 text-sm font-medium text-slate-600 dark:text-purple-300 border-b-2 border-purple-400">Detailed Profile</button>
-                    <button className="pb-2 text-sm font-medium text-slate-300 dark:text-purple-300/30 hover:text-slate-700 dark:text-purple-200">Partner Preferences</button>
+                <div className="mt-6 border-t border-purple-500/10 pt-4">
+                  <div className="flex gap-6 border-b border-purple-500/10">
+                    <button className="pb-2 text-sm font-medium text-purple-300 border-b-2 border-purple-400">Detailed Profile</button>
+                    <button className="pb-2 text-sm font-medium text-purple-300/30 hover:text-purple-200">Partner Preferences</button>
                   </div>
                   <div className="mt-4">
-                    <h3 className="text-sm font-bold text-slate-700 dark:text-purple-200 flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-purple-200 flex items-center gap-2">
                       <span className="text-purple-400/30 text-lg">&ldquo;</span> About {currentProfile.name}
                     </h3>
-                    <p className="text-sm text-slate-400 dark:text-purple-300/60 mt-2 leading-relaxed">
+                    <p className="text-sm text-purple-300/60 mt-2 leading-relaxed">
                       {currentProfile.about || `${currentProfile.name} is a ${currentProfile.education || 'well-educated'} professional from ${currentProfile.city || 'India'}. Looking for a compatible life partner.`}
                     </p>
                     <div className="flex items-center gap-3 mt-3">
-                      <span className="text-[10px] bg-white/5 text-slate-400 dark:text-purple-300/50 px-2 py-1 rounded-full border border-teal-100 dark:border-purple-500/10">ID: SM{currentProfile.id.slice(0, 8).toUpperCase()}</span>
+                      <span className="text-[10px] bg-white/5 text-purple-300/50 px-2 py-1 rounded-full border border-purple-500/10">ID: SM{currentProfile.id.slice(0, 8).toUpperCase()}</span>
                     </div>
                   </div>
                 </div>
@@ -380,9 +380,9 @@ export default function MatchesPage() {
           </div>
         ) : (
           <div className="glass-card text-center py-16">
-            <User className="h-12 w-12 text-teal-600 dark:text-purple-400/20 mx-auto mb-3" />
-            <h3 className="text-base font-semibold text-slate-800 dark:text-white mb-1">No results yet</h3>
-            <p className="text-sm text-slate-300 dark:text-purple-300/40 mb-4">
+            <User className="h-12 w-12 text-purple-400/20 mx-auto mb-3" />
+            <h3 className="text-base font-semibold text-white mb-1">No results yet</h3>
+            <p className="text-sm text-purple-300/40 mb-4">
               {activeTab === 'daily' ? 'Check back tomorrow for new recommendations!' :
                activeTab === 'nearby' ? 'No profiles found in your area' :
                'Start browsing profiles to see activity here'}

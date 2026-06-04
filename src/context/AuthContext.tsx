@@ -20,7 +20,7 @@ interface User {
 interface AuthContextType {
   user: User | null
   login: (email: string, password: string) => Promise<boolean>
-  register: (data: RegisterData) => Promise<boolean>
+  register: (data: RegisterData) => Promise<{ success: boolean; error?: string }>
   logout: () => void
   loading: boolean
   updateUserData: (data: Partial<User>) => void
@@ -80,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const register = async (data: RegisterData): Promise<boolean> => {
+  const register = async (data: RegisterData): Promise<{ success: boolean; error?: string }> => {
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
@@ -92,11 +92,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(result.user)
         localStorage.setItem('soulmateSync_user', JSON.stringify(result.user))
         localStorage.setItem('soulmateSync_token', result.token)
-        return true
+        return { success: true }
       }
-      return false
+      const errData = await res.json().catch(() => ({}))
+      return { success: false, error: errData.error || 'Registration failed' }
     } catch {
-      return false
+      return { success: false, error: 'Network error. Please try again.' }
     }
   }
 
