@@ -287,6 +287,7 @@ export default function Navbar() {
             <SubNavLink href="/meeting" label="Meeting Planner" />
             <SubNavLink href="/preferences" label="Partner Preferences" />
             <SubNavLink href="/settings" label="Settings" />
+            <SubNavLink href="/hosts/events" label="Events" />
           </div>
         )}
       </div>

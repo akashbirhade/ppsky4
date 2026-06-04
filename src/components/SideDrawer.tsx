@@ -83,6 +83,7 @@ export default function SideDrawer() {
           <DrawerLink href="/preferences" icon={<SlidersHorizontal className="h-4 w-4" />} label="Partner Preferences" onClick={() => setIsOpen(false)} />
           <DrawerLink href="/settings" icon={<Phone className="h-4 w-4" />} label="Contact Filters" onClick={() => setIsOpen(false)} />
           <DrawerLink href="/settings" icon={<Settings className="h-4 w-4" />} label="Account Settings" onClick={() => setIsOpen(false)} />
+          <DrawerLink href="/hosts/events" icon={<Calendar className="h-4 w-4 text-teal-400" />} label="Host Events" onClick={() => setIsOpen(false)} />
           <DrawerLink href="/settings" icon={<HelpCircle className="h-4 w-4" />} label="Help & Support" onClick={() => setIsOpen(false)} />
           <DrawerLink href="/settings" icon={<Shield className="h-4 w-4 text-green-400" />} label="Be Safe Online" onClick={() => setIsOpen(false)} />
           <DrawerButton icon={<Star className="h-4 w-4 text-yellow-400" />} label="Rate the App" onClick={() => setIsOpen(false)} />

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Shield, Brain, Star, Users, CheckCircle, ArrowRight, Sparkles, Crown, Video, MessageCircle, BadgeCheck, TrendingUp } from 'lucide-react'
 import HalfHeart from '@/components/HalfHeart'
 import AuthRedirect from '@/components/AuthRedirect'
+import HostLandingCard from '@/components/HostLandingCard'
 
 export default function Home() {
   return (
@@ -211,6 +212,9 @@ export default function Home() {
             </Link>
           </div>
         </div>
+
+        {/* Host Card */}
+        <HostLandingCard />
       </section>
 
       {/* Footer */}
