@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sendInterest, getInterestsSent, getInterestsReceived, respondToInterest, getMutualMatches } from '@/lib/database'
+import { sendInterest, getInterestsSent, getInterestsReceived, respondToInterest, getMutualMatches, getUserById } from '@/lib/database'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,7 +34,15 @@ export async function POST(req: NextRequest) {
 
     if (!senderId || !receiverId) return NextResponse.json({ error: 'senderId and receiverId required' }, { status: 400 })
     const interest = sendInterest(senderId, receiverId)
-    return NextResponse.json({ interest })
+    const senderProfile = getUserById(senderId)
+    const receiverProfile = getUserById(receiverId)
+    
+    return NextResponse.json({ 
+      interest,
+      success: true,
+      message: `Interest sent to ${receiverProfile?.name}!`,
+      sender: senderProfile ? { id: senderProfile.id, name: senderProfile.name, age: senderProfile.age, city: senderProfile.city } : null
+    })
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

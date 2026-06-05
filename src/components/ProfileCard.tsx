@@ -4,6 +4,9 @@ import { UserProfile } from '@/lib/database'
 import { MapPin, GraduationCap, Briefcase, BadgeCheck, Crown, Sparkles } from 'lucide-react'
 import HalfHeart from './HalfHeart'
 import Link from 'next/link'
+import { useState } from 'react'
+import { useAuth } from '@/context/AuthContext'
+import { useToast } from './Toast'
 
 interface ProfileCardProps {
   profile: UserProfile
@@ -11,7 +14,37 @@ interface ProfileCardProps {
 }
 
 export default function ProfileCard({ profile, compatibility }: ProfileCardProps) {
+  const { user } = useAuth()
+  const { showToast } = useToast()
+  const [sending, setSending] = useState(false)
   const score = compatibility || Math.floor(70 + Math.random() * 25)
+
+  const handleSendInterest = async () => {
+    if (!user) {
+      showToast('error', 'Login Required', 'Please login to send interest')
+      return
+    }
+
+    setSending(true)
+    try {
+      const res = await fetch('/api/activity/interests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senderId: user.id, receiverId: profile.id })
+      })
+      const data = await res.json()
+      
+      if (!res.ok) {
+        showToast('error', 'Failed to Send Interest', data.error || 'Something went wrong')
+      } else {
+        showToast('success', 'Interest Sent! 💜', `You've sent interest to ${profile.name}`)
+      }
+    } catch (err) {
+      showToast('error', 'Error', 'Failed to send interest')
+    } finally {
+      setSending(false)
+    }
+  }
   
   return (
     <div className="glass-card profile-hover group relative overflow-hidden">
@@ -94,8 +127,11 @@ export default function ProfileCard({ profile, compatibility }: ProfileCardProps
           <Link href={`/profile/${profile.id}`} className="flex-1 text-center py-2.5 text-xs font-medium text-slate-700 dark:text-purple-200 bg-white/5 rounded-xl border border-purple-400/10 hover:bg-white/10 hover:border-purple-400/30 transition-all">
             View Profile
           </Link>
-          <button className="flex-1 py-2.5 text-xs font-medium text-slate-800 dark:text-white bg-purple-600/50 rounded-xl border border-purple-500/30 hover:bg-purple-600/70 transition-all flex items-center justify-center gap-1.5">
-            <HalfHeart className="h-3 w-3" /> Interest
+          <button 
+            onClick={handleSendInterest}
+            disabled={sending}
+            className="flex-1 py-2.5 text-xs font-medium text-slate-800 dark:text-white bg-purple-600/50 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl border border-purple-500/30 hover:bg-purple-600/70 transition-all flex items-center justify-center gap-1.5">
+            <HalfHeart className="h-3 w-3" /> {sending ? 'Sending...' : 'Interest'}
             <Sparkles className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
           </button>
         </div>

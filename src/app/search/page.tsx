@@ -186,6 +186,18 @@ export default function SearchPage() {
 
           {/* Quick Search */}
           <form onSubmit={handleSearch} className="glass-card p-4 animate-fade-in-up delay-200" style={{opacity:0}}>
+            <div className="flex flex-wrap gap-3 mb-4 pb-4 border-b border-purple-500/10">
+              <div className="w-full">
+                <label className="text-xs text-slate-400 dark:text-purple-300/50 mb-1 block">Search by Name or Profile ID</label>
+                <input 
+                  type="text" 
+                  value={profileIdSearch} 
+                  onChange={(e) => setProfileIdSearch(e.target.value)} 
+                  placeholder="E.g. Priya or Sh09936464..." 
+                  className="input-field w-full" 
+                />
+              </div>
+            </div>
             <div className="flex flex-wrap gap-3">
               <select name="religion" value={filters.religion} onChange={handleChange} className="input-field flex-1 min-w-[130px]">
                 <option value="" className="bg-white dark:bg-dark-900">Any Religion</option>
@@ -319,7 +331,11 @@ export default function SearchPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <p className="text-sm text-slate-400 dark:text-purple-300/50">
-            {loading ? 'Searching...' : `${profiles.length} profiles found`}
+            {loading ? 'Searching...' : `${profiles.filter(p => {
+              if (!profileIdSearch.trim()) return true
+              const search = profileIdSearch.trim().toLowerCase()
+              return p.name.toLowerCase().includes(search) || p.id.toLowerCase().includes(search)
+            }).length} profiles found`}
             {activeFilterCount > 0 && !loading && <span className="ml-2 text-teal-600 dark:text-purple-400">({activeFilterCount} filters)</span>}
           </p>
           <div className="flex items-center gap-3">
@@ -337,9 +353,17 @@ export default function SearchPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1,2,3,4,5,6].map(i => (<div key={i} className="glass-card animate-pulse"><div className="h-44 bg-teal-50/50 dark:bg-purple-500/5 rounded-2xl mb-3" /><div className="h-4 bg-teal-50/50 dark:bg-purple-500/5 rounded w-3/4 mb-2" /><div className="h-3 bg-teal-50/50 dark:bg-purple-500/5 rounded w-1/2" /></div>))}
           </div>
-        ) : profiles.length > 0 ? (
+        ) : profiles.filter(p => {
+          if (!profileIdSearch.trim()) return true
+          const search = profileIdSearch.trim().toLowerCase()
+          return p.name.toLowerCase().includes(search) || p.id.toLowerCase().includes(search)
+        }).length > 0 ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {profiles.map((profile, i) => (
+            {profiles.filter(p => {
+              if (!profileIdSearch.trim()) return true
+              const search = profileIdSearch.trim().toLowerCase()
+              return p.name.toLowerCase().includes(search) || p.id.toLowerCase().includes(search)
+            }).map((profile, i) => (
               <div key={profile.id} className="animate-fade-in-up" style={{animationDelay: `${i * 0.08}s`, opacity: 0}}>
                 <ProfileCard profile={profile} />
               </div>
