@@ -383,6 +383,12 @@ function MessagesInner() {
                   <div className="flex items-center gap-2">
                     <div className="flex-1 relative">
                       <input value={input} onChange={e => setInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault()
+                            sendMsg(e as any)
+                          }
+                        }}
                         placeholder={`Message ${selectedUser.name}…`}
                         autoFocus
                         className="w-full px-4 py-2.5 bg-slate-100 dark:bg-white/[0.04] rounded-full text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-purple-300/30 focus:outline-none focus:ring-1 focus:ring-purple-500/30 border border-slate-200 dark:border-purple-500/10 transition-all" />

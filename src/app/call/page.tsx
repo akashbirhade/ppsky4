@@ -1,11 +1,19 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, useRef } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, Volume2, MessageCircle, User, Sparkles, Monitor, Calendar, Clock } from 'lucide-react'
+import { io, Socket } from 'socket.io-client'
 
 type CallState = 'idle' | 'calling' | 'connected' | 'ended'
+
+const ICE_SERVERS = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' }
+  ]
+}
 
 function CallPageInner() {
   const { user } = useAuth()
@@ -21,17 +29,105 @@ function CallPageInner() {
   const [isVideoOff, setIsVideoOff] = useState(false)
   const [duration, setDuration] = useState(0)
   const [callerName, setCallerName] = useState(paramName || 'Priya Sharma')
+  
+  // WebRTC references
+  const socketRef = useRef<Socket | null>(null)
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null)
+  const localStreamRef = useRef<MediaStream | null>(null)
+  const remoteStreamRef = useRef<MediaStream | null>(null)
+  const localVideoRef = useRef<HTMLVideoElement>(null)
+  const remoteVideoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => { if (!user) router.push('/login') }, [user, router])
 
+  // Initialize WebSocket and WebRTC
+  useEffect(() => {
+    if (callState !== 'idle' || !user) return
+
+    const socket = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001', {
+      transports: ['websocket'],
+      reconnection: true
+    })
+
+    socketRef.current = socket
+
+    socket.on('connect', () => {
+      console.log('Socket connected')
+    })
+
+    socket.on('call:incoming', async (data: any) => {
+      console.log('Incoming call from:', data.from)
+      // setCallState will be handled by the calling component
+    })
+
+    socket.on('call:accepted', async (data: any) => {
+      console.log('Call accepted, handling answer')
+      if (peerConnectionRef.current && data.sdp) {
+        try {
+          await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data.sdp))
+        } catch (err) {
+          console.error('Error setting remote description:', err)
+        }
+      }
+    })
+
+    socket.on('call:offer', async (data: any) => {
+      console.log('Received offer')
+      if (data.sdp && peerConnectionRef.current) {
+        try {
+          await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data.sdp))
+          const answer = await peerConnectionRef.current.createAnswer()
+          await peerConnectionRef.current.setLocalDescription(answer)
+          socket.emit('call:answer', { roomId: data.roomId, sdp: answer })
+        } catch (err) {
+          console.error('Error handling offer:', err)
+        }
+      }
+    })
+
+    socket.on('call:answer', async (data: any) => {
+      console.log('Received answer')
+      if (data.sdp && peerConnectionRef.current) {
+        try {
+          await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data.sdp))
+        } catch (err) {
+          console.error('Error setting remote description:', err)
+        }
+      }
+    })
+
+    socket.on('call:ice', async (data: any) => {
+      if (data.candidate && peerConnectionRef.current) {
+        try {
+          await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(data.candidate))
+        } catch (err) {
+          console.error('Error adding ICE candidate:', err)
+        }
+      }
+    })
+
+    socket.on('call:ended', () => {
+      console.log('Call ended by remote peer')
+      // Will trigger cleanup
+    })
+
+    return () => {
+      socket.disconnect()
+      socketRef.current = null
+    }
+  }, [user])
+
   // Auto-start call if navigated from a profile
   useEffect(() => {
-    if (paramType && paramName) {
-      setCallType(paramType)
-      setCallerName(paramName)
-      setCallState('calling')
-      setTimeout(() => setCallState('connected'), 3000)
+    if (paramType && paramName && callState === 'idle' && !peerConnectionRef.current) {
+      const initCall = async () => {
+        setCallType(paramType)
+        setCallerName(paramName)
+        await startCall(paramType, paramName)
+      }
+      initCall()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paramType, paramName])
 
   useEffect(() => {
@@ -48,14 +144,134 @@ function CallPageInner() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
   }
 
-  const startCall = (type: 'audio' | 'video', name?: string) => {
+  const setupPeerConnection = async () => {
+    try {
+      // Create peer connection
+      const peerConnection = new RTCPeerConnection(ICE_SERVERS)
+      peerConnectionRef.current = peerConnection
+
+      // Get local media stream
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: callType === 'video' ? { width: 1280, height: 720 } : false
+      })
+      
+      localStreamRef.current = stream
+
+      // Add local stream tracks to peer connection
+      stream.getTracks().forEach(track => {
+        peerConnection.addTrack(track, stream)
+      })
+
+      // Set local video preview
+      if (callType === 'video' && localVideoRef.current) {
+        localVideoRef.current.srcObject = stream
+      }
+
+      // Handle remote stream
+      peerConnection.ontrack = (event) => {
+        console.log('Received remote track:', event.track.kind)
+        if (remoteStreamRef.current) {
+          remoteStreamRef.current.addTrack(event.track)
+        } else {
+          const remoteStream = new MediaStream([event.track])
+          remoteStreamRef.current = remoteStream
+          if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = remoteStream
+          }
+        }
+      }
+
+      // Handle ICE candidates
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate && socketRef.current) {
+          socketRef.current.emit('call:ice', {
+            roomId: user?.id,
+            candidate: event.candidate
+          })
+        }
+      }
+
+      // Handle connection state changes
+      peerConnection.onconnectionstatechange = () => {
+        console.log('Connection state:', peerConnection.connectionState)
+        if (peerConnection.connectionState === 'connected') {
+          setCallState('connected')
+        } else if (peerConnection.connectionState === 'failed' || peerConnection.connectionState === 'disconnected') {
+          endCall()
+        }
+      }
+
+      return peerConnection
+    } catch (err) {
+      console.error('Error setting up peer connection:', err)
+      alert('Failed to access microphone/camera. Please check permissions.')
+      return null
+    }
+  }
+
+  const startCall = async (type: 'audio' | 'video', name?: string) => {
     setCallType(type)
     if (name) setCallerName(name)
     setCallState('calling')
-    setTimeout(() => setCallState('connected'), 3000)
+
+    const pc = await setupPeerConnection()
+    if (!pc) return
+
+    try {
+      // Create and send offer
+      const offer = await pc.createOffer()
+      await pc.setLocalDescription(offer)
+
+      if (socketRef.current) {
+        socketRef.current.emit('call:initiate', {
+          roomId: user?.id,
+          callType: type,
+          sdp: offer
+        })
+      }
+    } catch (err) {
+      console.error('Error creating offer:', err)
+      endCall()
+    }
+  }
+
+  const toggleMute = () => {
+    if (localStreamRef.current) {
+      localStreamRef.current.getAudioTracks().forEach(track => {
+        track.enabled = !isMuted
+      })
+      setIsMuted(!isMuted)
+    }
+  }
+
+  const toggleVideo = () => {
+    if (localStreamRef.current) {
+      localStreamRef.current.getVideoTracks().forEach(track => {
+        track.enabled = !isVideoOff
+      })
+      setIsVideoOff(!isVideoOff)
+    }
   }
 
   const endCall = () => {
+    // Stop all media tracks
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(track => track.stop())
+      localStreamRef.current = null
+    }
+
+    // Close peer connection
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close()
+      peerConnectionRef.current = null
+    }
+
+    // Notify remote peer
+    if (socketRef.current) {
+      socketRef.current.emit('call:end')
+    }
+
     setCallState('ended')
     setDuration(0)
     setTimeout(() => {
@@ -171,12 +387,10 @@ function CallPageInner() {
               {callType === 'video' && callState === 'connected' && !isVideoOff ? (
                 <div className="w-72 h-96 sm:w-96 sm:h-[28rem] rounded-3xl bg-gradient-to-br from-purple-900/50 to-dark-900 border border-teal-200/50 dark:border-purple-500/20 flex items-center justify-center mb-6 shadow-[0_0_60px_rgba(147,51,234,0.2)] overflow-hidden relative">
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60" />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/avatars/female.svg" alt={callerName} className="w-full h-full object-cover" />
+                  <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
                   {/* Self view */}
-                  <div className="absolute bottom-4 right-4 w-20 h-28 rounded-xl overflow-hidden border border-teal-200/40 dark:border-purple-400/20">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={user?.gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg'} alt="You" className="w-full h-full object-cover" />
+                  <div className="absolute bottom-4 right-4 w-20 h-28 rounded-xl overflow-hidden border border-teal-200/40 dark:border-purple-400/20 bg-black">
+                    <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
                   </div>
                   {/* Duration overlay */}
                   <div className="absolute top-4 left-4 bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full">
@@ -203,12 +417,12 @@ function CallPageInner() {
               {/* Call Controls */}
               {callState !== 'ended' && (
                 <div className="flex items-center gap-4">
-                  <button onClick={() => setIsMuted(!isMuted)} className={`p-4 rounded-full transition-all ${isMuted ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-white/5 text-slate-800 dark:text-white border border-teal-200/50 dark:border-purple-500/20 hover:bg-white/10'}`}>
+                  <button onClick={toggleMute} className={`p-4 rounded-full transition-all ${isMuted ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-white/5 text-slate-800 dark:text-white border border-teal-200/50 dark:border-purple-500/20 hover:bg-white/10'}`}>
                     {isMuted ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
                   </button>
                   
                   {callType === 'video' && (
-                    <button onClick={() => setIsVideoOff(!isVideoOff)} className={`p-4 rounded-full transition-all ${isVideoOff ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-white/5 text-slate-800 dark:text-white border border-teal-200/50 dark:border-purple-500/20 hover:bg-white/10'}`}>
+                    <button onClick={toggleVideo} className={`p-4 rounded-full transition-all ${isVideoOff ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-white/5 text-slate-800 dark:text-white border border-teal-200/50 dark:border-purple-500/20 hover:bg-white/10'}`}>
                       {isVideoOff ? <VideoOff className="h-5 w-5" /> : <Video className="h-5 w-5" />}
                     </button>
                   )}
