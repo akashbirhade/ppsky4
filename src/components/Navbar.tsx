@@ -270,6 +270,7 @@ export default function Navbar() {
                   {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-purple-600" />}
                 </button>
                 <Link href="/login" className="ml-3 btn-secondary text-sm py-2 px-5">Login</Link>
+                <Link href="/hosts" className="ml-2 btn-secondary text-sm py-2 px-5">Be a Host</Link>
                 <Link href="/register" className="ml-2 btn-primary text-xs py-1.5 px-3">Register Free</Link>
               </>
             )}
