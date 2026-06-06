@@ -145,6 +145,10 @@ export default function Navbar() {
                       <a href="#" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10">Contact Us</a>
                       <a href="#" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10">FAQs</a>
                       <a href="#" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10">Safety Tips</a>
+                      <div className="border-t border-purple-500/10 my-1"></div>
+                      <Link href="/legal" className="block px-4 py-2 text-sm text-purple-300 hover:bg-purple-500/10">Legal Center</Link>
+                      <Link href="/legal/terms-and-conditions" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10">Terms & Conditions</Link>
+                      <Link href="/legal/privacy-policy" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10">Privacy Policy</Link>
                     </div>
                   )}
                 </div>
