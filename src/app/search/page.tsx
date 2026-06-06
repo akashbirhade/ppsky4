@@ -60,7 +60,7 @@ function HeightRangeSlider({ min, max, onChange }: { min: number; max: number; o
 }
 
 export default function SearchPage() {
-  const { user } = useAuth()
+  const { user, authFetch } = useAuth()
   const [profiles, setProfiles] = useState<UserProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
@@ -107,7 +107,7 @@ export default function SearchPage() {
       if (amax) params.set('ageMax', String(amax))
       params.set('gender', oppositeGender)
       if (user?.id) params.set('excludeId', user.id)
-      const res = await fetch(`/api/profiles?${params.toString()}`)
+      const res = await authFetch(`/api/profiles?${params.toString()}`)
       const data = await res.json()
       setProfiles(data.profiles || [])
     } catch (err) { console.error(err) }
@@ -119,7 +119,7 @@ export default function SearchPage() {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
     saveTimerRef.current = setTimeout(async () => {
       try {
-        await fetch('/api/profiles', {
+        await authFetch('/api/profiles', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: user.id, partnerAgeMin: String(min), partnerAgeMax: String(max) })
@@ -128,7 +128,7 @@ export default function SearchPage() {
         setTimeout(() => setAgeSaved(false), 2000)
       } catch {}
     }, 800)
-  }, [user?.id])
+  }, [user?.id, authFetch])
 
   const handleAgeChange = (min: number, max: number) => { setAgeRange([min, max]); fetchProfiles(filters, [min, max]); saveAgeRange(min, max) }
   const handleHeightChange = (min: number, max: number) => { setHeightRange([min, max]) }
