@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useAuth } from '@/context/AuthContext'
 import { Search, MapPin, Users, Calendar, ChevronDown, Filter, LogIn, UserPlus } from 'lucide-react'
 
 interface Host {
@@ -20,6 +21,7 @@ interface Host {
 }
 
 export default function HostsPage() {
+  const { authFetch } = useAuth()
   const [hosts, setHosts] = useState<Host[]>([])
   const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState({ region: '', district: '', city: '' })
@@ -32,7 +34,7 @@ export default function HostsPage() {
       if (filters.region) params.set('region', filters.region)
       if (filters.district) params.set('district', filters.district)
       if (filters.city) params.set('city', filters.city)
-      const res = await fetch(`/api/hosts?${params.toString()}`)
+      const res = await authFetch(`/api/hosts?${params.toString()}`)
       const json = await res.json()
       if (json.success) {
         setHosts(json.data.hosts)

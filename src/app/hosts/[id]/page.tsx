@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import { useAuth } from '@/context/AuthContext'
 import { MapPin, Users, Calendar, Mail, Phone, ArrowLeft, User, Heart } from 'lucide-react'
 
 interface HostEvent {
@@ -44,6 +45,7 @@ interface Member {
 }
 
 export default function HostProfilePage() {
+  const { authFetch } = useAuth()
   const { id } = useParams()
   const [host, setHost] = useState<Host | null>(null)
   const [members, setMembers] = useState<Member[]>([])
@@ -53,7 +55,7 @@ export default function HostProfilePage() {
   useEffect(() => {
     const fetchHost = async () => {
       try {
-        const res = await fetch(`/api/hosts/${id}`)
+        const res = await authFetch(`/api/hosts/${id}`)
         const json = await res.json()
         if (json.success) setHost(json.data)
       } catch (err) { console.error(err) }
@@ -61,7 +63,7 @@ export default function HostProfilePage() {
     }
     const fetchMembers = async () => {
       try {
-        const res = await fetch(`/api/hosts/${id}/members`)
+        const res = await authFetch(`/api/hosts/${id}/members`)
         const json = await res.json()
         if (json.success) setMembers(json.data.members)
       } catch (err) { console.error(err) }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useAuth } from '@/context/AuthContext'
 import { Users, UserCheck, Calendar, MapPin, LogOut, Heart, Eye, Plus, User } from 'lucide-react'
 
 interface HostUser {
@@ -31,6 +32,7 @@ interface Member {
 }
 
 export default function HostPortalPage() {
+  const { authFetch } = useAuth()
   const router = useRouter()
   const [host, setHost] = useState<HostUser | null>(null)
   const [members, setMembers] = useState<Member[]>([])
@@ -47,7 +49,7 @@ export default function HostPortalPage() {
     setHost(hostData)
 
     // Fetch members
-    fetch(`/api/hosts/${hostData.id}/members`)
+    authFetch(`/api/hosts/${hostData.id}/members`)
       .then(res => res.json())
       .then(data => {
         if (data.success) setMembers(data.data.members)

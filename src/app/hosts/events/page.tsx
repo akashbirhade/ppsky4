@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useAuth } from '@/context/AuthContext'
 import { CalendarDays, MapPin, Users, IndianRupee, ArrowLeft, Clock, Tag } from 'lucide-react'
 
 interface HostEvent {
@@ -21,19 +22,20 @@ interface HostEvent {
 }
 
 export default function AllEventsPage() {
+  const { authFetch } = useAuth()
   const [events, setEvents] = useState<HostEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'past'>('all')
 
   useEffect(() => {
-    fetch('/api/hosts/events')
+    authFetch('/api/hosts/events')
       .then(res => res.json())
       .then(data => {
         setEvents(data.events || [])
         setLoading(false)
       })
       .catch(() => setLoading(false))
-  }, [])
+  }, [authFetch])
 
   const now = new Date()
   const filtered = events.filter(e => {

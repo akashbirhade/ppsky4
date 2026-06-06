@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import { useAuth } from '@/context/AuthContext'
 import { Users, UserCheck, Heart, Calendar, TrendingUp, Plus, ArrowLeft, Bell } from 'lucide-react'
 
 interface HostStats {
@@ -29,6 +30,7 @@ interface Interest {
 }
 
 export default function HostDashboardPage() {
+  const { authFetch } = useAuth()
   const { id } = useParams()
   const [stats, setStats] = useState<HostStats | null>(null)
   const [events, setEvents] = useState<HostEvent[]>([])
@@ -41,9 +43,9 @@ export default function HostDashboardPage() {
     const fetchDashboard = async () => {
       try {
         const [statsRes, eventsRes, interestsRes] = await Promise.all([
-          fetch(`/api/hosts/${id}/stats`),
-          fetch(`/api/hosts/${id}/events`),
-          fetch(`/api/hosts/${id}/interests?status=pending`),
+          authFetch(`/api/hosts/${id}/stats`),
+          authFetch(`/api/hosts/${id}/events`),
+          authFetch(`/api/hosts/${id}/interests?status=pending`),
         ])
         const statsJson = await statsRes.json()
         const eventsJson = await eventsRes.json()
@@ -60,7 +62,7 @@ export default function HostDashboardPage() {
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const res = await fetch(`/api/hosts/${id}/events`, {
+      const res = await authFetch(`/api/hosts/${id}/events`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -83,7 +85,7 @@ export default function HostDashboardPage() {
 
   const handleInterestAction = async (interestId: string, status: string) => {
     try {
-      const res = await fetch(`/api/hosts/${id}/interests/${interestId}`, {
+      const res = await authFetch(`/api/hosts/${id}/interests/${interestId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),

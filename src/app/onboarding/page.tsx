@@ -27,7 +27,7 @@ const SECTION_TO_STEP: Record<string, number> = {
 }
 
 function OnboardingContent() {
-  const { user } = useAuth()
+  const { user, authFetch } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const section = searchParams.get('section') || 'basic'
@@ -85,7 +85,7 @@ function OnboardingContent() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      await fetch('/api/profiles', {
+      await authFetch('/api/profiles', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -127,7 +127,7 @@ function OnboardingContent() {
     fd.append('userId', user.id)
     
     try {
-      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      const res = await authFetch('/api/upload', { method: 'POST', body: fd })
       const data = await res.json()
       if (data.success) {
         setFormData(prev => ({ ...prev, photoUrl: data.photoUrl }))

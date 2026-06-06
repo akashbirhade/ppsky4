@@ -20,7 +20,7 @@ interface Host {
 }
 
 export default function AdminHostsPage() {
-  const { user } = useAuth()
+  const { user, authFetch } = useAuth()
   const router = useRouter()
   const [hosts, setHosts] = useState<Host[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,7 +39,7 @@ export default function AdminHostsPage() {
 
   const fetchHosts = async () => {
     try {
-      const res = await fetch('/api/hosts?limit=100')
+      const res = await authFetch('/api/hosts?limit=100')
       const json = await res.json()
       if (json.success) setHosts(json.data.hosts)
     } catch (err) { console.error(err) }
@@ -49,7 +49,7 @@ export default function AdminHostsPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const res = await fetch('/api/hosts', {
+      const res = await authFetch('/api/hosts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -67,7 +67,7 @@ export default function AdminHostsPage() {
     e.preventDefault()
     if (!editingHost) return
     try {
-      const res = await fetch(`/api/hosts/${editingHost.id}`, {
+      const res = await authFetch(`/api/hosts/${editingHost.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -84,7 +84,7 @@ export default function AdminHostsPage() {
   const handleDelete = async (hostId: string) => {
     if (!confirm('Are you sure you want to delete this host?')) return
     try {
-      const res = await fetch(`/api/hosts/${hostId}`, { method: 'DELETE' })
+      const res = await authFetch(`/api/hosts/${hostId}`, { method: 'DELETE' })
       const json = await res.json()
       if (json.success) setHosts(prev => prev.filter(h => h.id !== hostId))
     } catch (err) { console.error(err) }
@@ -93,7 +93,7 @@ export default function AdminHostsPage() {
   const handleTransfer = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const res = await fetch(`/api/hosts/${transferData.fromHostId}/members/transfer`, {
+      const res = await authFetch(`/api/hosts/${transferData.fromHostId}/members/transfer`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ toHostId: transferData.toHostId, userId: transferData.userId }),
