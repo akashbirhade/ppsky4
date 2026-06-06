@@ -1,13 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserById } from '@/lib/database'
+import { authenticateRequest } from '@/lib/auth'
 
 export async function POST(req: NextRequest) {
   try {
+    // Verify JWT token
+    const authResult = authenticateRequest(req)
+    if ('error' in authResult) return authResult.error
+
     const body = await req.json()
     const { userId, ...profileData } = body
 
     if (!userId) {
       return NextResponse.json({ error: 'userId is required' }, { status: 400 })
+    }
+
+    // Ensure user can only update their own profile
+    if (userId !== authResult.user.userId) {
+      return NextResponse.json({ error: 'Unauthorized: cannot modify another user profile' }, { status: 403 })
     }
 
     const user = getUserById(userId)

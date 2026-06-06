@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getUserByEmail, updateUser } from '@/lib/database'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-
-const JWT_SECRET = process.env.JWT_SECRET || 'soulmatesync-secret-key-2024'
+import { JWT_SECRET } from '@/lib/auth'
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,7 +36,7 @@ export async function POST(req: NextRequest) {
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       JWT_SECRET,
-      { expiresIn: '30d' }
+      { expiresIn: '7d' }
     )
 
     return NextResponse.json({

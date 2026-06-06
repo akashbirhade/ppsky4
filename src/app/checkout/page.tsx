@@ -15,7 +15,7 @@ const PLANS: Record<string, { name: string; price: number; duration: string }> =
 type PaymentMethod = 'upi' | 'card' | 'netbanking' | 'phonepe'
 
 function CheckoutContent() {
-  const { user, updateUserData } = useAuth()
+  const { user, updateUserData, authFetch } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const planId = searchParams.get('plan') || 'gold'
@@ -51,9 +51,8 @@ function CheckoutContent() {
     setCouponMessage('')
     
     try {
-      const res = await fetch('/api/coupon', {
+      const res = await authFetch('/api/coupon', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: couponCode.trim(), plan: planId })
       })
       const data = await res.json()
@@ -96,9 +95,8 @@ function CheckoutContent() {
           return
         }
 
-        const res = await fetch('/api/payment/phonepe/initiate', {
+        const res = await authFetch('/api/payment/phonepe/initiate', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             userId: user.id,
             plan: planId,
@@ -129,9 +127,8 @@ function CheckoutContent() {
       }
       if (paymentMethod === 'netbanking') paymentDetails.bank = bank
 
-      const res = await fetch('/api/subscription', {
+      const res = await authFetch('/api/subscription', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: user.id,
           plan: planId,

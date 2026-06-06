@@ -1,6 +1,6 @@
 // ============================================================
 // NEXT.JS MIDDLEWARE - Security Gateway
-// Enforces security headers, CORS, rate limiting at edge
+// Enforces security headers, CORS, rate limiting, JWT auth at edge
 // ============================================================
 
 import { NextResponse } from 'next/server'
@@ -18,16 +18,33 @@ const SECURITY_HEADERS = {
   'X-Permitted-Cross-Domain-Policies': 'none',
 }
 
-// Paths that don't require authentication
-const PUBLIC_PATHS = [
-  '/',
-  '/login',
-  '/register',
-  '/forgot-password',
+// API paths that don't require authentication
+const PUBLIC_API_PATHS = [
   '/api/auth/login',
   '/api/auth/register',
   '/api/auth/refresh',
   '/api/health',
+  '/api/hosts/auth/login',
+  '/api/hosts/auth/register',
+  '/api/payment/phonepe/callback',
+]
+
+// Page paths that don't require authentication
+const PUBLIC_PAGE_PATHS = [
+  '/',
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/legal',
+  '/legal/terms-and-conditions',
+  '/legal/privacy-policy',
+  '/legal/refund-cancellation',
+  '/legal/return-policy',
+  '/legal/shipping-policy',
+  '/premium',
+  '/hosts',
+  '/payment/success',
+  '/payment/error',
 ]
 
 // Static asset patterns
@@ -164,6 +181,70 @@ export function middleware(request: NextRequest) {
         status: 204, 
         headers: Object.fromEntries(response.headers.entries()) 
       })
+    }
+
+    // JWT Authentication check for protected API routes
+    const isPublicApi = PUBLIC_API_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'))
+    if (!isPublicApi) {
+      const authHeader = request.headers.get('authorization')
+      const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
+
+      if (!token) {
+        return new NextResponse(
+          JSON.stringify({ error: 'Authentication required. Please login.' }),
+          {
+            status: 401,
+            headers: {
+              'Content-Type': 'application/json',
+              ...SECURITY_HEADERS,
+            }
+          }
+        )
+      }
+
+      // Verify JWT token structure and expiry at edge level
+      // Full cryptographic verification happens in the API route handler
+      try {
+        const parts = token.split('.')
+        if (parts.length !== 3) {
+          throw new Error('Invalid token format')
+        }
+        const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
+        
+        // Check expiry
+        if (payload.exp && payload.exp * 1000 < Date.now()) {
+          return new NextResponse(
+            JSON.stringify({ error: 'Token expired. Please login again.' }),
+            {
+              status: 401,
+              headers: {
+                'Content-Type': 'application/json',
+                ...SECURITY_HEADERS,
+              }
+            }
+          )
+        }
+
+        // Check required claims
+        if (!payload.userId || !payload.email) {
+          throw new Error('Invalid token claims')
+        }
+
+        // Pass user info to downstream via headers
+        response.headers.set('X-User-ID', payload.userId)
+        response.headers.set('X-User-Email', payload.email)
+      } catch {
+        return new NextResponse(
+          JSON.stringify({ error: 'Invalid or expired token. Please login again.' }),
+          {
+            status: 401,
+            headers: {
+              'Content-Type': 'application/json',
+              ...SECURITY_HEADERS,
+            }
+          }
+        )
+      }
     }
   }
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { validateCoupon, activatePremium, getUserById, isPremiumActive, getUserSubscription } from '@/lib/database'
+import { authenticateRequest } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,11 +13,20 @@ const PLANS = {
 // POST - Process payment and activate premium
 export async function POST(req: NextRequest) {
   try {
+    // Verify JWT token
+    const authResult = authenticateRequest(req)
+    if ('error' in authResult) return authResult.error
+
     const body = await req.json()
     const { userId, plan, paymentMethod, couponCode, paymentDetails } = body
 
     if (!userId || !plan || !paymentMethod) {
       return NextResponse.json({ error: 'userId, plan, and paymentMethod are required' }, { status: 400 })
+    }
+
+    // Ensure user can only activate subscription for themselves
+    if (userId !== authResult.user.userId) {
+      return NextResponse.json({ error: 'Unauthorized access' }, { status: 403 })
     }
 
     if (!PLANS[plan as keyof typeof PLANS]) {

@@ -3,9 +3,14 @@ import { writeFile, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
 import { updateUser, getUserById } from '@/lib/database'
+import { authenticateRequest } from '@/lib/auth'
 
 export async function POST(req: NextRequest) {
   try {
+    // Verify JWT token
+    const authResult = authenticateRequest(req)
+    if ('error' in authResult) return authResult.error
+
     const contentType = req.headers.get('content-type') || ''
     if (!contentType.includes('multipart/form-data') && !contentType.includes('application/x-www-form-urlencoded')) {
       return NextResponse.json({ error: 'Content-Type must be multipart/form-data' }, { status: 400 })
@@ -17,6 +22,11 @@ export async function POST(req: NextRequest) {
 
     if (!file || !userId) {
       return NextResponse.json({ error: 'File and userId are required' }, { status: 400 })
+    }
+
+    // Ensure user can only upload for themselves
+    if (userId !== authResult.user.userId) {
+      return NextResponse.json({ error: 'Unauthorized: cannot upload for another user' }, { status: 403 })
     }
 
     // Validate file type

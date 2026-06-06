@@ -1,16 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getMessages, getConversations, sendMessage, markMessagesRead } from '@/lib/database'
+import { authenticateRequest } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
   try {
+    // Verify JWT token
+    const authResult = authenticateRequest(req)
+    if ('error' in authResult) return authResult.error
+
     const { searchParams } = new URL(req.url)
     const userId = searchParams.get('userId')
     const partnerId = searchParams.get('partnerId')
 
     if (!userId) {
       return NextResponse.json({ error: 'User ID required' }, { status: 400 })
+    }
+
+    // Ensure user can only access their own messages
+    if (userId !== authResult.user.userId) {
+      return NextResponse.json({ error: 'Unauthorized access' }, { status: 403 })
     }
 
     if (partnerId) {
@@ -30,10 +40,19 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    // Verify JWT token
+    const authResult = authenticateRequest(req)
+    if ('error' in authResult) return authResult.error
+
     const { senderId, receiverId, content } = await req.json()
 
     if (!senderId || !receiverId || !content) {
       return NextResponse.json({ error: 'All fields required' }, { status: 400 })
+    }
+
+    // Ensure user can only send messages as themselves
+    if (senderId !== authResult.user.userId) {
+      return NextResponse.json({ error: 'Unauthorized: cannot send messages as another user' }, { status: 403 })
     }
 
     // Basic content validation

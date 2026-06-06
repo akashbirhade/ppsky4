@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { authenticateRequest } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,11 +29,20 @@ function getDefaults(userId: string): PrivacySettings {
 }
 
 export async function GET(req: NextRequest) {
+  // Verify JWT token
+  const authResult = authenticateRequest(req)
+  if ('error' in authResult) return authResult.error
+
   const { searchParams } = new URL(req.url)
   const userId = searchParams.get('userId')
   
   if (!userId) {
     return NextResponse.json({ error: 'userId required' }, { status: 400 })
+  }
+
+  // Ensure user can only access their own privacy settings
+  if (userId !== authResult.user.userId) {
+    return NextResponse.json({ error: 'Unauthorized access' }, { status: 403 })
   }
 
   const settings = privacyStore.get(userId) || getDefaults(userId)
@@ -41,10 +51,19 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    // Verify JWT token
+    const authResult = authenticateRequest(req)
+    if ('error' in authResult) return authResult.error
+
     const { userId, ...settings } = await req.json()
     
     if (!userId) {
       return NextResponse.json({ error: 'userId required' }, { status: 400 })
+    }
+
+    // Ensure user can only modify their own settings
+    if (userId !== authResult.user.userId) {
+      return NextResponse.json({ error: 'Unauthorized access' }, { status: 403 })
     }
 
     const current = privacyStore.get(userId) || getDefaults(userId)

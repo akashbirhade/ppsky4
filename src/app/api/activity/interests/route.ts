@@ -1,15 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendInterest, getInterestsSent, getInterestsReceived, respondToInterest, getMutualMatches, getUserById } from '@/lib/database'
+import { authenticateRequest } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
   try {
+    // Verify JWT token
+    const authResult = authenticateRequest(req)
+    if ('error' in authResult) return authResult.error
+
     const { searchParams } = new URL(req.url)
     const userId = searchParams.get('userId')
     const type = searchParams.get('type') // 'sent' | 'received' | 'mutual'
 
     if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
+
+    // Ensure user can only access their own data
+    if (userId !== authResult.user.userId) {
+      return NextResponse.json({ error: 'Unauthorized access' }, { status: 403 })
+    }
 
     if (type === 'sent') {
       return NextResponse.json({ interests: getInterestsSent(userId) })
@@ -25,6 +35,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    // Verify JWT token
+    const authResult = authenticateRequest(req)
+    if ('error' in authResult) return authResult.error
+
     const { senderId, receiverId, interestId, action } = await req.json()
     
     if (interestId && action) {

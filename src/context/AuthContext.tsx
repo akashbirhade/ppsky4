@@ -19,12 +19,14 @@ interface User {
 
 interface AuthContextType {
   user: User | null
+  token: string | null
   login: (email: string, password: string) => Promise<boolean>
   register: (data: RegisterData) => Promise<{ success: boolean; error?: string }>
   logout: () => void
   loading: boolean
   updateUserData: (data: Partial<User>) => void
   checkPremium: () => Promise<boolean>
+  authFetch: (url: string, options?: RequestInit) => Promise<Response>
 }
 
 interface RegisterData {
@@ -50,15 +52,46 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [token, setToken] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const stored = localStorage.getItem('soulmateSync_user')
-    if (stored) {
+    const storedToken = localStorage.getItem('soulmateSync_token')
+    if (stored && storedToken) {
       setUser(JSON.parse(stored))
+      setToken(storedToken)
     }
     setLoading(false)
   }, [])
+
+  /**
+   * Authenticated fetch - automatically attaches JWT token to requests
+   */
+  const authFetch = async (url: string, options: RequestInit = {}): Promise<Response> => {
+    const currentToken = token || localStorage.getItem('soulmateSync_token')
+    const headers = new Headers(options.headers || {})
+    
+    if (currentToken) {
+      headers.set('Authorization', `Bearer ${currentToken}`)
+    }
+    
+    if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
+      headers.set('Content-Type', 'application/json')
+    }
+
+    const response = await fetch(url, { ...options, headers })
+
+    // If token is expired/invalid, logout user
+    if (response.status === 401) {
+      const data = await response.clone().json().catch(() => ({}))
+      if (data.error?.includes('expired') || data.error?.includes('Invalid')) {
+        logout()
+      }
+    }
+
+    return response
+  }
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
@@ -70,6 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (res.ok) {
         const data = await res.json()
         setUser(data.user)
+        setToken(data.token)
         localStorage.setItem('soulmateSync_user', JSON.stringify(data.user))
         localStorage.setItem('soulmateSync_token', data.token)
         return true
@@ -90,6 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (res.ok) {
         const result = await res.json()
         setUser(result.user)
+        setToken(result.token)
         localStorage.setItem('soulmateSync_user', JSON.stringify(result.user))
         localStorage.setItem('soulmateSync_token', result.token)
         return { success: true }
@@ -103,6 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null)
+    setToken(null)
     localStorage.removeItem('soulmateSync_user')
     localStorage.removeItem('soulmateSync_token')
   }
@@ -118,7 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const checkPremium = async (): Promise<boolean> => {
     if (!user) return false
     try {
-      const res = await fetch(`/api/subscription?userId=${user.id}`)
+      const res = await authFetch(`/api/subscription?userId=${user.id}`)
       if (res.ok) {
         const data = await res.json()
         if (data.isPremium !== user.premium) {
@@ -131,7 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading, updateUserData, checkPremium }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout, loading, updateUserData, checkPremium, authFetch }}>
       {children}
     </AuthContext.Provider>
   )

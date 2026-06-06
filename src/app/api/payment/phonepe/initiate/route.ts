@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createPhonePePayment } from '@/lib/phonepe'
 import { getUserById, validateCoupon } from '@/lib/database'
+import { authenticateRequest } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,6 +17,10 @@ const PLANS = {
  */
 export async function POST(req: NextRequest) {
   try {
+    // Verify JWT token
+    const authResult = authenticateRequest(req)
+    if ('error' in authResult) return authResult.error
+
     const body = await req.json()
     const { userId, plan, couponCode, mobileNumber } = body
 
@@ -25,6 +30,11 @@ export async function POST(req: NextRequest) {
         { error: 'userId, plan, and mobileNumber are required' },
         { status: 400 }
       )
+    }
+
+    // Ensure user can only initiate payment for themselves
+    if (userId !== authResult.user.userId) {
+      return NextResponse.json({ error: 'Unauthorized access' }, { status: 403 })
     }
 
     // Validate plan
