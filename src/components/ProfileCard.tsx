@@ -14,7 +14,7 @@ interface ProfileCardProps {
 }
 
 export default function ProfileCard({ profile, compatibility }: ProfileCardProps) {
-  const { user } = useAuth()
+  const { user, authFetch } = useAuth()
   const { showToast } = useToast()
   const [sending, setSending] = useState(false)
   const score = compatibility || Math.floor(70 + Math.random() * 25)
@@ -27,7 +27,7 @@ export default function ProfileCard({ profile, compatibility }: ProfileCardProps
 
     setSending(true)
     try {
-      const res = await fetch('/api/activity/interests', {
+      const res = await authFetch('/api/activity/interests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ senderId: user.id, receiverId: profile.id })

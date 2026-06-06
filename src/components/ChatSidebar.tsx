@@ -65,7 +65,7 @@ function ChatAvatar({ name, photo, gender, online, verified }: { name: string; p
 }
 
 export default function ChatSidebar() {
-  const { user } = useAuth()
+  const { user, authFetch } = useAuth()
   const { isOpen, setIsOpen } = useChatSidebar()
   const [activeTab, setActiveTab] = useState<'alerts' | 'chats' | 'active'>('alerts')
   const isMinimized = !isOpen
@@ -81,7 +81,7 @@ export default function ChatSidebar() {
     if (!user) return
     const fetchChats = async () => {
       try {
-        const res = await fetch(`/api/messages?userId=${user.id}`)
+        const res = await authFetch(`/api/messages?userId=${user.id}`)
         const data = await res.json()
         const convos = data.conversations || []
         const mapped: ChatUser[] = convos.map((c: any) => ({

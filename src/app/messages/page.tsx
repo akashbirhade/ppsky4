@@ -70,7 +70,7 @@ function formatDate(ts: string) {
 }
 
 function MessagesInner() {
-  const { user } = useAuth()
+  const { user, authFetch } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const chatParam = searchParams.get('chat')
@@ -93,7 +93,7 @@ function MessagesInner() {
   const fetchConversations = useCallback(async () => {
     if (!user) return
     try {
-      const res = await fetch(`/api/messages?userId=${user.id}`, { cache: 'no-store' })
+      const res = await authFetch(`/api/messages?userId=${user.id}`, { cache: 'no-store' })
       if (res.ok) {
         const data = await res.json()
         setConversations(data.conversations || [])
@@ -101,27 +101,27 @@ function MessagesInner() {
     } finally {
       setLoadingConvs(false)
     }
-  }, [user])
+  }, [user, authFetch])
 
   const fetchMessages = useCallback(async (partnerId: string) => {
     if (!user) return
     try {
-      const res = await fetch(`/api/messages?userId=${user.id}&partnerId=${partnerId}`, { cache: 'no-store' })
+      const res = await authFetch(`/api/messages?userId=${user.id}&partnerId=${partnerId}`, { cache: 'no-store' })
       if (res.ok) {
         const data = await res.json()
         setMessages(data.messages || [])
       }
     } catch { /* ignore */ }
-  }, [user])
+  }, [user, authFetch])
 
   const markRead = useCallback(async (partnerId: string) => {
     if (!user) return
-    await fetch('/api/messages', {
+    await authFetch('/api/messages', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: user.id, senderId: partnerId })
     }).catch(() => { /* ignore */ })
-  }, [user])
+  }, [user, authFetch])
 
   // Poll conversations every 5s
   useEffect(() => {
@@ -138,7 +138,7 @@ function MessagesInner() {
     fetchMessages(chatParam).then(() => setLoadingMsgs(false))
     markRead(chatParam)
     // Fetch the profile info for the header
-    fetch(`/api/profiles/${chatParam}`)
+    authFetch(`/api/profiles/${chatParam}`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data?.profile) setSelectedUser({ ...data.profile, online: data.profile.online ?? false })
@@ -181,7 +181,7 @@ function MessagesInner() {
     }
     setMessages(prev => [...prev, optimistic])
     try {
-      const res = await fetch('/api/messages', {
+      const res = await authFetch('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ senderId: user.id, receiverId: selectedId, content: text })

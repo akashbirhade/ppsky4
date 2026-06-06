@@ -15,7 +15,7 @@ interface ProfileItem {
 }
 
 export default function MatchesPage() {
-  const { user } = useAuth()
+  const { user, authFetch } = useAuth()
   const router = useRouter()
   const { isOpen: chatSidebarOpen } = useChatSidebar()
   const [activeTab, setActiveTab] = useState('daily')
@@ -64,11 +64,11 @@ export default function MatchesPage() {
 
   const fetchCounts = async () => {
     try {
-      const res = await fetch(`/api/activity/matches?userId=${user!.id}&type=counts`)
+      const res = await authFetch(`/api/activity/matches?userId=${user!.id}&type=counts`)
       const d = await res.json()
       if (d.counts) setCounts(d.counts)
       // fetch user's own shortlist count
-      const slRes = await fetch(`/api/activity/shortlist?userId=${user!.id}`)
+      const slRes = await authFetch(`/api/activity/shortlist?userId=${user!.id}`)
       const slData = await slRes.json()
       setShortlistCount(slData.profiles?.length || 0)
     } catch {}
@@ -80,44 +80,44 @@ export default function MatchesPage() {
       let res
       switch (activeTab) {
         case 'daily':
-          res = await fetch(`/api/activity/matches?userId=${user!.id}&type=daily`)
+          res = await authFetch(`/api/activity/matches?userId=${user!.id}&type=daily`)
           const daily = await res.json()
           const dailyProfiles = (daily.profiles || []).map((p: any) => ({ profile: p }))
           setData(dailyProfiles)
           setMatchCount(dailyProfiles.length)
           break
         case 'viewed':
-          res = await fetch(`/api/activity/views?userId=${user!.id}&type=viewed`)
+          res = await authFetch(`/api/activity/views?userId=${user!.id}&type=viewed`)
           const viewed = await res.json()
           setData(viewed.profiles || [])
           break
         case 'visitors':
-          res = await fetch(`/api/activity/views?userId=${user!.id}&type=visitors`)
+          res = await authFetch(`/api/activity/views?userId=${user!.id}&type=visitors`)
           const visitors = await res.json()
           setData(visitors.profiles || [])
           break
         case 'sent':
-          res = await fetch(`/api/activity/interests?userId=${user!.id}&type=sent`)
+          res = await authFetch(`/api/activity/interests?userId=${user!.id}&type=sent`)
           const sent = await res.json()
           setData(sent.interests || [])
           break
         case 'received':
-          res = await fetch(`/api/activity/interests?userId=${user!.id}&type=received`)
+          res = await authFetch(`/api/activity/interests?userId=${user!.id}&type=received`)
           const received = await res.json()
           setData(received.interests || [])
           break
         case 'mutual':
-          res = await fetch(`/api/activity/interests?userId=${user!.id}&type=mutual`)
+          res = await authFetch(`/api/activity/interests?userId=${user!.id}&type=mutual`)
           const mutual = await res.json()
           setData((mutual.profiles || []).map((p: any) => ({ profile: p })))
           break
         case 'shortlist':
-          res = await fetch(`/api/activity/shortlist?userId=${user!.id}`)
+          res = await authFetch(`/api/activity/shortlist?userId=${user!.id}`)
           const sl = await res.json()
           setData(sl.profiles || [])
           break
         case 'nearby':
-          res = await fetch(`/api/activity/matches?userId=${user!.id}&type=nearby`)
+          res = await authFetch(`/api/activity/matches?userId=${user!.id}&type=nearby`)
           const nearby = await res.json()
           setData((nearby.profiles || []).map((p: any) => ({ profile: p })))
           break
@@ -127,17 +127,17 @@ export default function MatchesPage() {
   }
 
   const handleAccept = async (interestId: string) => {
-    await fetch('/api/activity/interests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ interestId, action: 'accepted' }) })
+    await authFetch('/api/activity/interests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ interestId, action: 'accepted' }) })
     fetchData()
     fetchCounts()
   }
   const handleDecline = async (interestId: string) => {
-    await fetch('/api/activity/interests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ interestId, action: 'declined' }) })
+    await authFetch('/api/activity/interests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ interestId, action: 'declined' }) })
     fetchData()
     fetchCounts()
   }
   const handleSendInterest = async (profileId: string) => {
-    await fetch('/api/activity/interests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ senderId: user!.id, receiverId: profileId }) })
+    await authFetch('/api/activity/interests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ senderId: user!.id, receiverId: profileId }) })
     fetchData()
   }
 
@@ -149,7 +149,7 @@ export default function MatchesPage() {
     }, 500)
   }
   const handleShortlist = async (profileId: string) => {
-    await fetch('/api/activity/shortlist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user!.id, profileId }) })
+    await authFetch('/api/activity/shortlist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user!.id, profileId }) })
     fetchData()
   }
 

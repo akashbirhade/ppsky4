@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { User, Save, Camera, Upload, BadgeCheck, MapPin, GraduationCap, Briefcase, Heart, Globe, BookOpen, Sparkles, TrendingUp, Star, Video, Share2 } from 'lucide-react'
 
 export default function ProfilePage() {
-  const { user } = useAuth()
+  const { user, authFetch } = useAuth()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -43,7 +43,7 @@ export default function ProfilePage() {
     e.preventDefault()
     setLoading(true)
     try {
-      await fetch('/api/profiles', {
+      await authFetch('/api/profiles', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...profile, userId: user?.id })

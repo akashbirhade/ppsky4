@@ -36,7 +36,7 @@ interface NotificationSettings {
 }
 
 export default function SettingsPage() {
-  const { user } = useAuth()
+  const { user, authFetch } = useAuth()
   const { language, setLanguage, languages } = useLanguage()
   const router = useRouter()
   const [activeSection, setActiveSection] = useState<'privacy' | 'notifications' | 'security' | 'account'>('privacy')
@@ -67,7 +67,7 @@ export default function SettingsPage() {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch(`/api/privacy?userId=${user!.id}`)
+      const res = await authFetch(`/api/privacy?userId=${user!.id}`)
       const data = await res.json()
       if (data.settings) setSettings(prev => ({ ...prev, ...data.settings }))
     } catch {}
@@ -75,7 +75,7 @@ export default function SettingsPage() {
 
   const fetchBlocked = async () => {
     try {
-      const res = await fetch(`/api/safety?userId=${user!.id}`)
+      const res = await authFetch(`/api/safety?userId=${user!.id}`)
       const data = await res.json()
       if (data.blockedUsers) setBlockedUsers(data.blockedUsers)
     } catch {}
@@ -84,7 +84,7 @@ export default function SettingsPage() {
   const saveSettings = async () => {
     setSaving(true)
     try {
-      await fetch('/api/privacy', {
+      await authFetch('/api/privacy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user!.id, ...settings })

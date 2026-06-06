@@ -11,7 +11,7 @@ import { useSlideIn, useStaggerCards } from '@/hooks/useGsap'
 import { useChatSidebar } from '@/context/ChatSidebarContext'
 
 export default function DashboardPage() {
-  const { user } = useAuth()
+  const { user, authFetch } = useAuth()
   const router = useRouter()
   const { isOpen: chatOpen } = useChatSidebar()
   const [profiles, setProfiles] = useState<UserProfile[]>([])
@@ -38,18 +38,18 @@ export default function DashboardPage() {
       if (filters.religion) params.set('religion', filters.religion)
       if (filters.city) params.set('city', filters.city)
       if (filters.education) params.set('education', filters.education)
-      const res = await fetch(`/api/profiles?${params.toString()}`)
+      const res = await authFetch(`/api/profiles?${params.toString()}`)
       const data = await res.json()
       setProfiles(data.profiles || [])
     } catch (err) { console.error(err) }
     setLoading(false)
-  }, [user, filters])
+  }, [user, filters, authFetch])
 
   useEffect(() => {
     if (!user) { router.push('/login'); return }
     fetchProfiles()
     // Load already-sent interests
-    fetch(`/api/activity/interests?userId=${user.id}&type=sent`)
+    authFetch(`/api/activity/interests?userId=${user.id}&type=sent`)
       .then(r => r.json())
       .then(data => {
         if (data.interests) {
@@ -58,7 +58,7 @@ export default function DashboardPage() {
       })
       .catch(() => {})
     // Load shortlisted profiles
-    fetch(`/api/activity/shortlist?userId=${user.id}`)
+    authFetch(`/api/activity/shortlist?userId=${user.id}`)
       .then(r => r.json())
       .then(data => {
         if (data.profiles) {
@@ -67,7 +67,7 @@ export default function DashboardPage() {
       })
       .catch(() => {})
     // Load dynamic stats
-    fetch(`/api/activity/matches?userId=${user.id}&type=counts`)
+    authFetch(`/api/activity/matches?userId=${user.id}&type=counts`)
       .then(r => r.json())
       .then(data => {
         if (data.counts) {
@@ -75,7 +75,7 @@ export default function DashboardPage() {
         }
       })
       .catch(() => {})
-    fetch(`/api/messages?userId=${user.id}`)
+    authFetch(`/api/messages?userId=${user.id}`)
       .then(r => r.json())
       .then(data => {
         setStats(prev => ({ ...prev, conversations: data.conversations?.length || 0 }))
@@ -92,7 +92,7 @@ export default function DashboardPage() {
     e.stopPropagation()
     if (!user) return
     setSentInterests(prev => new Set(prev).add(profileId))
-    await fetch('/api/activity/interests', {
+    await authFetch('/api/activity/interests', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ senderId: user.id, receiverId: profileId })
@@ -110,7 +110,7 @@ export default function DashboardPage() {
       else next.add(profileId)
       return next
     })
-    await fetch('/api/activity/shortlist', {
+    await authFetch('/api/activity/shortlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: user.id, profileId, action: isCurrently ? 'remove' : 'add' })

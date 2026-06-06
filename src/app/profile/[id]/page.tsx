@@ -19,7 +19,7 @@ interface Profile {
 export default function ProfileDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const { user, checkPremium } = useAuth()
+  const { user, checkPremium, authFetch } = useAuth()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [interestSent, setInterestSent] = useState(false)
@@ -55,7 +55,7 @@ export default function ProfileDetailPage() {
   const fetchSimilarProfiles = async () => {
     try {
       const params = new URLSearchParams({ gender: profile!.gender, religion: profile!.religion || '', city: profile!.city || '', excludeId: profile!.id })
-      const res = await fetch(`/api/profiles?${params.toString()}`)
+      const res = await authFetch(`/api/profiles?${params.toString()}`)
       const data = await res.json()
       setSimilarProfiles((data.profiles || []).slice(0, 6))
     } catch {}
@@ -63,7 +63,7 @@ export default function ProfileDetailPage() {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch('/api/profiles')
+      const res = await authFetch('/api/profiles')
       const data = await res.json()
       const found = data.profiles?.find((p: Profile) => p.id === params.id)
       setProfile(found || null)
@@ -74,7 +74,7 @@ export default function ProfileDetailPage() {
   const fetchCompatibility = async () => {
     if (!user || !profile) return
     try {
-      const res = await fetch(`/api/compatibility?userId=${user.id}&targetId=${profile.id}`)
+      const res = await authFetch(`/api/compatibility?userId=${user.id}&targetId=${profile.id}`)
       const data = await res.json()
       if (data.score) setCompatibility(data)
     } catch {}
@@ -82,7 +82,7 @@ export default function ProfileDetailPage() {
 
   const handleBlock = async () => {
     if (!user || !profile) return
-    await fetch('/api/safety', {
+    await authFetch('/api/safety', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'block', userId: user.id, targetId: profile.id })
@@ -92,7 +92,7 @@ export default function ProfileDetailPage() {
 
   const handleReport = async () => {
     if (!user || !profile || !reportReason) return
-    await fetch('/api/safety', {
+    await authFetch('/api/safety', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'report', userId: user.id, targetId: profile.id, reason: reportReason, details: reportDetails })
@@ -113,7 +113,7 @@ export default function ProfileDetailPage() {
   const handleViewContact = async () => {
     if (!user || !profile) return
     try {
-      const res = await fetch('/api/premium-features', {
+      const res = await authFetch('/api/premium-features', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'view_contact', userId: user.id, targetId: profile.id })
@@ -133,7 +133,7 @@ export default function ProfileDetailPage() {
     if (!user || !profile) return
     setCallLoading(true)
     try {
-      const res = await fetch('/api/premium-features', {
+      const res = await authFetch('/api/premium-features', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'call', userId: user.id, targetId: profile.id, callType: type })

@@ -16,7 +16,7 @@ interface Profile {
 }
 
 export default function KundaliPage() {
-  const { user } = useAuth()
+  const { user, authFetch } = useAuth()
   const router = useRouter()
   const [profiles, setProfiles] = useState<Profile[]>([])
   const [selectedProfile, setSelectedProfile] = useState<string>('')
@@ -29,7 +29,7 @@ export default function KundaliPage() {
   const fetchProfiles = async () => {
     try {
       const oppositeGender = user!.gender === 'Male' ? 'Female' : 'Male'
-      const res = await fetch(`/api/profiles?gender=${oppositeGender}&excludeId=${user!.id}`)
+      const res = await authFetch(`/api/profiles?gender=${oppositeGender}&excludeId=${user!.id}`)
       const data = await res.json()
       setProfiles(data.profiles || [])
     } catch {}
@@ -39,7 +39,7 @@ export default function KundaliPage() {
     if (!selectedProfile) return
     setLoading(true)
     try {
-      const res = await fetch(`/api/activity/kundali?userId=${user!.id}&profileId=${selectedProfile}`)
+      const res = await authFetch(`/api/activity/kundali?userId=${user!.id}&profileId=${selectedProfile}`)
       const data = await res.json()
       setResult(data.kundali)
       const p = profiles.find(p => p.id === selectedProfile)

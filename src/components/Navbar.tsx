@@ -18,7 +18,7 @@ export default function Navbar() {
   const [matchCount, setMatchCount] = useState(0)
   const [showSubNav, setShowSubNav] = useState(true)
   const lastScrollY = useRef(0)
-  const { user, logout } = useAuth()
+  const { user, logout, authFetch } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const profileRef = useRef<HTMLDivElement>(null)
   const helpRef = useRef<HTMLDivElement>(null)
@@ -39,7 +39,7 @@ export default function Navbar() {
     if (!user) return
     const fetchNotifs = async () => {
       try {
-        const res = await fetch(`/api/activity/interests?userId=${user.id}&type=received`)
+        const res = await authFetch(`/api/activity/interests?userId=${user.id}&type=received`)
         const data = await res.json()
         const interests = data.interests || []
         const notifs = interests.slice(0, 5).map((item: any) => ({
@@ -66,8 +66,8 @@ export default function Navbar() {
     const fetchCounts = async () => {
       try {
         const [msgRes, matchRes] = await Promise.all([
-          fetch(`/api/messages?userId=${user.id}`),
-          fetch(`/api/activity/matches?userId=${user.id}&type=counts`)
+          authFetch(`/api/messages?userId=${user.id}`),
+          authFetch(`/api/activity/matches?userId=${user.id}&type=counts`)
         ])
         if (msgRes.ok) {
           const msgData = await msgRes.json()

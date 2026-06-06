@@ -20,7 +20,7 @@ export default function AIChatBot() {
   const [detectedLang, setDetectedLang] = useState<string>('en')
   const [sessionId] = useState(() => Math.random().toString(36).slice(2))
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const { user } = useAuth()
+  const { user, authFetch } = useAuth()
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
@@ -45,7 +45,7 @@ export default function AIChatBot() {
     setIsTyping(true)
 
     try {
-      const res = await fetch('/api/chat', {
+      const res = await authFetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text, history: messages, userId: user?.id, sessionId })
