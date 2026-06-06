@@ -3,7 +3,7 @@
 import { useState, Suspense } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { CreditCard, Smartphone, Building2, Shield, CheckCircle, ArrowLeft, Crown, Lock, Zap, Tag, X, Gift, Percent } from 'lucide-react'
+import { CreditCard, Smartphone, Building2, Shield, CheckCircle, ArrowLeft, Crown, Lock, Zap, Tag, X, Gift, Percent, Wallet } from 'lucide-react'
 import Link from 'next/link'
 
 const PLANS: Record<string, { name: string; price: number; duration: string }> = {
@@ -12,7 +12,7 @@ const PLANS: Record<string, { name: string; price: number; duration: string }> =
   platinum: { name: 'Platinum', price: 4999, duration: '12 Months' },
 }
 
-type PaymentMethod = 'upi' | 'card' | 'netbanking'
+type PaymentMethod = 'upi' | 'card' | 'netbanking' | 'phonepe'
 
 function CheckoutContent() {
   const { user, updateUserData } = useAuth()
@@ -21,10 +21,11 @@ function CheckoutContent() {
   const planId = searchParams.get('plan') || 'gold'
   const plan = PLANS[planId] || PLANS.gold
 
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('upi')
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('phonepe')
   const [processing, setProcessing] = useState(false)
   const [success, setSuccess] = useState(false)
   const [upiId, setUpiId] = useState('')
+  const [mobileNumber, setMobileNumber] = useState('')
   const [cardData, setCardData] = useState({ number: '', expiry: '', cvv: '', name: '' })
   const [bank, setBank] = useState('')
   const [orderId, setOrderId] = useState('')
@@ -87,9 +88,45 @@ function CheckoutContent() {
     setProcessing(true)
 
     try {
+      // Handle PhonePe payment
+      if (paymentMethod === 'phonepe') {
+        if (!mobileNumber || mobileNumber.length !== 10) {
+          alert('Please enter a valid 10-digit mobile number')
+          setProcessing(false)
+          return
+        }
+
+        const res = await fetch('/api/payment/phonepe/initiate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user.id,
+            plan: planId,
+            couponCode: couponApplied ? couponCode : null,
+            mobileNumber,
+          })
+        })
+
+        const data = await res.json()
+        
+        if (res.ok && data.success && data.data?.paymentUrl) {
+          // Redirect to PhonePe payment page
+          window.location.href = data.data.paymentUrl
+        } else {
+          alert(data.error || 'Failed to initiate payment. Please try again.')
+        }
+        setProcessing(false)
+        return
+      }
+
+      // Handle other payment methods (existing logic)
       const paymentDetails: any = {}
       if (paymentMethod === 'upi') paymentDetails.upiId = upiId
-      if (paymentMethod === 'card') paymentDetails.cardNumber = cardData.number, paymentDetails.expiry = cardData.expiry, paymentDetails.cvv = cardData.cvv
+      if (paymentMethod === 'card') {
+        paymentDetails.cardNumber = cardData.number
+        paymentDetails.expiry = cardData.expiry
+        paymentDetails.cvv = cardData.cvv
+      }
       if (paymentMethod === 'netbanking') paymentDetails.bank = bank
 
       const res = await fetch('/api/subscription', {
@@ -173,8 +210,9 @@ function CheckoutContent() {
               </h2>
 
               {/* Method Tabs */}
-              <div className="grid grid-cols-3 gap-2 mb-6">
+              <div className="grid grid-cols-4 gap-2 mb-6">
                 {[
+                  { id: 'phonepe' as const, icon: Wallet, label: 'PhonePe' },
                   { id: 'upi' as const, icon: Smartphone, label: 'UPI' },
                   { id: 'card' as const, icon: CreditCard, label: 'Card' },
                   { id: 'netbanking' as const, icon: Building2, label: 'Net Banking' },
@@ -192,6 +230,31 @@ function CheckoutContent() {
               </div>
 
               <form onSubmit={handlePayment} className="space-y-4">
+                {/* PhonePe */}
+                {paymentMethod === 'phonepe' && (
+                  <div className="animate-fade-in-up">
+                    <label className="block text-xs text-slate-500 dark:text-purple-200/50 mb-1.5 flex items-center gap-1.5">
+                      <Wallet className="h-3.5 w-3.5" /> Mobile Number (for PhonePe)
+                    </label>
+                    <input type="tel" value={mobileNumber} onChange={e => setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                      className="input-field" placeholder="10-digit mobile number" maxLength={10} required />
+                    <p className="text-[10px] text-slate-300 dark:text-purple-300/40 mt-2">You will be redirected to PhonePe app/website for secure payment.</p>
+                    <div className="flex gap-2 mt-3 flex-wrap">
+                      {['9876543210', '8765432109', '7654321098'].map((num, i) => (
+                        <button key={i} type="button" onClick={() => setMobileNumber(num)}
+                          className="text-[10px] bg-white/5 text-slate-400 dark:text-purple-300/60 px-2.5 py-1.5 rounded-lg border border-teal-100 dark:border-purple-500/10 hover:bg-teal-50 dark:bg-purple-500/10 transition-all">
+                          {num}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="bg-purple-500/5 border border-purple-500/20 rounded-xl p-3 mt-3">
+                      <p className="text-[10px] text-purple-300/70 flex items-center gap-1.5">
+                        <CheckCircle className="h-3 w-3" /> Safe & Secure - PhonePe is PCI DSS Level 1 compliant
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* UPI */}
                 {paymentMethod === 'upi' && (
                   <div className="animate-fade-in-up">
@@ -259,16 +322,17 @@ function CheckoutContent() {
                   </div>
                 )}
 
-                <button type="submit" disabled={processing}
+                <button type="submit" disabled={processing || (paymentMethod === 'phonepe' && mobileNumber.length !== 10)}
                   className="w-full btn-primary py-4 text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 mt-6">
                   {processing ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Processing Payment...
+                      {paymentMethod === 'phonepe' ? 'Redirecting to PhonePe...' : 'Processing Payment...'}
                     </>
                   ) : (
                     <>
-                      <Lock className="h-4 w-4" /> Pay ₹{plan.price.toLocaleString()}
+                      <Lock className="h-4 w-4" /> 
+                      {paymentMethod === 'phonepe' ? 'Pay via PhonePe' : `Pay ₹${plan.price.toLocaleString()}`}
                     </>
                   )}
                 </button>
