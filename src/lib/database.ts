@@ -512,7 +512,7 @@ export function searchProfiles(filters: {
     if (filters.religion && filters.religion !== 'Any' && u.religion !== filters.religion) return false
     if (filters.city && !u.city.toLowerCase().includes(filters.city.toLowerCase())) return false
     if (filters.education && !u.education.toLowerCase().includes(filters.education.toLowerCase())) return false
-    return u.profileComplete
+    return true
   })
 }
 
