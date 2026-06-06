@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
-import { Search, Filter, Brain, Sparkles, MapPin, Clock, Users, Zap, Star, Save, SlidersHorizontal, BadgeCheck, Crown, BookOpen } from 'lucide-react'
+import { Search, Filter, Brain, Sparkles, MapPin, Clock, Users, Zap, Star, Save, SlidersHorizontal, BadgeCheck, Crown, BookOpen, X } from 'lucide-react'
 import HalfHeart from '@/components/HalfHeart'
 import ProfileCard from '@/components/ProfileCard'
 import { UserProfile } from '@/lib/database'
@@ -242,75 +242,113 @@ export default function SearchPage() {
               </div>
             )}
 
-            {/* Advanced Filters */}
+            {/* Advanced Filters - Popup Modal */}
             {showFilters && (
-              <div className="mt-4 pt-4 border-t border-teal-100 dark:border-purple-500/10 animate-fade-in-up">
-                <div className="grid sm:grid-cols-2 gap-4 mb-5">
-                  <div className="p-3 bg-teal-50/50 dark:bg-purple-500/5 rounded-2xl border border-teal-100 dark:border-purple-500/10">
-                    <AgeRangeSlider min={ageRange[0]} max={ageRange[1]} onChange={handleAgeChange} />
-                    {ageSaved && <div className="flex items-center gap-1.5 mt-2 text-[10px] text-green-400"><Save className="w-3 h-3" /> Saved</div>}
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowFilters(false)}>
+                {/* Backdrop */}
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+                
+                {/* Modal Card */}
+                <div className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto bg-white dark:bg-dark-900 rounded-3xl border border-teal-100 dark:border-purple-500/20 shadow-2xl shadow-purple-500/10 animate-scale-in" onClick={e => e.stopPropagation()}>
+                  {/* Modal Header */}
+                  <div className="sticky top-0 z-10 flex items-center justify-between p-5 pb-4 border-b border-teal-100 dark:border-purple-500/10 bg-white/95 dark:bg-dark-900/95 backdrop-blur-sm rounded-t-3xl">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                        <SlidersHorizontal className="h-4 w-4 text-purple-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold text-slate-800 dark:text-white">Filter Profiles</h3>
+                        <p className="text-[10px] text-slate-400 dark:text-purple-300/40">Refine your search results</p>
+                      </div>
+                    </div>
+                    <button onClick={() => setShowFilters(false)} className="w-8 h-8 rounded-xl bg-teal-50 dark:bg-purple-500/10 border border-teal-100 dark:border-purple-500/20 flex items-center justify-center text-slate-400 dark:text-purple-300/50 hover:text-slate-700 dark:text-white hover:bg-red-50 dark:hover:bg-red-500/10 transition-all">
+                      <X className="h-4 w-4" />
+                    </button>
                   </div>
-                  <div className="p-3 bg-teal-50/50 dark:bg-purple-500/5 rounded-2xl border border-teal-100 dark:border-purple-500/10">
-                    <HeightRangeSlider min={heightRange[0]} max={heightRange[1]} onChange={handleHeightChange} />
+
+                  {/* Modal Body */}
+                  <div className="p-5 space-y-5">
+                    {/* Age & Height Sliders */}
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="p-3 bg-teal-50/50 dark:bg-purple-500/5 rounded-2xl border border-teal-100 dark:border-purple-500/10">
+                        <AgeRangeSlider min={ageRange[0]} max={ageRange[1]} onChange={handleAgeChange} />
+                        {ageSaved && <div className="flex items-center gap-1.5 mt-2 text-[10px] text-green-400"><Save className="w-3 h-3" /> Saved</div>}
+                      </div>
+                      <div className="p-3 bg-teal-50/50 dark:bg-purple-500/5 rounded-2xl border border-teal-100 dark:border-purple-500/10">
+                        <HeightRangeSlider min={heightRange[0]} max={heightRange[1]} onChange={handleHeightChange} />
+                      </div>
+                    </div>
+
+                    {/* Dropdown Filters */}
+                    <div>
+                      <p className="text-[10px] text-slate-400 dark:text-purple-300/40 uppercase tracking-wider mb-2.5 font-medium">Preferences</p>
+                      <div className="grid grid-cols-2 gap-3">
+                        <select name="education" value={filters.education} onChange={handleChange} className="input-field text-sm">
+                          <option value="" className="bg-white dark:bg-dark-900">Any Education</option>
+                          {['MBA','B.Tech/B.E','MBBS','CA','M.Tech','B.Sc','M.Sc','LLB','PhD','Diploma'].map(e => (<option key={e} value={e} className="bg-white dark:bg-dark-900">{e}</option>))}
+                        </select>
+                        <select name="occupation" value={filters.occupation} onChange={handleChange} className="input-field text-sm">
+                          <option value="" className="bg-white dark:bg-dark-900">Any Occupation</option>
+                          {['Software Engineer','Doctor','Business Owner','Government Job','Teacher','Lawyer','CA/Finance','Engineer','Manager','Scientist'].map(o => (<option key={o} value={o} className="bg-white dark:bg-dark-900">{o}</option>))}
+                        </select>
+                        <select name="income" value={filters.income} onChange={handleChange} className="input-field text-sm">
+                          <option value="" className="bg-white dark:bg-dark-900">Any Income</option>
+                          {['Below 5 LPA','5-10 LPA','10-15 LPA','15-20 LPA','20-30 LPA','30-50 LPA','50+ LPA'].map(i => (<option key={i} value={i} className="bg-white dark:bg-dark-900">{i}</option>))}
+                        </select>
+                        <select name="motherTongue" value={filters.motherTongue} onChange={handleChange} className="input-field text-sm">
+                          <option value="" className="bg-white dark:bg-dark-900">Any Mother Tongue</option>
+                          {['Hindi','English','Marathi','Tamil','Telugu','Kannada','Gujarati','Punjabi','Bengali','Malayalam','Urdu'].map(l => (<option key={l} value={l} className="bg-white dark:bg-dark-900">{l}</option>))}
+                        </select>
+                        <select name="manglik" value={filters.manglik} onChange={handleChange} className="input-field text-sm">
+                          <option value="" className="bg-white dark:bg-dark-900">Manglik Status</option>
+                          <option value="yes" className="bg-white dark:bg-dark-900">Manglik</option>
+                          <option value="no" className="bg-white dark:bg-dark-900">Non-Manglik</option>
+                        </select>
+                        <select name="maritalStatus" value={filters.maritalStatus} onChange={handleChange} className="input-field text-sm">
+                          <option value="" className="bg-white dark:bg-dark-900">Marital Status</option>
+                          <option value="neverMarried" className="bg-white dark:bg-dark-900">Never Married</option>
+                          <option value="divorced" className="bg-white dark:bg-dark-900">Divorced</option>
+                          <option value="widowed" className="bg-white dark:bg-dark-900">Widowed</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Toggle Filters */}
+                    <div>
+                      <p className="text-[10px] text-slate-400 dark:text-purple-300/40 uppercase tracking-wider mb-2.5 font-medium">Quick Filters</p>
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <label className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-teal-50/50 dark:bg-purple-500/5 border border-teal-100 dark:border-purple-500/10 cursor-pointer hover:bg-teal-50 dark:hover:bg-purple-500/10 transition-all">
+                          <input type="checkbox" name="onlineNow" checked={filters.onlineNow} onChange={handleChange} className="w-3.5 h-3.5 rounded accent-purple-500" />
+                          <span className="text-xs text-slate-700 dark:text-purple-200">Online Now</span>
+                          <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse ml-auto" />
+                        </label>
+                        <label className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-teal-50/50 dark:bg-purple-500/5 border border-teal-100 dark:border-purple-500/10 cursor-pointer hover:bg-teal-50 dark:hover:bg-purple-500/10 transition-all">
+                          <input type="checkbox" name="verifiedOnly" checked={filters.verifiedOnly} onChange={handleChange} className="w-3.5 h-3.5 rounded accent-purple-500" />
+                          <span className="text-xs text-slate-700 dark:text-purple-200">Verified Only</span>
+                          <BadgeCheck className="h-3 w-3 text-green-400 ml-auto" />
+                        </label>
+                        <label className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-teal-50/50 dark:bg-purple-500/5 border border-teal-100 dark:border-purple-500/10 cursor-pointer hover:bg-teal-50 dark:hover:bg-purple-500/10 transition-all">
+                          <input type="checkbox" name="premiumOnly" checked={filters.premiumOnly} onChange={handleChange} className="w-3.5 h-3.5 rounded accent-purple-500" />
+                          <span className="text-xs text-slate-700 dark:text-purple-200">Premium Only</span>
+                          <Crown className="h-3 w-3 text-amber-400 ml-auto" />
+                        </label>
+                        <label className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-teal-50/50 dark:bg-purple-500/5 border border-teal-100 dark:border-purple-500/10 cursor-pointer hover:bg-teal-50 dark:hover:bg-purple-500/10 transition-all">
+                          <input type="checkbox" name="withPhoto" checked={filters.withPhoto} onChange={handleChange} className="w-3.5 h-3.5 rounded accent-purple-500" />
+                          <span className="text-xs text-slate-700 dark:text-purple-200">With Photo</span>
+                        </label>
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
-                  <select name="education" value={filters.education} onChange={handleChange} className="input-field text-sm">
-                    <option value="" className="bg-white dark:bg-dark-900">Any Education</option>
-                    {['MBA','B.Tech/B.E','MBBS','CA','M.Tech','B.Sc','M.Sc','LLB','PhD','Diploma'].map(e => (<option key={e} value={e} className="bg-white dark:bg-dark-900">{e}</option>))}
-                  </select>
-                  <select name="occupation" value={filters.occupation} onChange={handleChange} className="input-field text-sm">
-                    <option value="" className="bg-white dark:bg-dark-900">Any Occupation</option>
-                    {['Software Engineer','Doctor','Business Owner','Government Job','Teacher','Lawyer','CA/Finance','Engineer','Manager','Scientist'].map(o => (<option key={o} value={o} className="bg-white dark:bg-dark-900">{o}</option>))}
-                  </select>
-                  <select name="income" value={filters.income} onChange={handleChange} className="input-field text-sm">
-                    <option value="" className="bg-white dark:bg-dark-900">Any Income</option>
-                    {['Below 5 LPA','5-10 LPA','10-15 LPA','15-20 LPA','20-30 LPA','30-50 LPA','50+ LPA'].map(i => (<option key={i} value={i} className="bg-white dark:bg-dark-900">{i}</option>))}
-                  </select>
-                  <select name="motherTongue" value={filters.motherTongue} onChange={handleChange} className="input-field text-sm">
-                    <option value="" className="bg-white dark:bg-dark-900">Any Mother Tongue</option>
-                    {['Hindi','English','Marathi','Tamil','Telugu','Kannada','Gujarati','Punjabi','Bengali','Malayalam','Urdu'].map(l => (<option key={l} value={l} className="bg-white dark:bg-dark-900">{l}</option>))}
-                  </select>
-                  <select name="manglik" value={filters.manglik} onChange={handleChange} className="input-field text-sm">
-                    <option value="" className="bg-white dark:bg-dark-900">Manglik Status</option>
-                    <option value="yes" className="bg-white dark:bg-dark-900">Manglik</option>
-                    <option value="no" className="bg-white dark:bg-dark-900">Non-Manglik</option>
-                  </select>
-                  <select name="maritalStatus" value={filters.maritalStatus} onChange={handleChange} className="input-field text-sm">
-                    <option value="" className="bg-white dark:bg-dark-900">Marital Status</option>
-                    <option value="neverMarried" className="bg-white dark:bg-dark-900">Never Married</option>
-                    <option value="divorced" className="bg-white dark:bg-dark-900">Divorced</option>
-                    <option value="widowed" className="bg-white dark:bg-dark-900">Widowed</option>
-                  </select>
-                </div>
-
-                {/* Toggle Filters */}
-                <div className="flex flex-wrap gap-3 mb-4">
-                  <label className="flex items-center gap-2 px-3 py-2 rounded-xl bg-teal-50/50 dark:bg-purple-500/5 border border-teal-100 dark:border-purple-500/10 cursor-pointer hover:bg-teal-50 dark:bg-purple-500/10 transition-all">
-                    <input type="checkbox" name="onlineNow" checked={filters.onlineNow} onChange={handleChange} className="w-3.5 h-3.5 rounded accent-purple-500" />
-                    <span className="text-xs text-slate-700 dark:text-purple-200">Online Now</span>
-                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                  </label>
-                  <label className="flex items-center gap-2 px-3 py-2 rounded-xl bg-teal-50/50 dark:bg-purple-500/5 border border-teal-100 dark:border-purple-500/10 cursor-pointer hover:bg-teal-50 dark:bg-purple-500/10 transition-all">
-                    <input type="checkbox" name="verifiedOnly" checked={filters.verifiedOnly} onChange={handleChange} className="w-3.5 h-3.5 rounded accent-purple-500" />
-                    <span className="text-xs text-slate-700 dark:text-purple-200">Verified Only</span>
-                    <BadgeCheck className="h-3 w-3 text-green-400" />
-                  </label>
-                  <label className="flex items-center gap-2 px-3 py-2 rounded-xl bg-teal-50/50 dark:bg-purple-500/5 border border-teal-100 dark:border-purple-500/10 cursor-pointer hover:bg-teal-50 dark:bg-purple-500/10 transition-all">
-                    <input type="checkbox" name="premiumOnly" checked={filters.premiumOnly} onChange={handleChange} className="w-3.5 h-3.5 rounded accent-purple-500" />
-                    <span className="text-xs text-slate-700 dark:text-purple-200">Premium Only</span>
-                    <Crown className="h-3 w-3 text-amber-400" />
-                  </label>
-                  <label className="flex items-center gap-2 px-3 py-2 rounded-xl bg-teal-50/50 dark:bg-purple-500/5 border border-teal-100 dark:border-purple-500/10 cursor-pointer hover:bg-teal-50 dark:bg-purple-500/10 transition-all">
-                    <input type="checkbox" name="withPhoto" checked={filters.withPhoto} onChange={handleChange} className="w-3.5 h-3.5 rounded accent-purple-500" />
-                    <span className="text-xs text-slate-700 dark:text-purple-200">With Photo</span>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <button type="button" onClick={clearFilters} className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2 hover:bg-red-500/20 transition-all">Clear All</button>
-                  <button type="submit" className="btn-primary px-6 py-2 text-sm flex items-center gap-2"><Search className="h-3.5 w-3.5" /> Apply Filters</button>
+                  {/* Modal Footer */}
+                  <div className="sticky bottom-0 flex items-center justify-between p-5 pt-4 border-t border-teal-100 dark:border-purple-500/10 bg-white/95 dark:bg-dark-900/95 backdrop-blur-sm rounded-b-3xl">
+                    <button type="button" onClick={clearFilters} className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5 hover:bg-red-500/20 transition-all">
+                      Clear All
+                    </button>
+                    <button type="button" onClick={() => { fetchProfiles(); setShowFilters(false) }} className="btn-primary px-6 py-2.5 text-sm flex items-center gap-2">
+                      <Search className="h-3.5 w-3.5" /> Apply Filters
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
