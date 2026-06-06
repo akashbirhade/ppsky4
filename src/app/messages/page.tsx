@@ -38,12 +38,9 @@ function Avatar({ user, size = 12 }: { user?: { name?: string; photos?: string[]
     )
   }
   return (
-    <div className={`${cls} flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20`}>
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-        <circle cx="50" cy="50" r="50" fill="#2d1b69" />
-        <circle cx="50" cy="38" r="16" fill="rgba(124,58,237,0.6)" />
-        <ellipse cx="50" cy="80" rx="26" ry="22" fill="rgba(124,58,237,0.6)" />
-      </svg>
+    <div className={`${cls} flex items-center justify-center overflow-hidden`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={user?.gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg'} alt="Avatar" className="w-full h-full object-cover" />
     </div>
   )
 }

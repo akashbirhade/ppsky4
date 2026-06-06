@@ -408,13 +408,11 @@ function ProfileImage({ src, name, gender }: { src: string; name: string; gender
   const [err, setErr] = useState(false)
   if (err || !src) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900/40 to-dark-900">
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="w-24 h-24">
-          <circle cx="50" cy="50" r="50" fill={gender === 'Female' ? '#3b1d6e' : '#1e2a5e'} />
-          <circle cx="50" cy="35" r="18" fill={gender === 'Female' ? 'rgba(168,85,247,0.5)' : 'rgba(99,102,241,0.5)'} />
-          <ellipse cx="50" cy="78" rx="28" ry="24" fill={gender === 'Female' ? 'rgba(168,85,247,0.5)' : 'rgba(99,102,241,0.5)'} />
-        </svg>
-      </div>
+      <img
+        src={gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg'}
+        alt="Avatar"
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      />
     )
   }
   // eslint-disable-next-line @next/next/no-img-element
