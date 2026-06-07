@@ -22,6 +22,44 @@ export default function ProfilePage() {
 
   useEffect(() => { if (!user) router.push('/login') }, [user, router])
 
+  // Fetch existing profile data on load
+  useEffect(() => {
+    if (!user) return
+    const loadProfile = async () => {
+      try {
+        const res = await authFetch(`/api/profiles/${user.id}`)
+        if (res.ok) {
+          const data = await res.json()
+          const p = data.profile
+          setProfile({
+            religion: p.religion || '',
+            caste: p.caste || '',
+            motherTongue: p.motherTongue || '',
+            height: p.height || '',
+            education: p.education || '',
+            occupation: p.occupation || '',
+            income: p.income || '',
+            city: p.city || '',
+            state: p.state || '',
+            country: p.country || 'India',
+            about: p.about || '',
+            partnerAgeMin: String(p.partnerPreferences?.ageMin || '22'),
+            partnerAgeMax: String(p.partnerPreferences?.ageMax || '35'),
+            partnerReligion: p.partnerPreferences?.religion || 'Any',
+            partnerEducation: p.partnerPreferences?.education || 'Any',
+            partnerCity: p.partnerPreferences?.city || 'Any',
+          })
+          if (p.photos && p.photos.length > 0) {
+            setPhotos(p.photos)
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load profile:', err)
+      }
+    }
+    loadProfile()
+  }, [user, authFetch])
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setProfile(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
@@ -46,7 +84,7 @@ export default function ProfilePage() {
       await authFetch('/api/profiles', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...profile, userId: user?.id })
+        body: JSON.stringify({ ...profile, photos, userId: user?.id })
       })
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
