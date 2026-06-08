@@ -1,7 +1,7 @@
 'use client'
 
 import { UserProfile } from '@/lib/database'
-import { MapPin, GraduationCap, Briefcase, BadgeCheck, Crown, Sparkles } from 'lucide-react'
+import { MapPin, GraduationCap, Briefcase, BadgeCheck, Crown, Sparkles, Lock } from 'lucide-react'
 import HalfHeart from './HalfHeart'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -11,17 +11,26 @@ import { useToast } from './Toast'
 interface ProfileCardProps {
   profile: UserProfile
   compatibility?: number
+  interestStatus?: 'none' | 'pending' | 'accepted' | 'declined'
 }
 
-export default function ProfileCard({ profile, compatibility }: ProfileCardProps) {
+export default function ProfileCard({ profile, compatibility, interestStatus = 'none' }: ProfileCardProps) {
   const { user, authFetch } = useAuth()
   const { showToast } = useToast()
   const [sending, setSending] = useState(false)
+  const [currentStatus, setCurrentStatus] = useState(interestStatus)
   const score = compatibility || Math.floor(70 + Math.random() * 25)
+  const isPremium = user?.premium === true
+  const photoVisible = currentStatus === 'accepted'
 
   const handleSendInterest = async () => {
     if (!user) {
       showToast('error', 'Login Required', 'Please login to send interest')
+      return
+    }
+
+    if (!isPremium) {
+      showToast('info', 'Premium Required', 'Upgrade to premium to send interest')
       return
     }
 
@@ -37,6 +46,7 @@ export default function ProfileCard({ profile, compatibility }: ProfileCardProps
       if (!res.ok) {
         showToast('error', 'Failed to Send Interest', data.error || 'Something went wrong')
       } else {
+        setCurrentStatus('pending')
         showToast('success', 'Interest Sent! 💜', `You've sent interest to ${profile.name}`)
       }
     } catch (err) {
@@ -55,15 +65,26 @@ export default function ProfileCard({ profile, compatibility }: ProfileCardProps
         {/* Avatar Section */}
         <div className="relative mb-4">
           <div className="w-full h-44 bg-gradient-to-br from-purple-500/20 via-fuchsia-500/10 to-pink-500/20 rounded-2xl flex items-center justify-center overflow-hidden border border-purple-400/10">
-            {/* Illustrated avatar fallback */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={profile.gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg'}
               alt="Avatar"
-              className="w-full h-full object-cover"
+              className={`w-full h-full object-cover transition-all duration-300 ${!photoVisible ? 'blur-[8px] scale-105' : ''}`}
             />
             {/* Animated gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-dark-900/80 via-transparent to-transparent" />
+            
+            {/* Visible on Accept overlay */}
+            {!photoVisible && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 backdrop-blur-[2px]">
+                <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center mb-2">
+                  <Lock className="h-5 w-5 text-white/80" />
+                </div>
+                <span className="text-[11px] font-medium text-white/90 bg-black/40 px-3 py-1 rounded-full backdrop-blur-sm">
+                  Visible on Accept
+                </span>
+              </div>
+            )}
           </div>
           
           {/* Badges */}
@@ -127,13 +148,37 @@ export default function ProfileCard({ profile, compatibility }: ProfileCardProps
           <Link href={`/profile/${profile.id}`} className="flex-1 text-center py-2.5 text-xs font-medium text-slate-700 dark:text-purple-200 bg-white/5 rounded-xl border border-purple-400/10 hover:bg-white/10 hover:border-purple-400/30 transition-all">
             View Profile
           </Link>
-          <button 
-            onClick={handleSendInterest}
-            disabled={sending}
-            className="flex-1 py-2.5 text-xs font-medium text-slate-800 dark:text-white bg-purple-600/50 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl border border-purple-500/30 hover:bg-purple-600/70 transition-all flex items-center justify-center gap-1.5">
-            <HalfHeart className="h-3 w-3" /> {sending ? 'Sending...' : 'Interest'}
-            <Sparkles className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-          </button>
+          {!isPremium ? (
+            <Link 
+              href="/premium"
+              className="flex-1 py-2.5 text-xs font-medium text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/10 rounded-xl border border-amber-200 dark:border-amber-500/30 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-all flex items-center justify-center gap-1.5"
+            >
+              <Crown className="h-3 w-3" /> Upgrade to Connect
+            </Link>
+          ) : currentStatus === 'pending' ? (
+            <button 
+              disabled
+              className="flex-1 py-2.5 text-xs font-medium text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-500/10 rounded-xl border border-yellow-200 dark:border-yellow-500/30 cursor-default flex items-center justify-center gap-1.5"
+            >
+              <HalfHeart className="h-3 w-3" /> Request Sent
+            </button>
+          ) : currentStatus === 'accepted' ? (
+            <button 
+              disabled
+              className="flex-1 py-2.5 text-xs font-medium text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-500/10 rounded-xl border border-green-200 dark:border-green-500/30 cursor-default flex items-center justify-center gap-1.5"
+            >
+              <HalfHeart className="h-3 w-3" /> Connected
+            </button>
+          ) : (
+            <button 
+              onClick={handleSendInterest}
+              disabled={sending}
+              className="flex-1 py-2.5 text-xs font-medium text-slate-800 dark:text-white bg-purple-600/50 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl border border-purple-500/30 hover:bg-purple-600/70 transition-all flex items-center justify-center gap-1.5"
+            >
+              <HalfHeart className="h-3 w-3" /> {sending ? 'Sending...' : 'Connect'}
+              <Sparkles className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+          )}
         </div>
       </div>
     </div>

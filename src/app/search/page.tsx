@@ -62,6 +62,7 @@ function HeightRangeSlider({ min, max, onChange }: { min: number; max: number; o
 export default function SearchPage() {
   const { user, authFetch } = useAuth()
   const [profiles, setProfiles] = useState<UserProfile[]>([])
+  const [interestMap, setInterestMap] = useState<Record<string, 'pending' | 'accepted' | 'declined'>>({})
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
   const [activeTab, setActiveTab] = useState<FilterTab>('all')
@@ -82,9 +83,26 @@ export default function SearchPage() {
     onlineNow: false, verifiedOnly: false, premiumOnly: false, withPhoto: false
   })
 
+  // Fetch user's sent interests to determine status per profile
+  const fetchInterests = async () => {
+    if (!user?.id) return
+    try {
+      const res = await authFetch(`/api/activity/interests?userId=${user.id}&type=sent`)
+      const data = await res.json()
+      if (data.interests) {
+        const map: Record<string, 'pending' | 'accepted' | 'declined'> = {}
+        data.interests.forEach((item: any) => {
+          map[item.profile?.id || item.interest?.receiverId] = item.interest?.status
+        })
+        setInterestMap(map)
+      }
+    } catch {}
+  }
+
   useEffect(() => {
     if (user) {
       fetchProfiles()
+      fetchInterests()
       const saved = localStorage.getItem(`savedSearches_${user.id}`)
       if (saved) setSavedSearches(JSON.parse(saved))
     }
@@ -403,7 +421,7 @@ export default function SearchPage() {
               return p.name.toLowerCase().includes(search) || p.id.toLowerCase().includes(search)
             }).map((profile, i) => (
               <div key={profile.id} className="animate-fade-in-up" style={{animationDelay: `${i * 0.08}s`, opacity: 0}}>
-                <ProfileCard profile={profile} />
+                <ProfileCard profile={profile} interestStatus={interestMap[profile.id] || 'none'} />
               </div>
             ))}
           </div>
