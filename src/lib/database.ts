@@ -444,6 +444,10 @@ export function getUserByEmail(email: string): UserProfile | undefined {
   return getStoredUsers().find(u => u.email === email)
 }
 
+export function getUserByPhone(phone: string): UserProfile | undefined {
+  return getStoredUsers().find(u => u.phone === phone)
+}
+
 export function createUser(data: Partial<UserProfile>): UserProfile {
   const users = getStoredUsers()
   const newUser: UserProfile = {

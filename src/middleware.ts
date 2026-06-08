@@ -23,6 +23,8 @@ const PUBLIC_API_PATHS = [
   '/api/auth/login',
   '/api/auth/register',
   '/api/auth/refresh',
+  '/api/auth/otp/send',
+  '/api/auth/otp/verify',
   '/api/health',
   '/api/hosts/auth/login',
   '/api/hosts/auth/register',
