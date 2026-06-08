@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
-import { Users, UserCheck, Calendar, MapPin, LogOut, Heart, Eye, Plus, User, GraduationCap, Briefcase } from 'lucide-react'
+import { Users, UserCheck, Calendar, MapPin, LogOut, Heart, GraduationCap, Briefcase } from 'lucide-react'
 
 interface HostUser {
   id: string
@@ -139,9 +139,9 @@ export default function HostPortalPage() {
                 <Users size={18} className="text-teal-500" />
                 Recent Members
               </h3>
-              <div className="space-y-3 max-h-80 overflow-y-auto">
+              <div className="grid grid-cols-1 gap-3 max-h-[500px] overflow-y-auto">
                 {members.slice(0, 8).map(member => (
-                  <MemberRow key={member.id} member={member} />
+                  <MemberCard key={member.id} member={member} compact />
                 ))}
               </div>
             </div>
@@ -252,21 +252,57 @@ function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label:
   )
 }
 
-function MemberRow({ member }: { member: Member }) {
+function MemberCard({ member, compact }: { member: Member; compact?: boolean }) {
   return (
-    <div className="flex items-center justify-between py-2 px-3 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5">
-      <div className="flex items-center gap-3">
-        <div className={`w-9 h-9 rounded-full flex items-center justify-center ${member.gender === 'Female' ? 'bg-pink-100 dark:bg-pink-500/20' : 'bg-blue-100 dark:bg-blue-500/20'}`}>
-          <User size={16} className={member.gender === 'Female' ? 'text-pink-600 dark:text-pink-300' : 'text-blue-600 dark:text-blue-300'} />
+    <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden hover:shadow-lg dark:hover:border-purple-500/30 transition-all">
+      <div className="flex items-center gap-3 p-3">
+        {/* Avatar */}
+        <div className={`${compact ? 'w-12 h-12' : 'w-14 h-14'} rounded-xl overflow-hidden flex-shrink-0 relative`}>
+          <img
+            src={member.gender === 'Female' ? '/avatars/female.svg' : '/avatars/male.svg'}
+            alt={member.name}
+            className="w-full h-full object-cover"
+          />
+          <span className={`absolute bottom-0 left-0 right-0 text-[8px] text-center font-semibold py-0.5 ${member.gender === 'Female' ? 'bg-pink-500/90 text-white' : 'bg-blue-500/90 text-white'}`}>
+            {member.gender === 'Female' ? 'Bride' : 'Groom'}
+          </span>
         </div>
-        <div>
-          <p className="text-sm font-medium text-slate-700 dark:text-white">{member.name}</p>
-          <p className="text-xs text-slate-500 dark:text-purple-300/50">{member.age}y • {member.occupation} • {member.city}</p>
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-semibold text-slate-800 dark:text-white truncate">{member.name}</h4>
+            <span className="text-xs text-slate-500 dark:text-purple-300/60 flex-shrink-0 ml-2">{member.age} yrs</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-xs text-slate-600 dark:text-purple-200/70">
+            <span className="flex items-center gap-1">
+              <MapPin size={10} className="text-teal-500" /> {member.city}
+            </span>
+            <span className="flex items-center gap-1">
+              <GraduationCap size={10} className="text-purple-500" /> {member.education}
+            </span>
+            <span className="flex items-center gap-1">
+              <Briefcase size={10} className="text-blue-500" /> {member.occupation}
+            </span>
+          </div>
+          <p className="text-[11px] text-slate-500 dark:text-purple-300/50 mt-0.5 flex items-center gap-1">
+            <Heart size={10} className="text-pink-500" /> {member.religion} • {member.caste}
+          </p>
         </div>
       </div>
-      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${member.gender === 'Female' ? 'bg-pink-100 dark:bg-pink-500/20 text-pink-600 dark:text-pink-300' : 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-300'}`}>
-        {member.gender === 'Female' ? 'Bride' : 'Groom'}
-      </span>
+      {/* Actions */}
+      {!compact && (
+        <div className="flex items-center gap-2 px-3 pb-3">
+          <Link
+            href={`/profile/${member.id}`}
+            className="flex-1 text-center text-xs font-medium py-2 rounded-lg bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-500/20 transition"
+          >
+            View Profile
+          </Link>
+          <button className="flex-1 text-center text-xs font-medium py-2 rounded-lg bg-pink-50 dark:bg-pink-500/10 text-pink-700 dark:text-pink-300 hover:bg-pink-100 dark:hover:bg-pink-500/20 transition">
+            Send Interest
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -275,57 +311,18 @@ function MemberGrid({ members, title }: { members: Member[]; title: string }) {
   return (
     <div>
       <p className="text-sm text-slate-500 dark:text-purple-300/60 mb-4">{members.length} {title}</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {members.map(member => (
-          <div key={member.id} className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden hover:shadow-lg dark:hover:border-purple-500/30 transition-all">
-            {/* Photo */}
-            <div className="h-44 bg-gradient-to-br from-purple-500/20 via-fuchsia-500/10 to-pink-500/20 flex items-center justify-center overflow-hidden relative">
-              <img
-                src={member.gender === 'Female' ? '/avatars/female.svg' : '/avatars/male.svg'}
-                alt={member.name}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <span className={`absolute top-3 left-3 text-[10px] font-semibold px-2 py-0.5 rounded-lg ${member.gender === 'Female' ? 'bg-pink-500/80 text-white' : 'bg-blue-500/80 text-white'}`}>
-                {member.gender === 'Female' ? 'Bride' : 'Groom'}
-              </span>
-            </div>
-            {/* Info */}
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-base font-semibold text-slate-800 dark:text-white">{member.name}</h3>
-                <span className="text-xs text-slate-500 dark:text-purple-300/60">{member.age} yrs</span>
-              </div>
-              <div className="space-y-1.5 text-xs text-slate-600 dark:text-purple-200/70">
-                <p className="flex items-center gap-1.5">
-                  <MapPin size={12} className="text-teal-500" /> {member.city}
-                </p>
-                <p className="flex items-center gap-1.5">
-                  <GraduationCap size={12} className="text-purple-500" /> {member.education}
-                </p>
-                <p className="flex items-center gap-1.5">
-                  <Briefcase size={12} className="text-blue-500" /> {member.occupation}
-                </p>
-                <p className="flex items-center gap-1.5">
-                  <Heart size={12} className="text-pink-500" /> {member.religion} • {member.caste}
-                </p>
-              </div>
-              {/* Actions */}
-              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100 dark:border-white/5">
-                <Link
-                  href={`/profile/${member.id}`}
-                  className="flex-1 text-center text-xs font-medium py-2 rounded-lg bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-500/20 transition"
-                >
-                  View Profile
-                </Link>
-                <button className="flex-1 text-center text-xs font-medium py-2 rounded-lg bg-pink-50 dark:bg-pink-500/10 text-pink-700 dark:text-pink-300 hover:bg-pink-100 dark:hover:bg-pink-500/20 transition">
-                  Send Interest
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {members.length === 0 ? (
+        <div className="text-center py-16 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl">
+          <Users size={48} className="mx-auto text-slate-300 dark:text-purple-400/30 mb-4" />
+          <p className="text-slate-500 dark:text-purple-300/60">No members found</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {members.map(member => (
+            <MemberCard key={member.id} member={member} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

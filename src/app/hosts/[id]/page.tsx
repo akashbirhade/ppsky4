@@ -248,51 +248,51 @@ export default function HostProfilePage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {filteredMembers.map((member) => (
                         <div key={member.id} className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden hover:shadow-lg dark:hover:border-purple-500/30 transition-all">
-                          {/* Photo */}
-                          <div className="h-44 bg-gradient-to-br from-purple-500/20 via-fuchsia-500/10 to-pink-500/20 flex items-center justify-center overflow-hidden relative">
-                            <img
-                              src={member.gender === 'Female' ? '/avatars/female.svg' : '/avatars/male.svg'}
-                              alt={member.name}
-                              className="w-full h-full object-cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                            {/* Badge */}
-                            <span className={`absolute top-3 left-3 text-[10px] font-semibold px-2 py-0.5 rounded-lg ${member.gender === 'Female' ? 'bg-pink-500/80 text-white' : 'bg-blue-500/80 text-white'}`}>
-                              {member.gender === 'Female' ? 'Bride' : 'Groom'}
-                            </span>
+                          <div className="flex items-center gap-3 p-4">
+                            {/* Avatar */}
+                            <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 relative">
+                              <img
+                                src={member.gender === 'Female' ? '/avatars/female.svg' : '/avatars/male.svg'}
+                                alt={member.name}
+                                className="w-full h-full object-cover"
+                              />
+                              <span className={`absolute bottom-0 left-0 right-0 text-[8px] text-center font-semibold py-0.5 ${member.gender === 'Female' ? 'bg-pink-500/90 text-white' : 'bg-blue-500/90 text-white'}`}>
+                                {member.gender === 'Female' ? 'Bride' : 'Groom'}
+                              </span>
+                            </div>
+                            {/* Info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between">
+                                <h3 className="text-sm font-semibold text-slate-800 dark:text-white truncate">{member.name}</h3>
+                                <span className="text-xs text-slate-500 dark:text-purple-300/60 flex-shrink-0 ml-2">{member.age} yrs</span>
+                              </div>
+                              <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-xs text-slate-600 dark:text-purple-200/70">
+                                <span className="flex items-center gap-1">
+                                  <MapPin size={10} className="text-teal-500" /> {member.city}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <GraduationCap size={10} className="text-purple-500" /> {member.education}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Briefcase size={10} className="text-blue-500" /> {member.occupation}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-slate-500 dark:text-purple-300/50 mt-0.5 flex items-center gap-1">
+                                <Heart size={10} className="text-pink-500" /> {member.religion} • {member.caste}
+                              </p>
+                            </div>
                           </div>
-                          {/* Info */}
-                          <div className="p-4">
-                            <div className="flex items-center justify-between mb-2">
-                              <h3 className="text-base font-semibold text-slate-800 dark:text-white">{member.name}</h3>
-                              <span className="text-xs text-slate-500 dark:text-purple-300/60">{member.age} yrs</span>
-                            </div>
-                            <div className="space-y-1.5 text-xs text-slate-600 dark:text-purple-200/70">
-                              <p className="flex items-center gap-1.5">
-                                <MapPin size={12} className="text-teal-500" /> {member.city}
-                              </p>
-                              <p className="flex items-center gap-1.5">
-                                <GraduationCap size={12} className="text-purple-500" /> {member.education}
-                              </p>
-                              <p className="flex items-center gap-1.5">
-                                <Briefcase size={12} className="text-blue-500" /> {member.occupation}
-                              </p>
-                              <p className="flex items-center gap-1.5">
-                                <Heart size={12} className="text-pink-500" /> {member.religion} • {member.caste}
-                              </p>
-                            </div>
-                            {/* Actions */}
-                            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100 dark:border-white/5">
-                              <Link
-                                href={`/profile/${member.id}`}
-                                className="flex-1 text-center text-xs font-medium py-2 rounded-lg bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-500/20 transition"
-                              >
-                                View Profile
-                              </Link>
-                              <button className="flex-1 text-center text-xs font-medium py-2 rounded-lg bg-pink-50 dark:bg-pink-500/10 text-pink-700 dark:text-pink-300 hover:bg-pink-100 dark:hover:bg-pink-500/20 transition">
-                                Send Interest
-                              </button>
-                            </div>
+                          {/* Actions */}
+                          <div className="flex items-center gap-2 px-4 pb-3">
+                            <Link
+                              href={`/profile/${member.id}`}
+                              className="flex-1 text-center text-xs font-medium py-2 rounded-lg bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-500/20 transition"
+                            >
+                              View Profile
+                            </Link>
+                            <button className="flex-1 text-center text-xs font-medium py-2 rounded-lg bg-pink-50 dark:bg-pink-500/10 text-pink-700 dark:text-pink-300 hover:bg-pink-100 dark:hover:bg-pink-500/20 transition">
+                              Send Interest
+                            </button>
                           </div>
                         </div>
                       ))}
