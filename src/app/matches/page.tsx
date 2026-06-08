@@ -143,6 +143,7 @@ export default function MatchesPage() {
 
   const handleConnectClick = (profileId: string) => {
     setConnectPopup({ profileId, rippling: true })
+    handleSendInterest(profileId)
     setTimeout(() => {
       setConnectPopup(null)
       setLikedProfiles(prev => new Set(prev).add(profileId))
@@ -287,9 +288,29 @@ export default function MatchesPage() {
                       <span className="text-amber-400">⭐ Astro</span>
                     </div>
                   </div>
-                  {/* Like / Connect Button */}
+                  {/* Like / Connect / Accept / Decline Button */}
                   <div className="text-center">
-                    {likedProfiles.has(currentProfile.id) ? (
+                    {activeTab === 'received' && data[currentIndex]?.interest ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <p className="text-xs text-purple-300/60 mb-1">Respond to Interest</p>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => handleAccept(data[currentIndex].interest!.id)}
+                            className="w-12 h-12 bg-green-500/20 border border-green-500/40 rounded-full flex items-center justify-center text-green-400 hover:bg-green-500/40 transition-all hover:scale-110 shadow-lg"
+                            title="Accept"
+                          >
+                            <Check className="h-6 w-6" />
+                          </button>
+                          <button
+                            onClick={() => handleDecline(data[currentIndex].interest!.id)}
+                            className="w-12 h-12 bg-red-500/20 border border-red-500/40 rounded-full flex items-center justify-center text-red-400 hover:bg-red-500/40 transition-all hover:scale-110 shadow-lg"
+                            title="Decline"
+                          >
+                            <X className="h-6 w-6" />
+                          </button>
+                        </div>
+                      </div>
+                    ) : likedProfiles.has(currentProfile.id) ? (
                       <div className="flex items-center gap-2 animate-fade-in-up">
                         {/* WhatsApp */}
                         <button

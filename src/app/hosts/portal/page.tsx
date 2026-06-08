@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
-import { Users, UserCheck, Calendar, MapPin, LogOut, Heart, Eye, Plus, User } from 'lucide-react'
+import { Users, UserCheck, Calendar, MapPin, LogOut, Heart, Eye, Plus, User, GraduationCap, Briefcase } from 'lucide-react'
 
 interface HostUser {
   id: string
@@ -32,12 +32,12 @@ interface Member {
 }
 
 export default function HostPortalPage() {
-  const { authFetch } = useAuth()
+  const { user, authFetch } = useAuth()
   const router = useRouter()
   const [host, setHost] = useState<HostUser | null>(null)
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'overview' | 'brides' | 'grooms' | 'events'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'foryou' | 'brides' | 'grooms' | 'events'>('foryou')
 
   useEffect(() => {
     const stored = localStorage.getItem('hostUser')
@@ -73,6 +73,10 @@ export default function HostPortalPage() {
 
   const brides = members.filter(m => m.gender === 'Female')
   const grooms = members.filter(m => m.gender === 'Male')
+  const userGender = user?.gender?.toLowerCase()
+  const forYouMembers = userGender
+    ? members.filter(m => m.gender.toLowerCase() !== userGender)
+    : members
 
   return (
     <div className="min-h-screen pt-[104px] pb-8 px-4 md:px-8">
@@ -111,7 +115,7 @@ export default function HostPortalPage() {
 
         {/* Tabs */}
         <div className="flex gap-1 mb-6 bg-slate-100 dark:bg-white/5 rounded-xl p-1 overflow-x-auto">
-          {(['overview', 'brides', 'grooms', 'events'] as const).map((tab) => (
+          {(['overview', 'foryou', 'brides', 'grooms', 'events'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -121,7 +125,7 @@ export default function HostPortalPage() {
                   : 'text-slate-500 dark:text-purple-300/50 hover:text-slate-700 dark:hover:text-purple-200'
               }`}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {tab === 'foryou' ? 'For You' : tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
           ))}
         </div>
@@ -170,6 +174,10 @@ export default function HostPortalPage() {
               )}
             </div>
           </div>
+        )}
+
+        {activeTab === 'foryou' && (
+          <MemberGrid members={forYouMembers} title={userGender === 'female' ? 'Groom Profiles For You' : userGender === 'male' ? 'Bride Profiles For You' : 'Profiles For You'} />
         )}
 
         {activeTab === 'brides' && (
@@ -269,21 +277,51 @@ function MemberGrid({ members, title }: { members: Member[]; title: string }) {
       <p className="text-sm text-slate-500 dark:text-purple-300/60 mb-4">{members.length} {title}</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {members.map(member => (
-          <div key={member.id} className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-4">
-            <div className="flex items-center gap-3 mb-3">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${member.gender === 'Female' ? 'bg-pink-100 dark:bg-pink-500/20' : 'bg-blue-100 dark:bg-blue-500/20'}`}>
-                <User size={20} className={member.gender === 'Female' ? 'text-pink-600 dark:text-pink-300' : 'text-blue-600 dark:text-blue-300'} />
-              </div>
-              <div>
-                <p className="font-medium text-slate-800 dark:text-white">{member.name}</p>
-                <p className="text-xs text-slate-500 dark:text-purple-300/50">{member.age} years</p>
-              </div>
+          <div key={member.id} className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden hover:shadow-lg dark:hover:border-purple-500/30 transition-all">
+            {/* Photo */}
+            <div className="h-44 bg-gradient-to-br from-purple-500/20 via-fuchsia-500/10 to-pink-500/20 flex items-center justify-center overflow-hidden relative">
+              <img
+                src={member.gender === 'Female' ? '/avatars/female.svg' : '/avatars/male.svg'}
+                alt={member.name}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <span className={`absolute top-3 left-3 text-[10px] font-semibold px-2 py-0.5 rounded-lg ${member.gender === 'Female' ? 'bg-pink-500/80 text-white' : 'bg-blue-500/80 text-white'}`}>
+                {member.gender === 'Female' ? 'Bride' : 'Groom'}
+              </span>
             </div>
-            <div className="space-y-1.5 text-xs text-slate-600 dark:text-purple-200/70">
-              <p><span className="text-slate-400 dark:text-purple-300/40">Education:</span> {member.education}</p>
-              <p><span className="text-slate-400 dark:text-purple-300/40">Occupation:</span> {member.occupation}</p>
-              <p><span className="text-slate-400 dark:text-purple-300/40">City:</span> {member.city}</p>
-              <p><span className="text-slate-400 dark:text-purple-300/40">Community:</span> {member.caste}</p>
+            {/* Info */}
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-base font-semibold text-slate-800 dark:text-white">{member.name}</h3>
+                <span className="text-xs text-slate-500 dark:text-purple-300/60">{member.age} yrs</span>
+              </div>
+              <div className="space-y-1.5 text-xs text-slate-600 dark:text-purple-200/70">
+                <p className="flex items-center gap-1.5">
+                  <MapPin size={12} className="text-teal-500" /> {member.city}
+                </p>
+                <p className="flex items-center gap-1.5">
+                  <GraduationCap size={12} className="text-purple-500" /> {member.education}
+                </p>
+                <p className="flex items-center gap-1.5">
+                  <Briefcase size={12} className="text-blue-500" /> {member.occupation}
+                </p>
+                <p className="flex items-center gap-1.5">
+                  <Heart size={12} className="text-pink-500" /> {member.religion} • {member.caste}
+                </p>
+              </div>
+              {/* Actions */}
+              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100 dark:border-white/5">
+                <Link
+                  href={`/profile/${member.id}`}
+                  className="flex-1 text-center text-xs font-medium py-2 rounded-lg bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-500/20 transition"
+                >
+                  View Profile
+                </Link>
+                <button className="flex-1 text-center text-xs font-medium py-2 rounded-lg bg-pink-50 dark:bg-pink-500/10 text-pink-700 dark:text-pink-300 hover:bg-pink-100 dark:hover:bg-pink-500/20 transition">
+                  Send Interest
+                </button>
+              </div>
             </div>
           </div>
         ))}

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
-import { MapPin, Users, Calendar, Mail, Phone, ArrowLeft, User, Heart } from 'lucide-react'
+import { MapPin, Users, Calendar, Mail, Phone, ArrowLeft, User, Heart, GraduationCap, Briefcase, BadgeCheck } from 'lucide-react'
 
 interface HostEvent {
   id: string
@@ -40,12 +40,14 @@ interface Member {
   city: string
   education: string
   occupation: string
+  religion: string
+  caste: string
   photo: string
   hostId: string
 }
 
 export default function HostProfilePage() {
-  const { authFetch } = useAuth()
+  const { user, authFetch } = useAuth()
   const { id } = useParams()
   const [host, setHost] = useState<Host | null>(null)
   const [members, setMembers] = useState<Member[]>([])
@@ -223,37 +225,82 @@ export default function HostProfilePage() {
         )}
 
         {activeTab === 'members' && (
-          <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-6">
-            <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">
-              Members ({members.length})
-            </h2>
-            {members.length === 0 ? (
-              <div className="text-center py-8">
-                <User size={40} className="mx-auto text-slate-300 dark:text-purple-400/30 mb-3" />
-                <p className="text-slate-500 dark:text-purple-300/60">No members yet</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {members.map((member) => (
-                  <div key={member.id} className="flex items-center justify-between py-3 px-4 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${member.gender === 'Female' ? 'bg-pink-100 dark:bg-pink-500/20' : 'bg-blue-100 dark:bg-blue-500/20'}`}>
-                        <User size={18} className={member.gender === 'Female' ? 'text-pink-600 dark:text-pink-300' : 'text-blue-600 dark:text-blue-300'} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-700 dark:text-white">{member.name}</p>
-                        <p className="text-xs text-slate-500 dark:text-purple-300/50">
-                          {member.age}y • {member.occupation} • {member.city}
-                        </p>
-                      </div>
-                    </div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${member.gender === 'Female' ? 'bg-pink-100 dark:bg-pink-500/20 text-pink-600 dark:text-pink-300' : 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-300'}`}>
-                      {member.gender === 'Female' ? 'Bride' : 'Groom'}
-                    </span>
+          <div>
+            {/* Show opposite gender: if user is Female show Males, vice versa */}
+            {(() => {
+              const userGender = user?.gender?.toLowerCase()
+              const filteredMembers = userGender
+                ? members.filter(m => m.gender.toLowerCase() !== userGender)
+                : members
+              return (
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-slate-800 dark:text-white">
+                      {userGender === 'female' ? 'Groom' : userGender === 'male' ? 'Bride' : ''} Profiles ({filteredMembers.length})
+                    </h2>
                   </div>
-                ))}
-              </div>
-            )}
+                  {filteredMembers.length === 0 ? (
+                    <div className="text-center py-12 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl">
+                      <User size={40} className="mx-auto text-slate-300 dark:text-purple-400/30 mb-3" />
+                      <p className="text-slate-500 dark:text-purple-300/60">No profiles to show</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filteredMembers.map((member) => (
+                        <div key={member.id} className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden hover:shadow-lg dark:hover:border-purple-500/30 transition-all">
+                          {/* Photo */}
+                          <div className="h-44 bg-gradient-to-br from-purple-500/20 via-fuchsia-500/10 to-pink-500/20 flex items-center justify-center overflow-hidden relative">
+                            <img
+                              src={member.gender === 'Female' ? '/avatars/female.svg' : '/avatars/male.svg'}
+                              alt={member.name}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                            {/* Badge */}
+                            <span className={`absolute top-3 left-3 text-[10px] font-semibold px-2 py-0.5 rounded-lg ${member.gender === 'Female' ? 'bg-pink-500/80 text-white' : 'bg-blue-500/80 text-white'}`}>
+                              {member.gender === 'Female' ? 'Bride' : 'Groom'}
+                            </span>
+                          </div>
+                          {/* Info */}
+                          <div className="p-4">
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="text-base font-semibold text-slate-800 dark:text-white">{member.name}</h3>
+                              <span className="text-xs text-slate-500 dark:text-purple-300/60">{member.age} yrs</span>
+                            </div>
+                            <div className="space-y-1.5 text-xs text-slate-600 dark:text-purple-200/70">
+                              <p className="flex items-center gap-1.5">
+                                <MapPin size={12} className="text-teal-500" /> {member.city}
+                              </p>
+                              <p className="flex items-center gap-1.5">
+                                <GraduationCap size={12} className="text-purple-500" /> {member.education}
+                              </p>
+                              <p className="flex items-center gap-1.5">
+                                <Briefcase size={12} className="text-blue-500" /> {member.occupation}
+                              </p>
+                              <p className="flex items-center gap-1.5">
+                                <Heart size={12} className="text-pink-500" /> {member.religion} • {member.caste}
+                              </p>
+                            </div>
+                            {/* Actions */}
+                            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100 dark:border-white/5">
+                              <Link
+                                href={`/profile/${member.id}`}
+                                className="flex-1 text-center text-xs font-medium py-2 rounded-lg bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-500/20 transition"
+                              >
+                                View Profile
+                              </Link>
+                              <button className="flex-1 text-center text-xs font-medium py-2 rounded-lg bg-pink-50 dark:bg-pink-500/10 text-pink-700 dark:text-pink-300 hover:bg-pink-100 dark:hover:bg-pink-500/20 transition">
+                                Send Interest
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )
+            })()}
           </div>
         )}
       </div>

@@ -21,6 +21,7 @@ export type Intent =
   | 'family_advice'
   | 'features'
   | 'how_to_use'
+  | 'registration'
   | 'verification'
   | 'complaint'
   | 'general_question'
@@ -96,6 +97,11 @@ const INTENT_PATTERNS: IntentPattern[] = [
     intent: 'how_to_use',
     patterns: ['how', 'use', 'start', 'begin', 'steps', 'guide', 'help', 'process', 'kaise', 'kasa', 'shuru'],
     weight: 1
+  },
+  {
+    intent: 'registration',
+    patterns: ['register', 'sign up', 'signup', 'create account', 'new account', 'join', 'registration', 'onboard', 'naya account', 'account banana', 'account create'],
+    weight: 3
   },
   {
     intent: 'verification',

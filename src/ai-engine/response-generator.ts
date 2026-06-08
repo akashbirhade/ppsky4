@@ -47,6 +47,9 @@ export function generateResponse(ctx: ResponseContext): string {
     case 'complaint':
       response = getComplaintResponse(language, sentiment)
       break
+    case 'registration':
+      response = getRegistrationResponse(language, userName)
+      break
     default:
       // Use RAG content as primary response
       if (ragContent) {
@@ -208,6 +211,51 @@ Is there something specific I can help you with?`,
 4. तातडीची मदत - सपोर्ट टीमशी संपर्क करा
 
 काही विशेष मदत हवी आहे का?`
+  }
+  return responses[language]
+}
+
+function getRegistrationResponse(language: Language, userName?: string): string {
+  const responses: Record<Language, string> = {
+    en: `${userName ? `${userName}, l` : 'L'}et me guide you through registration! 🎉
+
+Here's how to create your account:
+
+1️⃣ **Basic Info** — Name, email, phone number, and set a password
+2️⃣ **Personal Details** — Age, gender, religion, caste, mother tongue, height
+3️⃣ **Education & Career** — Your qualification and profession
+4️⃣ **Location** — City, state, country
+5️⃣ **About You** — A short bio describing yourself
+6️⃣ **Partner Preferences** — Age range, religion, education you prefer
+7️⃣ **Photos** — Upload your best photos (profiles with photos get 10x more matches!)
+
+Would you like me to help you with any specific step? I can guide you through each one!`,
+    hi: `${userName ? `${userName}, ` : ''}मैं आपको रजिस्ट्रेशन में मदद करता हूं! 🎉
+
+अकाउंट बनाने के स्टेप्स:
+
+1️⃣ **बेसिक जानकारी** — नाम, ईमेल, फोन नंबर, पासवर्ड
+2️⃣ **व्यक्तिगत विवरण** — उम्र, लिंग, धर्म, जाति, मातृभाषा, ऊंचाई
+3️⃣ **शिक्षा और करियर** — आपकी योग्यता और पेशा
+4️⃣ **लोकेशन** — शहर, राज्य, देश
+5️⃣ **अपने बारे में** — एक छोटा सा परिचय
+6️⃣ **पार्टनर प्रेफरेंस** — उम्र सीमा, धर्म, शिक्षा
+7️⃣ **फोटो** — अपनी बेस्ट फोटो अपलोड करें
+
+किसी स्टेप में मदद चाहिए तो बताइए!`,
+    mr: `${userName ? `${userName}, ` : ''}मी तुम्हाला रजिस्ट्रेशनमध्ये मदत करतो! 🎉
+
+अकाउंट तयार करण्याची पद्धत:
+
+1️⃣ **मूळ माहिती** — नाव, ईमेल, फोन नंबर, पासवर्ड
+2️⃣ **वैयक्तिक माहिती** — वय, लिंग, धर्म, जात, मातृभाषा, उंची
+3️⃣ **शिक्षण आणि करिअर** — पात्रता आणि व्यवसाय
+4️⃣ **लोकेशन** — शहर, राज्य, देश
+5️⃣ **तुमच्याबद्दल** — लहान परिचय
+6️⃣ **पार्टनर प्राधान्ये** — वय श्रेणी, धर्म, शिक्षण
+7️⃣ **फोटो** — सर्वोत्तम फोटो अपलोड करा
+
+कोणत्याही स्टेपमध्ये मदत हवी असल्यास सांगा!`
   }
   return responses[language]
 }
