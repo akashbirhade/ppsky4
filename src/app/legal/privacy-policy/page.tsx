@@ -25,7 +25,7 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-3xl font-bold text-white mb-4">Introduction</h2>
             <p className="text-slate-300 leading-relaxed mb-4">
-              This Privacy Policy describes how <span className="font-semibold">8459210421</span> and its affiliates (collectively {`"8459210421, we, our, us"`}) collect, use, share, protect or otherwise process your information/ personal data through our website <span className="text-purple-400">https://ppsky4.vercel.app/</span> (hereinafter referred to as Platform).
+              This Privacy Policy describes how <span className="font-semibold">8459210421</span> and its affiliates (collectively {`"8459210421, we, our, us"`}) collect, use, share, protect or otherwise process your information/ personal data through our website <span className="text-purple-400">https://soulmatesync.com/</span> (hereinafter referred to as Platform).
             </p>
             <p className="text-slate-300 leading-relaxed mb-4">
               Please note that you may be able to browse certain sections of the Platform without registering with us. We do not offer any product/service under this Platform outside India and your personal data will primarily be stored and processed in India.

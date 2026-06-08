@@ -33,7 +33,7 @@ export default function TermsAndConditions() {
           <section>
             <h2 className="text-2xl font-bold text-white mb-4">2. Publication & Compliance</h2>
             <p className="text-slate-300 leading-relaxed mb-4">
-              This document is published in accordance with the provisions of Rule 3 (1) of the Information Technology (Intermediaries guidelines) Rules, 2011 that require publishing the rules and regulations, privacy policy and Terms of Use for access or usage of domain name <span className="text-purple-400">https://ppsky4.vercel.app/</span> {`('Website')`}, including the related mobile site and mobile application (hereinafter referred to as {`'Platform'`}).
+              This document is published in accordance with the provisions of Rule 3 (1) of the Information Technology (Intermediaries guidelines) Rules, 2011 that require publishing the rules and regulations, privacy policy and Terms of Use for access or usage of domain name <span className="text-purple-400">https://soulmatesync.com/</span> {`('Website')`}, including the related mobile site and mobile application (hereinafter referred to as {`'Platform'`}).
             </p>
           </section>
 
