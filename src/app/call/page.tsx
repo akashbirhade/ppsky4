@@ -115,7 +115,7 @@ function CallPageInner() {
       socket.disconnect()
       socketRef.current = null
     }
-  }, [user])
+  }, [callState, user])
 
   // Auto-start call if navigated from a profile
   useEffect(() => {

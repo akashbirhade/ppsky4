@@ -1,5 +1,7 @@
 import prisma from '../config/prisma';
-import { HostStatus } from '@prisma/client';
+
+type HostStatus = 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+const db = prisma as any;
 
 // ─── HOST CRUD ──────────────────────────────────────────────────────────────
 
@@ -13,7 +15,7 @@ export const createHost = async (data: {
   community?: string;
   profilePhoto?: string;
 }) => {
-  return prisma.host.create({ data });
+  return db.host.create({ data });
 };
 
 export const getHosts = async (filters: {
@@ -33,21 +35,21 @@ export const getHosts = async (filters: {
   else where.status = 'ACTIVE';
 
   const [hosts, total] = await Promise.all([
-    prisma.host.findMany({
+    db.host.findMany({
       where,
       include: { _count: { select: { members: true, events: true } } },
       skip: (page - 1) * limit,
       take: limit,
       orderBy: { createdAt: 'desc' },
     }),
-    prisma.host.count({ where }),
+    db.host.count({ where }),
   ]);
 
   return { hosts, total, page, totalPages: Math.ceil(total / limit) };
 };
 
 export const getHostById = async (id: string) => {
-  return prisma.host.findUnique({
+  return db.host.findUnique({
     where: { id },
     include: {
       _count: { select: { members: true, events: true } },
@@ -67,29 +69,29 @@ export const updateHost = async (id: string, data: Partial<{
   profilePhoto: string;
   status: HostStatus;
 }>) => {
-  return prisma.host.update({ where: { id }, data });
+  return db.host.update({ where: { id }, data });
 };
 
 export const deleteHost = async (id: string) => {
-  return prisma.host.delete({ where: { id } });
+  return db.host.delete({ where: { id } });
 };
 
 // ─── MEMBER MANAGEMENT ──────────────────────────────────────────────────────
 
 export const assignMember = async (hostId: string, userId: string) => {
-  return prisma.hostMember.create({ data: { hostId, userId } });
+  return db.hostMember.create({ data: { hostId, userId } });
 };
 
 export const removeMember = async (hostId: string, userId: string) => {
-  return prisma.hostMember.delete({
+  return db.hostMember.delete({
     where: { hostId_userId: { hostId, userId } },
   });
 };
 
 export const transferMember = async (fromHostId: string, toHostId: string, userId: string) => {
   return prisma.$transaction([
-    prisma.hostMember.delete({ where: { hostId_userId: { hostId: fromHostId, userId } } }),
-    prisma.hostMember.create({ data: { hostId: toHostId, userId } }),
+    db.hostMember.delete({ where: { hostId_userId: { hostId: fromHostId, userId } } }),
+    db.hostMember.create({ data: { hostId: toHostId, userId } }),
   ]);
 };
 
@@ -100,15 +102,16 @@ export const getHostMembers = async (hostId: string, filters: {
 }) => {
   const { gender, page = 1, limit = 20 } = filters;
   const where: any = { hostId };
+  if (gender) where.user = { gender };
 
-  const members = await prisma.hostMember.findMany({
+  const members = await db.hostMember.findMany({
     where,
     skip: (page - 1) * limit,
     take: limit,
     orderBy: { joinedAt: 'desc' },
   });
 
-  const total = await prisma.hostMember.count({ where });
+  const total = await db.hostMember.count({ where });
 
   return { members, total, page, totalPages: Math.ceil(total / limit) };
 };
@@ -124,11 +127,11 @@ export const createHostEvent = async (data: {
   fee?: number;
   maxParticipants?: number;
 }) => {
-  return prisma.hostEvent.create({ data: { ...data, fee: data.fee ?? undefined } });
+  return db.hostEvent.create({ data: { ...data, fee: data.fee ?? undefined } });
 };
 
 export const getHostEvents = async (hostId: string) => {
-  return prisma.hostEvent.findMany({
+  return db.hostEvent.findMany({
     where: { hostId, isActive: true },
     orderBy: { date: 'asc' },
   });
@@ -143,11 +146,11 @@ export const updateHostEvent = async (eventId: string, data: Partial<{
   maxParticipants: number;
   isActive: boolean;
 }>) => {
-  return prisma.hostEvent.update({ where: { id: eventId }, data });
+  return db.hostEvent.update({ where: { id: eventId }, data });
 };
 
 export const deleteHostEvent = async (eventId: string) => {
-  return prisma.hostEvent.delete({ where: { id: eventId } });
+  return db.hostEvent.delete({ where: { id: eventId } });
 };
 
 // ─── HOST INTERESTS ─────────────────────────────────────────────────────────
@@ -158,20 +161,20 @@ export const createInterest = async (data: {
   toUserId: string;
   note?: string;
 }) => {
-  return prisma.hostInterest.create({ data });
+  return db.hostInterest.create({ data });
 };
 
 export const getHostInterests = async (hostId: string, status?: string) => {
   const where: any = { hostId };
   if (status) where.status = status;
-  return prisma.hostInterest.findMany({
+  return db.hostInterest.findMany({
     where,
     orderBy: { createdAt: 'desc' },
   });
 };
 
 export const updateInterestStatus = async (interestId: string, status: string) => {
-  return prisma.hostInterest.update({
+  return db.hostInterest.update({
     where: { id: interestId },
     data: { status },
   });
@@ -181,9 +184,9 @@ export const updateInterestStatus = async (interestId: string, status: string) =
 
 export const getHostStats = async (hostId: string) => {
   const [totalMembers, pendingInterests, upcomingEvents] = await Promise.all([
-    prisma.hostMember.count({ where: { hostId } }),
-    prisma.hostInterest.count({ where: { hostId, status: 'pending' } }),
-    prisma.hostEvent.count({ where: { hostId, isActive: true, date: { gte: new Date() } } }),
+    db.hostMember.count({ where: { hostId } }),
+    db.hostInterest.count({ where: { hostId, status: 'pending' } }),
+    db.hostEvent.count({ where: { hostId, isActive: true, date: { gte: new Date() } } }),
   ]);
 
   return { totalMembers, pendingInterests, upcomingEvents };

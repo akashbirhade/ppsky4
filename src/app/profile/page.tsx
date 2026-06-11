@@ -121,6 +121,7 @@ export default function ProfilePage() {
             <div className="relative group">
               <div className="w-28 h-28 rounded-full bg-gradient-to-br from-purple-500/30 to-fuchsia-500/30 flex items-center justify-center border-2 border-teal-200/50 dark:border-purple-400/30 shadow-[0_0_30px_rgba(147,51,234,0.2)]">
                 {photos.length > 0 ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img src={photos[0]} alt="Profile" className="w-full h-full rounded-full object-cover" />
                 ) : (
                   <User className="h-12 w-12 text-slate-400 dark:text-purple-300/60" />
@@ -296,6 +297,7 @@ export default function ProfilePage() {
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {photos.map((photo, i) => (
                   <div key={i} className="relative aspect-square rounded-2xl overflow-hidden border border-teal-200/50 dark:border-purple-500/20 group">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={photo} alt={`Photo ${i+1}`} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <button onClick={() => setPhotos(prev => prev.filter((_, idx) => idx !== i))} className="text-slate-800 dark:text-white text-xs bg-red-500/80 px-3 py-1.5 rounded-lg">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -40,28 +40,16 @@ export default function ProfileDetailPage() {
   const [detailTab, setDetailTab] = useState<'about' | 'preferences'>('about')
   const [similarProfiles, setSimilarProfiles] = useState<any[]>([])
 
-  useEffect(() => {
-    fetchProfile()
-  }, [params.id])
-
-  useEffect(() => {
-    if (profile && user) fetchCompatibility()
-  }, [profile, user])
-
-  useEffect(() => {
-    if (profile) fetchSimilarProfiles()
-  }, [profile])
-
-  const fetchSimilarProfiles = async () => {
+  const fetchSimilarProfiles = useCallback(async () => {
     try {
       const params = new URLSearchParams({ gender: profile!.gender, religion: profile!.religion || '', city: profile!.city || '', excludeId: profile!.id })
       const res = await authFetch(`/api/profiles?${params.toString()}`)
       const data = await res.json()
       setSimilarProfiles((data.profiles || []).slice(0, 6))
     } catch {}
-  }
+  }, [profile, authFetch])
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const res = await authFetch('/api/profiles')
       const data = await res.json()
@@ -69,16 +57,28 @@ export default function ProfileDetailPage() {
       setProfile(found || null)
     } catch (err) { console.error(err) }
     setLoading(false)
-  }
+  }, [authFetch, params.id])
 
-  const fetchCompatibility = async () => {
+  const fetchCompatibility = useCallback(async () => {
     if (!user || !profile) return
     try {
       const res = await authFetch(`/api/compatibility?userId=${user.id}&targetId=${profile.id}`)
       const data = await res.json()
       if (data.score) setCompatibility(data)
     } catch {}
-  }
+  }, [authFetch, user, profile])
+
+  useEffect(() => {
+    fetchProfile()
+  }, [fetchProfile])
+
+  useEffect(() => {
+    if (profile && user) fetchCompatibility()
+  }, [profile, user, fetchCompatibility])
+
+  useEffect(() => {
+    if (profile) fetchSimilarProfiles()
+  }, [profile, fetchSimilarProfiles])
 
   const handleBlock = async () => {
     if (!user || !profile) return
@@ -181,6 +181,7 @@ export default function ProfileDetailPage() {
             {/* Blurred Photo with lock */}
             <div className="relative w-full aspect-[4/3] overflow-hidden bg-gradient-to-br from-purple-900/40 to-dark-900">
               {profile.photos?.[0] ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={profile.photos[0]}
                   alt="Locked profile"
@@ -345,6 +346,7 @@ export default function ProfileDetailPage() {
             <div className="relative lg:w-[380px] xl:w-[420px] shrink-0 bg-gradient-to-br from-purple-900/30 to-dark-900">
               {profile.photos && profile.photos.length > 0 ? (
                 <div className="relative w-full aspect-[3/4] lg:h-full">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
                     src={profile.photos[0]} 
                     alt={profile.name} 
@@ -561,6 +563,7 @@ export default function ProfileDetailPage() {
               <Link key={sp.id} href={`/profile/${sp.id}`} className="shrink-0 w-32 p-3 rounded-xl bg-white/[0.02] border border-purple-500/10 text-center hover:bg-purple-500/5 transition-colors cursor-pointer">
                 <div className="w-14 h-14 rounded-full overflow-hidden mx-auto border border-purple-500/10">
                   {sp.photos && sp.photos[0] ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img src={sp.photos[0]} alt={sp.name} className="w-full h-full object-cover" />
                   ) : (
                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">

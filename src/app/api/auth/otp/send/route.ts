@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserByPhone } from '@/lib/database'
+import { getOtpStore } from '@/lib/otp-store'
 
-// In-memory OTP store (in production, use Redis or similar)
-const otpStore = new Map<string, { otp: string; expiresAt: number; purpose: 'register' | 'login' }>()
-
-export function getOtpStore() {
-  return otpStore
-}
+const otpStore = getOtpStore()
 
 export async function POST(req: NextRequest) {
   try {
@@ -59,15 +55,22 @@ export async function POST(req: NextRequest) {
     })
 
     // In production, send SMS via Twilio/MSG91/etc.
-    // For demo, log the OTP
-    console.log(`[OTP] ${cleanPhone}: ${otp} (purpose: ${purpose})`)
+    // Only log OTP in non-production environments.
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[OTP] ${cleanPhone}: ${otp} (purpose: ${purpose})`)
+    }
 
-    return NextResponse.json({
+    const response: Record<string, unknown> = {
       success: true,
       message: 'OTP sent successfully',
-      // Include OTP in response for demo purposes only
-      demo_otp: otp,
-    })
+    }
+
+    // Include OTP in API response only for local/demo environments.
+    if (process.env.NODE_ENV !== 'production') {
+      response.demo_otp = otp
+    }
+
+    return NextResponse.json(response)
   } catch (error) {
     console.error('OTP send error:', error)
     return NextResponse.json({ error: 'Failed to send OTP' }, { status: 500 })

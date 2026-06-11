@@ -104,13 +104,13 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
     // Send email + SMS notification
     const userRecord = await prisma.user.findUnique({
       where: { id: userId },
-      select: { email: true, mobile: true, username: true },
+      select: { email: true, mobileNumber: true, username: true },
     });
     if (userRecord) {
       const updatedFields = Object.keys(data).filter(k => k !== 'profileCompletionPercentage');
       sendProfileUpdateAlert({
         email: userRecord.email,
-        phone: userRecord.mobile ?? undefined,
+        phone: userRecord.mobileNumber ?? undefined,
         userName: userRecord.username,
         updatedFields,
       }).catch(() => {}); // fire-and-forget
@@ -150,12 +150,12 @@ export const uploadPhoto = async (req: Request, res: Response, next: NextFunctio
     // Send email + SMS notification (after response sent)
     prisma.user.findUnique({
       where: { id: userId },
-      select: { email: true, mobile: true, username: true },
+      select: { email: true, mobileNumber: true, username: true },
     }).then(userRecord => {
       if (userRecord) {
         sendPhotoUploadAlert({
           email: userRecord.email,
-          phone: userRecord.mobile ?? undefined,
+          phone: userRecord.mobileNumber ?? undefined,
           userName: userRecord.username,
         }).catch(() => {});
       }

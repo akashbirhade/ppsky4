@@ -85,7 +85,7 @@ export default function DashboardPage() {
     const fields = [user.name, user.email, user.gender, user.age, (user as any).religion, (user as any).city, (user as any).education, (user as any).occupation, (user as any).about]
     const filled = fields.filter(Boolean).length
     setStats(prev => ({ ...prev, profileScore: Math.round((filled / fields.length) * 100) }))
-  }, [user, router, fetchProfiles])
+  }, [user, router, fetchProfiles, authFetch])
 
   const handleSendInterest = async (e: React.MouseEvent, profileId: string) => {
     e.preventDefault()
@@ -408,6 +408,7 @@ function ProfileImage({ src, name, gender }: { src: string; name: string; gender
   const [err, setErr] = useState(false)
   if (err || !src) {
     return (
+      // eslint-disable-next-line @next/next/no-img-element
       <img
         src={gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg'}
         alt="Avatar"

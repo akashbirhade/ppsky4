@@ -18,8 +18,44 @@ import SideDrawer from '@/components/SideDrawer'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://soulmatesync.com'),
   title: 'Soulmate Sync - Find Your Perfect Life Partner | AI Matchmaking',
   description: 'India\'s most luxurious AI-Powered Matchmaking Platform. Verified profiles, smart matching, video calls & more.',
+  applicationName: 'Soulmate Sync',
+  keywords: [
+    'matrimony',
+    'matchmaking',
+    'ai matchmaking',
+    'shaadi',
+    'indian matrimony',
+    'verified profiles',
+  ],
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    url: '/',
+    siteName: 'Soulmate Sync',
+    title: 'Soulmate Sync - Find Your Perfect Life Partner',
+    description: 'AI-powered matchmaking with verified profiles, secure chat, and video calling.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Soulmate Sync - Find Your Perfect Life Partner',
+    description: 'AI-powered matchmaking with verified profiles, secure chat, and video calling.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
 }
 
 export default function RootLayout({
@@ -43,6 +79,12 @@ export default function RootLayout({
         `}} />
       </head>
       <body className={`${inter.className} min-h-screen transition-colors duration-300`}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-white focus:text-slate-900"
+        >
+          Skip to main content
+        </a>
         <ThemeProvider>
         <ChatSidebarProvider>
         <AuthProvider>
@@ -59,7 +101,7 @@ export default function RootLayout({
             <div className="relative z-10">
               <Navbar />
               <ChatSidebar />
-              <main className="min-h-screen">
+              <main id="main-content" className="min-h-screen">
                 <PageTransition>
                   {children}
                 </PageTransition>

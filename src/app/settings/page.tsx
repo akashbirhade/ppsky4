@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRouter } from 'next/navigation'
@@ -59,27 +59,27 @@ export default function SettingsPage() {
     { id: '2', name: 'MacBook Air', lastActive: '1 hour ago', current: false },
   ])
 
-  useEffect(() => {
-    if (!user) { router.push('/login'); return }
-    fetchSettings()
-    fetchBlocked()
-  }, [user, router])
-
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     try {
       const res = await authFetch(`/api/privacy?userId=${user!.id}`)
       const data = await res.json()
       if (data.settings) setSettings(prev => ({ ...prev, ...data.settings }))
     } catch {}
-  }
+  }, [authFetch, user])
 
-  const fetchBlocked = async () => {
+  const fetchBlocked = useCallback(async () => {
     try {
       const res = await authFetch(`/api/safety?userId=${user!.id}`)
       const data = await res.json()
       if (data.blockedUsers) setBlockedUsers(data.blockedUsers)
     } catch {}
-  }
+  }, [authFetch, user])
+
+  useEffect(() => {
+    if (!user) { router.push('/login'); return }
+    fetchSettings()
+    fetchBlocked()
+  }, [user, router, fetchSettings, fetchBlocked])
 
   const saveSettings = async () => {
     setSaving(true)

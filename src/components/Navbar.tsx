@@ -58,7 +58,7 @@ export default function Navbar() {
     fetchNotifs()
     const interval = setInterval(fetchNotifs, 15000)
     return () => clearInterval(interval)
-  }, [user])
+  }, [user, authFetch])
 
   // Fetch dynamic inbox and match counts
   useEffect(() => {
@@ -83,7 +83,7 @@ export default function Navbar() {
     fetchCounts()
     const interval = setInterval(fetchCounts, 30000)
     return () => clearInterval(interval)
-  }, [user])
+  }, [user, authFetch])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -100,7 +100,7 @@ export default function Navbar() {
   }, [])
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-dark-900/90 backdrop-blur-xl border-b border-teal-100/60 dark:border-purple-500/10 shadow-sm dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
+    <nav aria-label="Primary navigation" className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-dark-900/90 backdrop-blur-xl border-b border-teal-100/60 dark:border-purple-500/10 shadow-sm dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-center lg:justify-between items-center h-14 lg:h-16 relative">
           {/* Theme toggle - mobile only, right side */}
@@ -108,6 +108,7 @@ export default function Navbar() {
             onClick={toggleTheme}
             className="lg:hidden absolute right-0 w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 dark:bg-purple-500/10 border border-slate-200 dark:border-purple-500/20 hover:bg-slate-200 dark:hover:bg-purple-500/20 transition-all"
             title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-purple-600" />}
           </button>
@@ -136,7 +137,7 @@ export default function Navbar() {
 
                 {/* Help Dropdown */}
                 <div ref={helpRef} className="relative ml-3">
-                  <button onClick={() => setHelpOpen(!helpOpen)} className="flex items-center gap-1 text-purple-200/70 hover:text-white text-sm font-medium transition-colors">
+                  <button onClick={() => setHelpOpen(!helpOpen)} aria-expanded={helpOpen} aria-haspopup="menu" aria-label="Open help menu" className="flex items-center gap-1 text-purple-200/70 hover:text-white text-sm font-medium transition-colors">
                     Help <ChevronDown className="h-3.5 w-3.5" />
                   </button>
                   {helpOpen && (
@@ -158,6 +159,7 @@ export default function Navbar() {
                   onClick={toggleTheme}
                   className="ml-3 w-9 h-9 flex items-center justify-center rounded-full bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all"
                   title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                  aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
                 >
                   {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-purple-400" />}
                 </button>
@@ -168,6 +170,9 @@ export default function Navbar() {
                     onClick={() => setUserInfoOpen(!userInfoOpen)}
                     className="relative w-9 h-9 flex items-center justify-center rounded-full bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all"
                     title="Notifications"
+                    aria-label="Open notifications"
+                    aria-expanded={userInfoOpen}
+                    aria-haspopup="menu"
                   >
                     <Bell className="h-4 w-4 text-purple-300" />
                     {notifCount > 0 && (
@@ -211,9 +216,10 @@ export default function Navbar() {
 
                 {/* Profile Avatar Dropdown */}
                 <div ref={profileRef} className="relative ml-3">
-                  <button onClick={() => setProfileOpen(!profileOpen)} className="flex items-center gap-1.5 group">
+                  <button onClick={() => setProfileOpen(!profileOpen)} aria-label="Open profile menu" aria-expanded={profileOpen} aria-haspopup="menu" className="flex items-center gap-1.5 group">
                     <div className="w-9 h-9 rounded-full bg-purple-500/20 border-2 border-purple-400/30 flex items-center justify-center overflow-hidden group-hover:border-purple-300/50 transition-all">
                       {user.photos && user.photos.length > 0 ? (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img src={user.photos[0]} alt="" className="w-full h-full object-cover" />
                       ) : (
                         // eslint-disable-next-line @next/next/no-img-element

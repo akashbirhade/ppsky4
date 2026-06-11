@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
 import { Plus, Edit, Trash2, Users, MapPin, Search, UserPlus, ArrowRightLeft, BarChart3, X } from 'lucide-react'
@@ -33,18 +33,18 @@ export default function AdminHostsPage() {
     name: '', mobile: '', email: '', region: '', district: '', city: '', community: '',
   })
 
-  useEffect(() => {
-    fetchHosts()
-  }, [])
-
-  const fetchHosts = async () => {
+  const fetchHosts = useCallback(async () => {
     try {
       const res = await authFetch('/api/hosts?limit=100')
       const json = await res.json()
       if (json.success) setHosts(json.data.hosts)
     } catch (err) { console.error(err) }
     setLoading(false)
-  }
+  }, [authFetch])
+
+  useEffect(() => {
+    fetchHosts()
+  }, [fetchHosts])
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -135,6 +135,7 @@ export default function VerifyPage() {
             <div className="flex flex-col items-center">
               {photoPreview ? (
                 <div className="w-48 h-48 rounded-2xl overflow-hidden border-2 border-blue-500/30 mb-4 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={photoPreview} alt="Selfie" className="w-full h-full object-cover" />
                 </div>
               ) : (
@@ -161,6 +162,7 @@ export default function VerifyPage() {
             <div className="flex flex-col items-center">
               {idPreview ? (
                 <div className="w-full max-w-sm h-48 rounded-2xl overflow-hidden border-2 border-teal-200 dark:border-purple-500/30 mb-4 shadow-[0_0_30px_rgba(147,51,234,0.2)]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={idPreview} alt="ID" className="w-full h-full object-cover" />
                 </div>
               ) : (

@@ -203,6 +203,7 @@ function OnboardingContent() {
               <div className="flex flex-col items-center gap-4">
                 <label htmlFor="photo-upload" className="w-32 h-32 rounded-full bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 border-2 border-dashed border-teal-200/50 dark:border-purple-400/30 flex items-center justify-center cursor-pointer hover:border-purple-400/60 transition-all group overflow-hidden">
                   {formData.photoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img src={formData.photoUrl} alt="Profile" className="w-full h-full object-cover rounded-full" />
                   ) : (
                     <div className="text-center">

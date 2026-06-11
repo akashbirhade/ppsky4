@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -31,7 +31,6 @@ export default function MatchesPage() {
   const [timeLeft, setTimeLeft] = useState('')
 
   useEffect(() => { if (!user) router.push('/login') }, [user, router])
-  useEffect(() => { if (user) { fetchCounts(); fetchData() } }, [user, activeTab])
 
   // Countdown timer - resets daily at midnight
   useEffect(() => {
@@ -62,7 +61,7 @@ export default function MatchesPage() {
     animateSlide('prev')
   }
 
-  const fetchCounts = async () => {
+  const fetchCounts = useCallback(async () => {
     try {
       const res = await authFetch(`/api/activity/matches?userId=${user!.id}&type=counts`)
       const d = await res.json()
@@ -72,9 +71,9 @@ export default function MatchesPage() {
       const slData = await slRes.json()
       setShortlistCount(slData.profiles?.length || 0)
     } catch {}
-  }
+  }, [authFetch, user])
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true)
     try {
       let res
@@ -124,7 +123,9 @@ export default function MatchesPage() {
       }
     } catch (err) { console.error(err) }
     setLoading(false)
-  }
+  }, [activeTab, authFetch, user])
+
+  useEffect(() => { if (user) { fetchCounts(); fetchData() } }, [user, fetchCounts, fetchData])
 
   const handleAccept = async (interestId: string) => {
     await authFetch('/api/activity/interests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ interestId, action: 'accepted' }) })
@@ -251,6 +252,7 @@ export default function MatchesPage() {
               <div className="lg:w-80 shrink-0 p-4">
                 <div className="relative rounded-xl overflow-hidden">
                   {currentProfile.photos && currentProfile.photos.length > 0 ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img src={currentProfile.photos[0]} alt={currentProfile.name} className="w-full h-80 object-cover rounded-xl" />
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element

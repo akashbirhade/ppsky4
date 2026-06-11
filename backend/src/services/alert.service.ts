@@ -51,8 +51,10 @@ async function sendSMS(to: string, body: string): Promise<boolean> {
       return false;
     }
 
-    const twilio = await import('twilio');
-    const client = twilio.default(config.twilio.accountSid, config.twilio.authToken);
+    // Load Twilio lazily only when SMS credentials are configured.
+    // Using require here avoids a hard compile-time dependency in minimal setups.
+    const twilio = require('twilio');
+    const client = twilio(config.twilio.accountSid, config.twilio.authToken);
 
     await client.messages.create({
       body,

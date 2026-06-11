@@ -72,7 +72,7 @@ export default function HostProfilePage() {
     }
     fetchHost()
     fetchMembers()
-  }, [id])
+  }, [id, authFetch])
 
   if (loading) {
     return (
@@ -107,6 +107,7 @@ export default function HostProfilePage() {
           <div className="flex flex-col sm:flex-row items-start gap-5">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-2xl overflow-hidden flex-shrink-0">
               {host.profilePhoto ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img src={host.profilePhoto} alt={host.name} className="w-full h-full object-cover" />
               ) : (
                 host.name.charAt(0).toUpperCase()
@@ -251,6 +252,7 @@ export default function HostProfilePage() {
                           <div className="flex items-center gap-3 p-4">
                             {/* Avatar */}
                             <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 relative">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
                                 src={member.gender === 'Female' ? '/avatars/female.svg' : '/avatars/male.svg'}
                                 alt={member.name}

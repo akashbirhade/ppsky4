@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
@@ -39,6 +39,18 @@ export default function HostPortalPage() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'overview' | 'foryou' | 'brides' | 'grooms' | 'events'>('foryou')
 
+  const fetchMembers = useCallback(async (hostId: string) => {
+    try {
+      const res = await authFetch(`/api/hosts/${hostId}/members`)
+      const data = await res.json()
+      if (data.success) setMembers(data.data.members)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }, [authFetch])
+
   useEffect(() => {
     const stored = localStorage.getItem('hostUser')
     if (!stored) {
@@ -48,15 +60,8 @@ export default function HostPortalPage() {
     const hostData = JSON.parse(stored)
     setHost(hostData)
 
-    // Fetch members
-    authFetch(`/api/hosts/${hostData.id}/members`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) setMembers(data.data.members)
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false))
-  }, [router])
+    fetchMembers(hostData.id)
+  }, [router, fetchMembers])
 
   const handleLogout = () => {
     localStorage.removeItem('hostUser')
@@ -258,6 +263,7 @@ function MemberCard({ member, compact }: { member: Member; compact?: boolean }) 
       <div className="flex items-center gap-3 p-3">
         {/* Avatar */}
         <div className={`${compact ? 'w-12 h-12' : 'w-14 h-14'} rounded-xl overflow-hidden flex-shrink-0 relative`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={member.gender === 'Female' ? '/avatars/female.svg' : '/avatars/male.svg'}
             alt={member.name}

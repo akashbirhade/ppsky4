@@ -103,7 +103,7 @@ export default function ChatSidebar() {
     fetchChats()
     const interval = setInterval(fetchChats, 15000)
     return () => clearInterval(interval)
-  }, [user])
+  }, [user, authFetch])
 
   // Close status dropdown when clicking outside
   useEffect(() => {

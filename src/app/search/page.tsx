@@ -84,7 +84,7 @@ export default function SearchPage() {
   })
 
   // Fetch user's sent interests to determine status per profile
-  const fetchInterests = async () => {
+  const fetchInterests = useCallback(async () => {
     if (!user?.id) return
     try {
       const res = await authFetch(`/api/activity/interests?userId=${user.id}&type=sent`)
@@ -97,18 +97,9 @@ export default function SearchPage() {
         setInterestMap(map)
       }
     } catch {}
-  }
+  }, [user?.id, authFetch])
 
-  useEffect(() => {
-    if (user) {
-      fetchProfiles()
-      fetchInterests()
-      const saved = localStorage.getItem(`savedSearches_${user.id}`)
-      if (saved) setSavedSearches(JSON.parse(saved))
-    }
-  }, [user])
-
-  const fetchProfiles = async (f?: typeof filters, age?: [number, number]) => {
+  const fetchProfiles = useCallback(async (f?: typeof filters, age?: [number, number]) => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
@@ -130,7 +121,16 @@ export default function SearchPage() {
       setProfiles(data.profiles || [])
     } catch (err) { console.error(err) }
     setLoading(false)
-  }
+  }, [filters, ageRange, oppositeGender, user?.id, authFetch])
+
+  useEffect(() => {
+    if (user) {
+      fetchProfiles()
+      fetchInterests()
+      const saved = localStorage.getItem(`savedSearches_${user.id}`)
+      if (saved) setSavedSearches(JSON.parse(saved))
+    }
+  }, [user, fetchProfiles, fetchInterests])
 
   const saveAgeRange = useCallback((min: number, max: number) => {
     if (!user?.id) return

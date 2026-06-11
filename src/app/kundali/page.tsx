@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -24,16 +24,16 @@ export default function KundaliPage() {
   const [loading, setLoading] = useState(false)
   const [selectedName, setSelectedName] = useState('')
 
-  useEffect(() => { if (!user) router.push('/login'); else fetchProfiles() }, [user, router])
-
-  const fetchProfiles = async () => {
+  const fetchProfiles = useCallback(async () => {
     try {
       const oppositeGender = user!.gender === 'Male' ? 'Female' : 'Male'
       const res = await authFetch(`/api/profiles?gender=${oppositeGender}&excludeId=${user!.id}`)
       const data = await res.json()
       setProfiles(data.profiles || [])
     } catch {}
-  }
+  }, [user, authFetch])
+
+  useEffect(() => { if (!user) router.push('/login'); else fetchProfiles() }, [user, router, fetchProfiles])
 
   const checkKundali = async () => {
     if (!selectedProfile) return

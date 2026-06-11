@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
@@ -39,25 +39,26 @@ export default function HostDashboardPage() {
   const [showEventForm, setShowEventForm] = useState(false)
   const [eventForm, setEventForm] = useState({ title: '', description: '', date: '', venue: '', fee: '', maxParticipants: '' })
 
+  const fetchDashboard = useCallback(async () => {
+    try {
+      const [statsRes, eventsRes, interestsRes] = await Promise.all([
+        authFetch(`/api/hosts/${id}/stats`),
+        authFetch(`/api/hosts/${id}/events`),
+        authFetch(`/api/hosts/${id}/interests?status=pending`),
+      ])
+      const statsJson = await statsRes.json()
+      const eventsJson = await eventsRes.json()
+      const interestsJson = await interestsRes.json()
+      if (statsJson.success) setStats(statsJson.data)
+      if (eventsJson.success) setEvents(eventsJson.data)
+      if (interestsJson.success) setInterests(interestsJson.data)
+    } catch (err) { console.error(err) }
+    setLoading(false)
+  }, [authFetch, id])
+
   useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const [statsRes, eventsRes, interestsRes] = await Promise.all([
-          authFetch(`/api/hosts/${id}/stats`),
-          authFetch(`/api/hosts/${id}/events`),
-          authFetch(`/api/hosts/${id}/interests?status=pending`),
-        ])
-        const statsJson = await statsRes.json()
-        const eventsJson = await eventsRes.json()
-        const interestsJson = await interestsRes.json()
-        if (statsJson.success) setStats(statsJson.data)
-        if (eventsJson.success) setEvents(eventsJson.data)
-        if (interestsJson.success) setInterests(interestsJson.data)
-      } catch (err) { console.error(err) }
-      setLoading(false)
-    }
     fetchDashboard()
-  }, [id])
+  }, [fetchDashboard])
 
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault()

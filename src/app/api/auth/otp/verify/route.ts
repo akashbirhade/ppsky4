@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getUserByPhone, updateUser } from '@/lib/database'
 import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '@/lib/auth'
-import { getOtpStore } from '../send/route'
+import { getOtpStore } from '@/lib/otp-store'
 
 export async function POST(req: NextRequest) {
   try {

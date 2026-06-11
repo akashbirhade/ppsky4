@@ -22,7 +22,7 @@ export class UploadService {
   async uploadProfilePhoto(
     fileBuffer: Buffer,
     userId: string,
-    mimeType: string
+    _mimeType: string
   ): Promise<UploadResult> {
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(

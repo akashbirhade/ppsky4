@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
 import { Search, MapPin, Users, Calendar, ChevronDown, Filter, LogIn, UserPlus } from 'lucide-react'
@@ -27,7 +27,7 @@ export default function HostsPage() {
   const [filters, setFilters] = useState({ region: '', district: '', city: '' })
   const [showFilters, setShowFilters] = useState(false)
 
-  const fetchHosts = async () => {
+  const fetchHosts = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
@@ -41,9 +41,9 @@ export default function HostsPage() {
       }
     } catch (err) { console.error(err) }
     setLoading(false)
-  }
+  }, [filters, authFetch])
 
-  useEffect(() => { fetchHosts() }, [filters])
+  useEffect(() => { fetchHosts() }, [fetchHosts])
 
   return (
     <div className="min-h-screen pt-[104px] pb-8 px-4 md:px-8">
@@ -142,6 +142,7 @@ export default function HostsPage() {
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-14 h-14 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-white font-bold text-lg overflow-hidden">
                         {host.profilePhoto ? (
+                          // eslint-disable-next-line @next/next/no-img-element
                           <img src={host.profilePhoto} alt={host.name} className="w-full h-full object-cover" />
                         ) : (
                           host.name.charAt(0).toUpperCase()
