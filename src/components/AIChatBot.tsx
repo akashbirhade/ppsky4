@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { MessageCircle, X, Send, Bot, User, Sparkles, Minus } from 'lucide-react'
+import { MessageCircle, X, Send, Bot, User, Sparkles, Minus, Mic, MicOff, Volume2, VolumeX } from 'lucide-react'
 import HalfHeart from './HalfHeart'
 import { useAuth } from '@/context/AuthContext'
 
@@ -17,10 +17,22 @@ export default function AIChatBot() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [isListening, setIsListening] = useState(false)
+  const [isSpeaking, setIsSpeaking] = useState(false)
+  const [isMuted, setIsMuted] = useState(false)
+  const [transcript, setTranscript] = useState('')
   const [detectedLang, setDetectedLang] = useState<string>('en')
   const [sessionId] = useState(() => Math.random().toString(36).slice(2))
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const recognitionRef = useRef<any>(null)
+  const synthRef = useRef<SpeechSynthesis | null>(null)
   const { user, authFetch } = useAuth()
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      synthRef.current = window.speechSynthesis
+    }
+  }, [])
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
@@ -36,7 +48,18 @@ export default function AIChatBot() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const sendMessage = async (overrideText?: string) => {
+  const speak = (text: string) => {
+    if (isMuted || !synthRef.current) return
+    synthRef.current.cancel()
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = detectedLang === 'hi' ? 'hi-IN' : detectedLang === 'mr' ? 'mr-IN' : 'en-IN'
+    utterance.rate = 0.95
+    utterance.onstart = () => setIsSpeaking(true)
+    utterance.onend = () => setIsSpeaking(false)
+    synthRef.current.speak(utterance)
+  }
+
+  const sendMessage = async (overrideText?: string, speakReply = false) => {
     const text = overrideText || input.trim()
     if (!text) return
     const userMsg: ChatMessage = { role: 'user', content: text }
@@ -53,15 +76,68 @@ export default function AIChatBot() {
       const data = await res.json()
       if (data.language) setDetectedLang(data.language)
       setTimeout(() => {
-        setMessages(prev => [...prev, { role: 'assistant', content: data.response, language: data.language }])
+        const responseText = data.response || 'Let me try that again in a moment.'
+        setMessages(prev => [...prev, { role: 'assistant', content: responseText, language: data.language }])
+        if (speakReply) speak(responseText)
         setIsTyping(false)
       }, 800 + Math.random() * 1000)
     } catch {
       setTimeout(() => {
-        setMessages(prev => [...prev, { role: 'assistant', content: "Let me try again in a moment! 💫" }])
+        const fallback = 'Let me try again in a moment!'
+        setMessages(prev => [...prev, { role: 'assistant', content: fallback }])
+        if (speakReply) speak(fallback)
         setIsTyping(false)
       }, 500)
     }
+  }
+
+  const startListening = () => {
+    if (typeof window === 'undefined') return
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Voice recognition is not supported in this browser. Please use Chrome.')
+      return
+    }
+    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
+    const recognition = new SpeechRecognition()
+    recognition.continuous = false
+    recognition.interimResults = true
+    recognition.lang = detectedLang === 'hi' ? 'hi-IN' : detectedLang === 'mr' ? 'mr-IN' : 'en-IN'
+
+    recognition.onstart = () => setIsListening(true)
+    recognition.onresult = (event: any) => {
+      let finalTranscript = ''
+      let interimTranscript = ''
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript
+        else interimTranscript += event.results[i][0].transcript
+      }
+      setTranscript(finalTranscript || interimTranscript)
+      if (finalTranscript) {
+        setTranscript('')
+        sendMessage(finalTranscript, true)
+      }
+    }
+    recognition.onerror = () => {
+      setIsListening(false)
+      setTranscript('')
+    }
+    recognition.onend = () => setIsListening(false)
+    recognitionRef.current = recognition
+    recognition.start()
+  }
+
+  const stopListening = () => {
+    recognitionRef.current?.stop()
+    setIsListening(false)
+    setTranscript('')
+  }
+
+  const toggleMute = () => {
+    if (!isMuted) {
+      synthRef.current?.cancel()
+      setIsSpeaking(false)
+    }
+    setIsMuted(prev => !prev)
   }
 
   return (
@@ -114,6 +190,14 @@ export default function AIChatBot() {
                 </p>
               </div>
               <button
+                onClick={toggleMute}
+                className="p-1.5 hover:bg-purple-500/20 rounded-full transition-colors"
+                title={isMuted ? 'Unmute voice' : 'Mute voice'}
+              >
+                {isMuted ? <VolumeX className="h-4 w-4 text-purple-200" /> : <Volume2 className="h-4 w-4 text-purple-200" />}
+              </button>
+              {isSpeaking && <span className="text-[10px] text-purple-200/90">Speaking...</span>}
+              <button
                 onClick={() => setIsMinimized(true)}
                 className="ml-auto p-1.5 hover:bg-purple-500/20 rounded-full transition-colors"
                 title="Minimize"
@@ -158,6 +242,12 @@ export default function AIChatBot() {
             <div ref={messagesEndRef} />
           </div>
 
+          {transcript && (
+            <div className="px-4 py-2 bg-teal-50 dark:bg-purple-500/10 border-t border-teal-100 dark:border-purple-500/10 text-xs text-teal-700 dark:text-purple-200 italic">
+              &ldquo;{transcript}&rdquo;
+            </div>
+          )}
+
           {/* Quick Actions */}
           {messages.length <= 1 && (
             <div className="px-3 py-2 bg-white dark:bg-dark-900/90 border-t border-teal-100 dark:border-purple-500/10">
@@ -176,6 +266,16 @@ export default function AIChatBot() {
           {/* Input */}
           <div className="p-3 bg-white dark:bg-dark-900/95 border-t border-teal-100 dark:border-purple-500/10">
             <div className="flex items-center gap-2">
+              <button
+                onClick={isListening ? stopListening : startListening}
+                disabled={isTyping}
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+                  isListening ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 text-slate-700 dark:text-purple-200'
+                } disabled:opacity-40`}
+                title={isListening ? 'Stop listening' : 'Speak to AI'}
+              >
+                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+              </button>
               <input
                 type="text"
                 value={input}

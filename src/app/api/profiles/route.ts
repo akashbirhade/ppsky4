@@ -45,6 +45,16 @@ export async function PUT(req: NextRequest) {
 
     // Build update data
     const updateData: any = { ...profileData }
+    const existingPartnerPreferences = existing.partnerPreferences || {
+      ageMin: 22,
+      ageMax: 35,
+      heightMin: "5'0\"",
+      heightMax: "6'5\"",
+      religion: 'Any',
+      education: 'Any',
+      occupation: 'Any',
+      city: 'Any',
+    }
     
     // If core fields are provided, mark profile as complete
     if (profileData.religion && profileData.city && profileData.education && profileData.occupation) {
@@ -52,17 +62,19 @@ export async function PUT(req: NextRequest) {
     }
 
     // Handle partner preferences if provided
-    if (profileData.partnerAgeMin || profileData.partnerAgeMax) {
+    if (profileData.partnerAgeMin || profileData.partnerAgeMax || profileData.partnerReligion || profileData.partnerEducation || profileData.partnerCity) {
+      const parsedAgeMin = Number.parseInt(String(profileData.partnerAgeMin), 10)
+      const parsedAgeMax = Number.parseInt(String(profileData.partnerAgeMax), 10)
       updateData.partnerPreferences = {
-        ...existing.partnerPreferences,
-        ageMin: parseInt(profileData.partnerAgeMin) || existing.partnerPreferences.ageMin,
-        ageMax: parseInt(profileData.partnerAgeMax) || existing.partnerPreferences.ageMax,
-        heightMin: profileData.partnerHeightMin || existing.partnerPreferences.heightMin,
-        heightMax: profileData.partnerHeightMax || existing.partnerPreferences.heightMax,
-        religion: profileData.partnerReligion || existing.partnerPreferences.religion,
-        education: profileData.partnerEducation || existing.partnerPreferences.education,
-        occupation: profileData.partnerOccupation || existing.partnerPreferences.occupation,
-        city: profileData.partnerCity || existing.partnerPreferences.city,
+        ...existingPartnerPreferences,
+        ageMin: Number.isFinite(parsedAgeMin) ? parsedAgeMin : existingPartnerPreferences.ageMin,
+        ageMax: Number.isFinite(parsedAgeMax) ? parsedAgeMax : existingPartnerPreferences.ageMax,
+        heightMin: profileData.partnerHeightMin || existingPartnerPreferences.heightMin,
+        heightMax: profileData.partnerHeightMax || existingPartnerPreferences.heightMax,
+        religion: profileData.partnerReligion || existingPartnerPreferences.religion,
+        education: profileData.partnerEducation || existingPartnerPreferences.education,
+        occupation: profileData.partnerOccupation || existingPartnerPreferences.occupation,
+        city: profileData.partnerCity || existingPartnerPreferences.city,
       }
       // Remove flat partner preference fields
       delete updateData.partnerAgeMin

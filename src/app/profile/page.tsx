@@ -10,6 +10,7 @@ export default function ProfilePage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('personal')
   const [photos, setPhotos] = useState<string[]>([])
   const [profile, setProfile] = useState({
@@ -80,15 +81,25 @@ export default function ProfilePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setSaveError(null)
     try {
-      await authFetch('/api/profiles', {
+      const res = await authFetch('/api/profiles', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...profile, photos, userId: user?.id })
       })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Unable to save profile details')
+      }
+
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
-    } catch (err) { console.error(err) }
+    } catch (err) {
+      console.error(err)
+      setSaveError(err instanceof Error ? err.message : 'Unable to save profile details')
+    }
     setLoading(false)
   }
 
@@ -219,6 +230,11 @@ export default function ProfilePage() {
         {saved && (
           <div className="bg-green-500/10 border border-green-500/20 text-green-300 px-4 py-3 rounded-2xl mb-4 text-sm animate-fade-in-up flex items-center gap-2">
             <Sparkles className="h-4 w-4" /> Profile updated successfully!
+          </div>
+        )}
+        {saveError && (
+          <div className="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-2xl mb-4 text-sm animate-fade-in-up">
+            {saveError}
           </div>
         )}
 
