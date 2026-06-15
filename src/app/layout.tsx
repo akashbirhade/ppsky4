@@ -6,7 +6,6 @@ import { LanguageProvider } from '@/context/LanguageContext'
 import { ThemeProvider } from '@/context/ThemeContext'
 import { ToastProvider } from '@/components/Toast'
 import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
 import ChatSidebar from '@/components/ChatSidebar'
 import { ChatSidebarProvider } from '@/context/ChatSidebarContext'
 import PageTransition from '@/components/PageTransition'
@@ -105,7 +104,6 @@ export default function RootLayout({
                   {children}
                 </PageTransition>
               </main>
-              <Footer />
             </div>
             <AIChatBot />
             <SideDrawer />
