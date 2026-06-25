@@ -3,15 +3,17 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
-import { User, Save, Camera, Upload, BadgeCheck, MapPin, GraduationCap, Briefcase, Heart, Globe, BookOpen, Sparkles, TrendingUp, Star, Video, Share2 } from 'lucide-react'
+import { User, Save, Camera, Upload, BadgeCheck, MapPin, GraduationCap, Briefcase, Heart, Globe, BookOpen, Sparkles, TrendingUp, Star, Video, Share2, FileText } from 'lucide-react'
+import BiodataUpload from '@/components/BiodataUpload'
 
 export default function ProfilePage() {
   const { user, authFetch } = useAuth()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [profileLoading, setProfileLoading] = useState(true)
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState('personal')
+  const [activeTab, setActiveTab] = useState('biodata')
   const [photos, setPhotos] = useState<string[]>([])
   const [profile, setProfile] = useState({
     religion: '', caste: '', motherTongue: '', height: '',
@@ -27,12 +29,25 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!user) return
     const loadProfile = async () => {
+      setProfileLoading(true)
+      
+      // Load from localStorage cache immediately (prevents flash of empty form)
+      try {
+        const cached = localStorage.getItem(`profile_data_${user.id}`)
+        if (cached) {
+          const cachedData = JSON.parse(cached)
+          if (cachedData.profile) setProfile(cachedData.profile)
+          if (cachedData.photos?.length > 0) setPhotos(cachedData.photos)
+        }
+      } catch {}
+
+      // Then fetch from server for latest data
       try {
         const res = await authFetch(`/api/profiles/${user.id}`)
         if (res.ok) {
           const data = await res.json()
           const p = data.profile
-          setProfile({
+          const loadedProfile = {
             religion: p.religion || '',
             caste: p.caste || '',
             motherTongue: p.motherTongue || '',
@@ -49,17 +64,24 @@ export default function ProfilePage() {
             partnerReligion: p.partnerPreferences?.religion || 'Any',
             partnerEducation: p.partnerPreferences?.education || 'Any',
             partnerCity: p.partnerPreferences?.city || 'Any',
-          })
-          if (p.photos && p.photos.length > 0) {
-            setPhotos(p.photos)
           }
+          setProfile(loadedProfile)
+          const loadedPhotos = p.photos && p.photos.length > 0 ? p.photos : []
+          if (loadedPhotos.length > 0) setPhotos(loadedPhotos)
+          
+          // Cache in localStorage
+          localStorage.setItem(`profile_data_${user.id}`, JSON.stringify({
+            profile: loadedProfile,
+            photos: loadedPhotos,
+          }))
         }
       } catch (err) {
         console.error('Failed to load profile:', err)
       }
+      setProfileLoading(false)
     }
     loadProfile()
-  }, [user, authFetch])
+  }, [user?.id])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setProfile(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -94,6 +116,14 @@ export default function ProfilePage() {
         throw new Error(data.error || 'Unable to save profile details')
       }
 
+      // Save to localStorage cache for persistence across refreshes
+      if (user?.id) {
+        localStorage.setItem(`profile_data_${user.id}`, JSON.stringify({
+          profile,
+          photos,
+        }))
+      }
+
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } catch (err) {
@@ -105,7 +135,19 @@ export default function ProfilePage() {
 
   if (!user) return null
 
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen bg-mesh pt-[104px] pb-12 px-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-10 h-10 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-slate-400 dark:text-purple-300/50">Loading profile...</p>
+        </div>
+      </div>
+    )
+  }
+
   const tabs = [
+    { id: 'biodata', label: 'Biodata Upload', icon: FileText },
     { id: 'personal', label: 'Personal', icon: User },
     { id: 'photos', label: 'Photos', icon: Camera },
     { id: 'career', label: 'Career', icon: Briefcase },
@@ -450,6 +492,56 @@ export default function ProfilePage() {
                     'Keep it under 90 seconds for best engagement',
                     'Film in good lighting with clear audio',
                     'Be genuine and smile!'
+                  ].map((tip, i) => (
+                    <li key={i} className="text-xs text-slate-400 dark:text-purple-300/50 flex items-start gap-2">
+                      <Star className="h-3 w-3 text-teal-600 dark:text-purple-400/60 mt-0.5 shrink-0" />
+                      {tip}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {/* Biodata Upload Tab */}
+          {activeTab === 'biodata' && (
+            <div className="glass-card animate-fade-in-up">
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-5 flex items-center gap-2">
+                <FileText className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Upload Biodata
+              </h2>
+              <p className="text-xs text-slate-300 dark:text-purple-300/40 mb-4">
+                Upload your biodata (PDF, image, or document) and we&apos;ll automatically extract your details to fill your profile.
+              </p>
+              <BiodataUpload
+                userId={user?.id || ''}
+                authFetch={authFetch}
+                onExtracted={(data, fileUrl) => {
+                  setProfile(prev => ({
+                    ...prev,
+                    religion: data.religion || prev.religion,
+                    caste: data.caste || prev.caste,
+                    motherTongue: data.motherTongue || prev.motherTongue,
+                    height: data.height || prev.height,
+                    education: data.education || prev.education,
+                    occupation: data.occupation || prev.occupation,
+                    income: data.income || prev.income,
+                    city: data.city || prev.city,
+                    state: data.state || prev.state,
+                    country: data.country || prev.country,
+                    about: data.about || prev.about,
+                  }))
+                }}
+              />
+              <div className="mt-5 p-4 bg-teal-50/50 dark:bg-purple-500/5 border border-teal-100 dark:border-purple-500/10 rounded-xl">
+                <h4 className="text-sm font-medium text-slate-800 dark:text-white mb-2 flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-teal-600 dark:text-purple-400" /> Supported Formats
+                </h4>
+                <ul className="space-y-1.5">
+                  {[
+                    'PDF - Best for text extraction (recommended)',
+                    'Images (JPEG, PNG) - Saved for reference',
+                    'Word Documents (.doc, .docx)',
+                    'Text Files (.txt)',
                   ].map((tip, i) => (
                     <li key={i} className="text-xs text-slate-400 dark:text-purple-300/50 flex items-start gap-2">
                       <Star className="h-3 w-3 text-teal-600 dark:text-purple-400/60 mt-0.5 shrink-0" />

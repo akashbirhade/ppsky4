@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { searchProfiles, updateUser, getUserById } from '@/lib/database'
+import { authenticateRequest } from '@/lib/auth'
+import { sanitizeProfileData } from '@/lib/security'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,6 +33,10 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    // Verify authentication
+    const authResult = authenticateRequest(req)
+    if ('error' in authResult) return authResult.error
+
     const body = await req.json()
     const { userId, ...profileData } = body
 
@@ -38,13 +44,21 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'User ID required' }, { status: 400 })
     }
 
+    // Ensure users can only update their own profile
+    if (userId !== authResult.user.userId) {
+      return NextResponse.json({ error: 'Unauthorized: cannot update another user\'s profile' }, { status: 403 })
+    }
+
     const existing = getUserById(userId)
     if (!existing) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
+    // Sanitize all input data
+    const sanitizedData = sanitizeProfileData(profileData)
+
     // Build update data
-    const updateData: any = { ...profileData }
+    const updateData: any = { ...sanitizedData }
     const existingPartnerPreferences = existing.partnerPreferences || {
       ageMin: 22,
       ageMax: 35,

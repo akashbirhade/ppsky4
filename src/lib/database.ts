@@ -11,7 +11,12 @@ const SUBSCRIPTIONS_FILE = path.join(DATA_DIR, 'subscriptions.json')
 const COUPONS_FILE = path.join(DATA_DIR, 'coupons.json')
 
 // In-memory cache for serverless environments (Vercel)
-const memoryStore: Record<string, any> = {}
+// Use globalThis to survive module reloads in Next.js dev mode
+const globalForDb = globalThis as unknown as { __dbMemoryStore?: Record<string, any> }
+if (!globalForDb.__dbMemoryStore) {
+  globalForDb.__dbMemoryStore = {}
+}
+const memoryStore: Record<string, any> = globalForDb.__dbMemoryStore
 
 function ensureDataDir() {
   try {
@@ -43,12 +48,21 @@ function readJSON<T>(filePath: string, fallback: T): T {
 function writeJSON(filePath: string, data: any) {
   // Always update memory cache
   memoryStore[filePath] = data
-  // Try to write to filesystem (works locally, fails gracefully on Vercel)
+  // Try to write to filesystem atomically (works locally, fails gracefully on Vercel)
   try {
     ensureDataDir()
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
+    // Write to temp file first, then rename (atomic write prevents corruption)
+    const tempPath = filePath + '.tmp'
+    fs.writeFileSync(tempPath, JSON.stringify(data, null, 2))
+    fs.renameSync(tempPath, filePath)
   } catch {
     // Read-only filesystem - data stays in memory for this invocation
+    // Try direct write as fallback
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
+    } catch {
+      // Truly read-only - memory only
+    }
   }
 }
 
@@ -825,10 +839,21 @@ export function getDailyRecommendations(userId: string): UserProfile[] {
   if (!user) return []
   const users = getStoredUsers()
   const oppositeGender = user.gender === 'Male' ? 'Female' : 'Male'
-  return users
-    .filter(u => u.id !== userId && u.gender === oppositeGender && u.profileComplete)
-    .sort(() => 0.5 - Math.random())
-    .slice(0, 20)
+
+  // Use smart matching: score all candidates and return top matches
+  const candidates = users.filter(u => u.id !== userId && u.gender === oppositeGender)
+
+  // Import matching algorithm inline to avoid circular deps
+  const { getTopMatches } = require('./matching-algorithm')
+  const topMatches = getTopMatches(user, candidates, 20)
+
+  // Return user profiles sorted by match score
+  return topMatches.map((match: any) => {
+    const profile = getUserById(match.userId)
+    if (!profile) return null
+    // Attach match score and highlights to the profile
+    return { ...profile, matchScore: match.score, matchHighlights: match.highlights }
+  }).filter(Boolean)
 }
 
 // Activity counts for dashboard

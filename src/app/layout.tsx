@@ -10,6 +10,7 @@ import ChatSidebar from '@/components/ChatSidebar'
 import { ChatSidebarProvider } from '@/context/ChatSidebarContext'
 import PageTransition from '@/components/PageTransition'
 import AIChatBot from '@/components/AIChatBot'
+import VoiceAssistant from '@/components/VoiceAssistant'
 import ServiceWorkerRegistration from '@/components/ServiceWorker'
 import SideDrawer from '@/components/SideDrawer'
 
@@ -106,6 +107,7 @@ export default function RootLayout({
               </main>
             </div>
             <AIChatBot />
+            <VoiceAssistant />
             <SideDrawer />
             <ServiceWorkerRegistration />
               </div>
