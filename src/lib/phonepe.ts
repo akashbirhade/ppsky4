@@ -1,47 +1,38 @@
 import crypto from 'crypto'
-import axios from 'axios'
 
 // PhonePe Configuration
+// UAT/Sandbox: https://api-preprod.phonepe.com/apis/pg-sandbox
+// Production: https://api.phonepe.com/apis/hermes
 export const PHONEPE_CONFIG = {
-  // For production, use: https://api.phonepe.com/apis/hermes
-  // For sandbox/staging, use: https://api-sandbox.phonepe.com/apis/hermes
   BASE_URL: process.env.PHONEPE_ENV === 'production'
     ? 'https://api.phonepe.com/apis/hermes'
-    : 'https://api-sandbox.phonepe.com/apis/hermes',
-  MERCHANT_ID: process.env.PHONEPE_MERCHANT_ID || 'MERCHANTUAT',
-  MERCHANT_KEY: process.env.PHONEPE_MERCHANT_KEY || 'MerchantKey123',
-  APP_ID: process.env.PHONEPE_APP_ID || '1111',
+    : 'https://api-preprod.phonepe.com/apis/pg-sandbox',
+  MERCHANT_ID: process.env.PHONEPE_MERCHANT_ID || 'PGTESTPAYUAT86',
+  SALT_KEY: process.env.PHONEPE_SALT_KEY || '96434309-7796-489d-8924-ab56988a6076',
+  SALT_INDEX: parseInt(process.env.PHONEPE_SALT_INDEX || '1'),
 }
 
 /**
- * Generate PhonePe request signature
+ * Generate PhonePe X-VERIFY header (SHA256 checksum)
  */
-export function generatePhonePeSignature(payload: string): string {
-  const keyIndex = 1
-  const hashPayload = payload + '/pg/v1/pay' + PHONEPE_CONFIG.MERCHANT_KEY
-  const sha256Hash = crypto
-    .createHash('sha256')
-    .update(hashPayload)
-    .digest('hex')
-  return sha256Hash + '###' + keyIndex
+export function generateChecksum(payload: string, endpoint: string): string {
+  const string = payload + endpoint + PHONEPE_CONFIG.SALT_KEY
+  const sha256 = crypto.createHash('sha256').update(string).digest('hex')
+  return sha256 + '###' + PHONEPE_CONFIG.SALT_INDEX
 }
 
 /**
- * Verify PhonePe response signature (for webhook)
+ * Verify PhonePe callback response checksum
  */
 export function verifyPhonePeSignature(
-  responsePayload: string,
-  signature: string
+  responseBase64: string,
+  receivedChecksum: string
 ): boolean {
   try {
-    const [receivedHash, keyIndex] = signature.split('###')
-    const hashPayload = responsePayload + '/pg/v1/pay' + PHONEPE_CONFIG.MERCHANT_KEY
-    const calculatedHash = crypto
-      .createHash('sha256')
-      .update(hashPayload)
-      .digest('hex')
-    
-    return receivedHash === calculatedHash
+    const string = responseBase64 + '/pg/v1/status' + PHONEPE_CONFIG.SALT_KEY
+    const sha256 = crypto.createHash('sha256').update(string).digest('hex')
+    const expectedChecksum = sha256 + '###' + PHONEPE_CONFIG.SALT_INDEX
+    return expectedChecksum === receivedChecksum
   } catch (error) {
     console.error('Error verifying PhonePe signature:', error)
     return false
@@ -49,11 +40,11 @@ export function verifyPhonePeSignature(
 }
 
 /**
- * Create PhonePe payment request
+ * Create PhonePe payment request (PAY API)
  */
 export async function createPhonePePayment(paymentData: {
   orderId: string
-  amount: number // in paise (1 rupee = 100 paise)
+  amount: number // in paise
   customerId: string
   mobileNumber: string
   redirectUrl: string
@@ -61,112 +52,94 @@ export async function createPhonePePayment(paymentData: {
   description?: string
   productName?: string
 }) {
-  try {
-    const payload = {
-      merchantId: PHONEPE_CONFIG.MERCHANT_ID,
-      merchantUserId: paymentData.customerId,
-      mobileNumber: paymentData.mobileNumber,
-      amount: paymentData.amount,
-      orderId: paymentData.orderId,
-      redirectUrl: paymentData.redirectUrl,
-      callbackUrl: paymentData.callbackUrl,
-      merchantTransactionId: `TXN_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
-      deviceContext: {
-        deviceOS: 'WEB',
-      },
-      paymentInstrument: {
-        type: 'UPI',
-      },
-    }
+  const merchantTransactionId = `MT_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
 
-    const payloadBase64 = Buffer.from(JSON.stringify(payload)).toString('base64')
-    const signature = generatePhonePeSignature(payloadBase64)
-
-    const response = await axios.post(
-      `${PHONEPE_CONFIG.BASE_URL}/pg/v1/pay`,
-      {
-        request: payloadBase64,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-VERIFY': signature,
-        },
-      }
-    )
-
-    return response.data
-  } catch (error) {
-    console.error('PhonePe payment creation error:', error)
-    throw error
+  const payload = {
+    merchantId: PHONEPE_CONFIG.MERCHANT_ID,
+    merchantTransactionId,
+    merchantUserId: paymentData.customerId,
+    amount: paymentData.amount,
+    redirectUrl: paymentData.redirectUrl,
+    redirectMode: 'REDIRECT',
+    callbackUrl: paymentData.callbackUrl,
+    mobileNumber: paymentData.mobileNumber,
+    paymentInstrument: {
+      type: 'PAY_PAGE',
+    },
   }
+
+  const payloadBase64 = Buffer.from(JSON.stringify(payload)).toString('base64')
+  const checksum = generateChecksum(payloadBase64, '/pg/v1/pay')
+
+  const response = await fetch(`${PHONEPE_CONFIG.BASE_URL}/pg/v1/pay`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-VERIFY': checksum,
+    },
+    body: JSON.stringify({ request: payloadBase64 }),
+  })
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(data.message || `PhonePe API error: ${response.status}`)
+  }
+
+  return { ...data, merchantTransactionId }
 }
 
 /**
  * Check PhonePe payment status
  */
 export async function checkPhonePePaymentStatus(merchantTransactionId: string) {
-  try {
-    const keyIndex = 1
-    const statusCheckPayload = `${PHONEPE_CONFIG.MERCHANT_ID}${merchantTransactionId}/pg/v1/status${PHONEPE_CONFIG.MERCHANT_KEY}`
-    const sha256 = crypto
-      .createHash('sha256')
-      .update(statusCheckPayload)
-      .digest('hex')
-    const finalXHeaders = sha256 + '###' + keyIndex
+  const endpoint = `/pg/v1/status/${PHONEPE_CONFIG.MERCHANT_ID}/${merchantTransactionId}`
+  const string = endpoint + PHONEPE_CONFIG.SALT_KEY
+  const sha256 = crypto.createHash('sha256').update(string).digest('hex')
+  const checksum = sha256 + '###' + PHONEPE_CONFIG.SALT_INDEX
 
-    const response = await axios.get(
-      `${PHONEPE_CONFIG.BASE_URL}/pg/v1/status/${PHONEPE_CONFIG.MERCHANT_ID}/${merchantTransactionId}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-VERIFY': finalXHeaders,
-          'X-MERCHANT-ID': PHONEPE_CONFIG.MERCHANT_ID,
-        },
-      }
-    )
+  const response = await fetch(`${PHONEPE_CONFIG.BASE_URL}${endpoint}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-VERIFY': checksum,
+      'X-MERCHANT-ID': PHONEPE_CONFIG.MERCHANT_ID,
+    },
+  })
 
-    return response.data
-  } catch (error) {
-    console.error('PhonePe status check error:', error)
-    throw error
-  }
+  const data = await response.json()
+  return data
 }
 
 /**
  * Refund PhonePe payment
  */
 export async function refundPhonePePayment(
-  merchantTransactionId: string,
+  originalTransactionId: string,
   amount: number
 ) {
-  try {
-    const refundPayload = {
-      merchantId: PHONEPE_CONFIG.MERCHANT_ID,
-      originalTransactionId: merchantTransactionId,
-      refundAmount: amount,
-      refundMerchantTransactionId: `REFUND_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
-    }
+  const merchantTransactionId = `REFUND_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
 
-    const payloadBase64 = Buffer.from(JSON.stringify(refundPayload)).toString('base64')
-    const signature = generatePhonePeSignature(payloadBase64)
-
-    const response = await axios.post(
-      `${PHONEPE_CONFIG.BASE_URL}/pg/v1/refund`,
-      {
-        request: payloadBase64,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-VERIFY': signature,
-        },
-      }
-    )
-
-    return response.data
-  } catch (error) {
-    console.error('PhonePe refund error:', error)
-    throw error
+  const payload = {
+    merchantId: PHONEPE_CONFIG.MERCHANT_ID,
+    merchantUserId: 'system',
+    originalTransactionId,
+    merchantTransactionId,
+    amount,
+    callbackUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/payment/phonepe/callback`,
   }
+
+  const payloadBase64 = Buffer.from(JSON.stringify(payload)).toString('base64')
+  const checksum = generateChecksum(payloadBase64, '/pg/v1/refund')
+
+  const response = await fetch(`${PHONEPE_CONFIG.BASE_URL}/pg/v1/refund`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-VERIFY': checksum,
+    },
+    body: JSON.stringify({ request: payloadBase64 }),
+  })
+
+  return response.json()
 }

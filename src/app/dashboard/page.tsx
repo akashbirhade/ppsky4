@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Star, Crown, MapPin, Briefcase, GraduationCap, Search, SlidersHorizontal, X, ChevronDown, Users, Eye, MessageCircle, TrendingUp, Calendar, Sparkles, BadgeCheck, Phone } from 'lucide-react'
 import HalfHeart from '@/components/HalfHeart'
+import ProfileCompletion from '@/components/ProfileCompletion'
 import { UserProfile } from '@/lib/database'
 import { useSlideIn, useStaggerCards } from '@/hooks/useGsap'
 import { useChatSidebar } from '@/context/ChatSidebarContext'
@@ -128,6 +129,7 @@ export default function DashboardPage() {
       <div className={`max-w-7xl mx-auto px-4 transition-all duration-300 ${chatOpen ? 'xl:pr-80' : 'xl:pr-4'}`}>
         
         {/* Header - What they're looking for */}
+        {user && <ProfileCompletion user={user} />}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6" ref={headerRef}>
           <div>
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">

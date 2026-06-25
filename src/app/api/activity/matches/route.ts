@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getNearbyProfiles, getDailyRecommendations, getActivityCounts } from '@/lib/database'
+import { getNearbyProfiles, getDailyRecommendations, getActivityCounts, getUserById } from '@/lib/database'
+import { calculateMatchScore } from '@/lib/matching-algorithm'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,13 +12,21 @@ export async function GET(req: NextRequest) {
 
     if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
 
+    const currentUser = getUserById(userId)
+
     if (type === 'nearby') {
       const profiles = getNearbyProfiles(userId)
-      const safe = profiles.map(({ password, ...rest }) => rest)
+      const safe = profiles.map(({ password, ...rest }) => {
+        const matchInfo = currentUser ? calculateMatchScore(currentUser, { ...rest, password: '' }) : null
+        return { ...rest, matchScore: matchInfo?.score, matchHighlights: matchInfo?.highlights }
+      })
       return NextResponse.json({ profiles: safe })
     } else if (type === 'daily') {
       const profiles = getDailyRecommendations(userId)
-      const safe = profiles.map(({ password, ...rest }) => rest)
+      const safe = profiles.map(({ password, ...rest }) => {
+        const matchInfo = currentUser ? calculateMatchScore(currentUser, { ...rest, password: '' }) : null
+        return { ...rest, matchScore: matchInfo?.score, matchHighlights: matchInfo?.highlights }
+      })
       return NextResponse.json({ profiles: safe })
     } else if (type === 'counts') {
       const counts = getActivityCounts(userId)

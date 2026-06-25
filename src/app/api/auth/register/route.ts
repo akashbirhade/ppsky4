@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createUser, getUserByEmail } from '@/lib/database'
+import { generateVerificationToken, sendVerificationEmail } from '@/lib/email-verification'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '@/lib/auth'
@@ -71,6 +72,10 @@ export async function POST(req: NextRequest) {
       JWT_SECRET,
       { expiresIn: '7d' }
     )
+
+    // Send verification email (non-blocking)
+    const verifyToken = generateVerificationToken(newUser.id, newUser.email)
+    sendVerificationEmail(newUser.email, verifyToken).catch(() => {})
 
     return NextResponse.json({
       user: {

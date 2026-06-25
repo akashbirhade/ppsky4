@@ -175,7 +175,7 @@ export default function MatchesPage() {
     return `${Math.floor(hrs / 24)}d ago`
   }
 
-  const currentProfile = data[currentIndex]?.profile
+  const currentProfile = data[currentIndex]?.profile as any
 
   return (
     <div className="min-h-screen bg-mesh pt-[104px] pb-12">
@@ -276,6 +276,23 @@ export default function MatchesPage() {
 
               {/* Right: Profile Details */}
               <div className="flex-1 p-6">
+                {/* Match Score Badge */}
+                {currentProfile.matchScore && (
+                  <div className="mb-3 flex items-center gap-2 flex-wrap">
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${
+                      currentProfile.matchScore >= 80 ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
+                      currentProfile.matchScore >= 60 ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
+                      'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                    }`}>
+                      <Sparkles className="h-3 w-3" /> {currentProfile.matchScore}% Match
+                    </span>
+                    {currentProfile.matchHighlights?.slice(0, 3).map((h: string, i: number) => (
+                      <span key={i} className="inline-flex px-2 py-0.5 rounded-full bg-purple-500/10 text-[10px] text-purple-300/80 border border-purple-500/15">
+                        {h}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <div className="flex items-start justify-between">
                   <div>
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
@@ -347,7 +364,7 @@ export default function MatchesPage() {
                           className="relative w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center text-white hover:bg-purple-700 transition-colors shadow-[0_0_20px_rgba(147,51,234,0.4)] overflow-hidden"
                         >
                           <Heart className="h-6 w-6 relative z-10" />
-                          {connectPopup?.profileId === currentProfile.id && connectPopup.rippling && (
+                          {connectPopup && connectPopup.profileId === currentProfile.id && connectPopup.rippling && (
                             <span className="absolute inset-0 rounded-full animate-ping bg-purple-400/60" />
                           )}
                         </button>

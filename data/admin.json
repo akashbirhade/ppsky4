@@ -1,0 +1,78 @@
+{
+  "reports": [
+    {
+      "id": "rpt_001",
+      "reportedUserId": "user_fake1",
+      "reportedByUserId": "user_abc",
+      "reason": "fake_photos",
+      "description": "Profile photos appear to be taken from a stock website",
+      "status": "pending",
+      "createdAt": "2026-06-24T10:30:00Z",
+      "updatedAt": "2026-06-24T10:30:00Z"
+    },
+    {
+      "id": "rpt_002",
+      "reportedUserId": "user_spam1",
+      "reportedByUserId": "user_xyz",
+      "reason": "spam",
+      "description": "Sending bulk promotional messages to multiple users",
+      "status": "investigating",
+      "createdAt": "2026-06-23T14:20:00Z",
+      "updatedAt": "2026-06-24T09:00:00Z",
+      "adminNote": "Looking into message patterns"
+    },
+    {
+      "id": "rpt_003",
+      "reportedUserId": "user_harass1",
+      "reportedByUserId": "user_def",
+      "reason": "harassment",
+      "description": "Sending inappropriate and threatening messages",
+      "status": "pending",
+      "createdAt": "2026-06-23T08:15:00Z",
+      "updatedAt": "2026-06-23T08:15:00Z"
+    }
+  ],
+  "bans": [],
+  "verificationRequests": [
+    {
+      "id": "ver_001",
+      "userId": "user_ver1",
+      "type": "id_proof",
+      "documentUrl": "/uploads/id_proof_001.jpg",
+      "status": "pending",
+      "submittedAt": "2026-06-24T12:00:00Z"
+    },
+    {
+      "id": "ver_002",
+      "userId": "user_ver2",
+      "type": "photo",
+      "documentUrl": "/uploads/selfie_002.jpg",
+      "status": "pending",
+      "submittedAt": "2026-06-24T11:30:00Z"
+    },
+    {
+      "id": "ver_003",
+      "userId": "user_ver3",
+      "type": "education",
+      "documentUrl": "/uploads/degree_003.pdf",
+      "status": "approved",
+      "submittedAt": "2026-06-23T09:00:00Z",
+      "reviewedAt": "2026-06-24T10:00:00Z",
+      "reviewedBy": "admin@soulmatesync.com"
+    }
+  ],
+  "systemConfig": {
+    "maxPhotos": 6,
+    "maxMessageLength": 1000,
+    "dailyInterestLimit": 10,
+    "premiumDailyInterestLimit": 50,
+    "enableAIChatbot": true,
+    "enableVideoCalls": true,
+    "enableKundali": true,
+    "maintenanceMode": false,
+    "registrationOpen": true,
+    "minAge": 18,
+    "maxAge": 70
+  },
+  "announcements": []
+}

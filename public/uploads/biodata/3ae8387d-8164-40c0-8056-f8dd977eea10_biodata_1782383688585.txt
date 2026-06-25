@@ -1,0 +1,30 @@
+
+BIODATA
+
+Name: Arjun Patel
+Gender: Male
+Date of Birth: 15/06/1993
+Age: 31 years
+Religion: Hindu
+Caste: Patel
+Mother Tongue: Gujarati
+Height: 5'11"
+Marital Status: Never Married
+
+Education: B.Tech Computer Science
+Occupation: Senior Software Engineer
+Income: 18 LPA
+Company: TCS
+
+City: Pune
+State: Maharashtra
+Country: India
+
+About Me: I am a hardworking and family-oriented person who loves traveling and playing cricket. Looking for a life partner with similar values.
+
+Family Type: Nuclear
+Father's Occupation: Retired Government Officer
+Mother's Occupation: Homemaker
+Siblings: 1 Sister (Married)
+
+Hobbies: Cricket, Traveling, Photography, Reading

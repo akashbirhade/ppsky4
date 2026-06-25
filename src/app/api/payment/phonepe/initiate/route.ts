@@ -97,8 +97,8 @@ export async function POST(req: NextRequest) {
       success: true,
       data: {
         orderId,
-        phonepeResponse: phonePeResponse,
-        paymentUrl: phonePeResponse.data?.instrumentResponse?.redirectUrl,
+        merchantTransactionId: phonePeResponse.merchantTransactionId,
+        paymentUrl: phonePeResponse.data?.instrumentResponse?.redirectInfo?.url,
         amount: totalAmount,
         amountInPaise,
         plan,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyPhonePeSignature, checkPhonePePaymentStatus } from '@/lib/phonepe'
+import { checkPhonePePaymentStatus } from '@/lib/phonepe'
 import { activatePremium, getUserById } from '@/lib/database'
 
 export const dynamic = 'force-dynamic'
@@ -11,95 +11,70 @@ export const dynamic = 'force-dynamic'
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { response: responsePayload, signature } = body
+    const { response: responseBase64 } = body
 
-    // Verify PhonePe signature
-    if (!verifyPhonePeSignature(responsePayload, signature)) {
-      console.error('Invalid PhonePe signature')
+    if (!responseBase64) {
+      return NextResponse.json({ error: 'Missing response payload' }, { status: 400 })
+    }
+
+    // Decode the base64 response
+    const decodedPayload = JSON.parse(
+      Buffer.from(responseBase64, 'base64').toString('utf-8')
+    )
+
+    const { code, merchantTransactionId, data: paymentData } = decodedPayload
+
+    if (code !== 'PAYMENT_SUCCESS') {
       return NextResponse.json(
-        { error: 'Invalid signature' },
-        { status: 403 }
+        { success: false, code, message: 'Payment failed or pending' },
+        { status: 400 }
       )
     }
 
-    // Decode response payload
-    const decodedPayload = JSON.parse(
-      Buffer.from(responsePayload, 'base64').toString('utf-8')
-    )
-
-    const {
-      code,
-      merchantTransactionId,
-      transactionId,
-      amount,
-      data: paymentData,
-    } = decodedPayload
-
-    // Check payment status
+    // Double-check payment status via PhonePe API
     const statusResponse = await checkPhonePePaymentStatus(merchantTransactionId)
 
     if (statusResponse.code === 'PAYMENT_SUCCESS') {
-      // Extract user and plan info from merchantTransactionId
-      // Format: TXN_TIMESTAMP_RANDOM
-      const orderId = decodedPayload.orderId || merchantTransactionId
-      
-      // Parse order data from the request body or session
-      // For now, we'll extract from the transaction metadata
-      try {
-        // In production, you should store this data in a database
-        // For now, we're assuming the order data is passed through the response
-        const userId = paymentData?.merchantUserId || decodedPayload.merchantUserId
-        const plan = decodedPayload.plan || 'gold' // You should store this
+      const userId = paymentData?.merchantUserId || statusResponse.data?.merchantUserId
+      const amount = statusResponse.data?.amount || decodedPayload.amount || 0
+      const amountInRupees = Math.round(amount / 100)
 
-        if (userId && plan) {
-          const user = getUserById(userId)
-          if (user) {
-            // Activate premium subscription
-            const amountInRupees = Math.round(amount / 100)
-            const subscription = activatePremium(
-              userId,
-              plan as 'silver' | 'gold' | 'platinum',
-              amountInRupees,
-              'phonepe',
-              null
-            )
+      // Determine plan from amount
+      let plan: 'silver' | 'gold' | 'platinum' = 'gold'
+      if (amountInRupees <= 1800) plan = 'silver'
+      else if (amountInRupees <= 3600) plan = 'gold'
+      else plan = 'platinum'
 
-            return NextResponse.json({
-              success: true,
-              code: 'PAYMENT_SUCCESS',
-              subscription,
-              transactionId,
-              message: 'Payment verified and subscription activated',
-            })
-          }
+      if (userId) {
+        const user = getUserById(userId)
+        if (user) {
+          const subscription = activatePremium(userId, plan, amountInRupees, 'phonepe', null)
+          return NextResponse.json({
+            success: true,
+            code: 'PAYMENT_SUCCESS',
+            subscription,
+            transactionId: statusResponse.data?.transactionId || merchantTransactionId,
+            message: 'Payment verified and subscription activated',
+          })
         }
-      } catch (error) {
-        console.error('Error activating subscription:', error)
       }
 
       return NextResponse.json({
         success: true,
         code: 'PAYMENT_SUCCESS',
-        transactionId,
+        transactionId: merchantTransactionId,
         message: 'Payment verified successfully',
       })
     } else {
       return NextResponse.json(
-        {
-          success: false,
-          code: statusResponse.code || code,
-          message: 'Payment failed or pending',
-        },
+        { success: false, code: statusResponse.code, message: 'Payment verification failed' },
         { status: 400 }
       )
     }
   } catch (error) {
     console.error('PhonePe callback error:', error)
     return NextResponse.json(
-      {
-        error: 'Failed to process callback',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
+      { error: 'Failed to process callback', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }

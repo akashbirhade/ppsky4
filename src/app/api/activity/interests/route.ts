@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendInterest, getInterestsSent, getInterestsReceived, respondToInterest, getMutualMatches, getUserById } from '@/lib/database'
 import { authenticateRequest } from '@/lib/auth'
+import { notifyInterestReceived, notifyNewMatch } from '@/lib/push-notifications'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,6 +44,11 @@ export async function POST(req: NextRequest) {
     
     if (interestId && action) {
       const result = respondToInterest(interestId, action)
+      // Notify on acceptance (mutual match)
+      if (action === 'accepted' && result) {
+        const sender = getUserById(result.senderId)
+        if (sender) notifyNewMatch(result.senderId, 'your interest was accepted').catch(() => {})
+      }
       return NextResponse.json({ interest: result })
     }
 
@@ -50,6 +56,11 @@ export async function POST(req: NextRequest) {
     const interest = sendInterest(senderId, receiverId)
     const senderProfile = getUserById(senderId)
     const receiverProfile = getUserById(receiverId)
+
+    // Send push notification to receiver
+    if (senderProfile) {
+      notifyInterestReceived(receiverId, senderProfile.name).catch(() => {})
+    }
     
     return NextResponse.json({ 
       interest,

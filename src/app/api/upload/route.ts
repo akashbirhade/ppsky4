@@ -4,6 +4,7 @@ import { existsSync } from 'fs'
 import path from 'path'
 import { updateUser, getUserById } from '@/lib/database'
 import { authenticateRequest } from '@/lib/auth'
+import { uploadProfilePhoto } from '@/lib/cloudinary'
 
 export async function POST(req: NextRequest) {
   try {
@@ -46,22 +47,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // Create uploads directory
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads')
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true })
-    }
-
-    // Generate unique filename
-    const ext = file.name.split('.').pop() || 'jpg'
-    const filename = `${userId}_${Date.now()}.${ext}`
-    const filepath = path.join(uploadDir, filename)
-
-    // Write file
     const bytes = await file.arrayBuffer()
-    await writeFile(filepath, Buffer.from(bytes))
+    const buffer = Buffer.from(bytes)
 
-    const photoUrl = `/uploads/${filename}`
+    let photoUrl: string
+
+    // Try Cloudinary first, fall back to local storage
+    if (process.env.CLOUDINARY_CLOUD_NAME) {
+      try {
+        const result = await uploadProfilePhoto(buffer, userId)
+        photoUrl = result.url
+      } catch (cloudErr) {
+        console.error('Cloudinary upload failed, using local:', cloudErr)
+        // Fallback to local
+        photoUrl = await saveLocally(buffer, userId, file.name)
+      }
+    } else {
+      photoUrl = await saveLocally(buffer, userId, file.name)
+    }
 
     // Update user photos
     const photos = [...(user.photos || []), photoUrl]
@@ -77,4 +80,16 @@ export async function POST(req: NextRequest) {
     console.error('Upload error:', error)
     return NextResponse.json({ error: 'Failed to upload photo' }, { status: 500 })
   }
+}
+
+async function saveLocally(buffer: Buffer, userId: string, originalName: string): Promise<string> {
+  const uploadDir = path.join(process.cwd(), 'public', 'uploads')
+  if (!existsSync(uploadDir)) {
+    await mkdir(uploadDir, { recursive: true })
+  }
+  const ext = originalName.split('.').pop() || 'jpg'
+  const filename = `${userId}_${Date.now()}.${ext}`
+  const filepath = path.join(uploadDir, filename)
+  await writeFile(filepath, buffer)
+  return `/uploads/${filename}`
 }

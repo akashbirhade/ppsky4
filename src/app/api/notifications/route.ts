@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getUserById, getWhoViewedMe, getInterestsReceived, getMutualMatches } from '@/lib/database'
+import { authenticateRequest } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -240,10 +242,87 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const url = new URL(req.url)
   const userId = url.searchParams.get('userId')
+  const type = url.searchParams.get('type') // 'feed' | 'preferences'
 
   if (!userId) {
     return NextResponse.json({ error: 'userId required' }, { status: 400 })
   }
+
+  // Return real notification feed
+  if (type === 'feed') {
+    const user = getUserById(userId)
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+
+    const notifications: any[] = []
+
+    try {
+      const viewers = getWhoViewedMe(userId)
+      viewers.slice(0, 5).forEach(v => {
+        notifications.push({
+          id: `view_${v.profile.id}`,
+          type: 'profile_view',
+          title: `${v.profile.name} viewed your profile`,
+          message: `From ${v.profile.city || 'India'}`,
+          timestamp: v.timestamp,
+          read: false,
+          profileId: v.profile.id,
+          profilePhoto: v.profile.photos?.[0] || null,
+        })
+      })
+    } catch {}
+
+    try {
+      const interests = getInterestsReceived(userId)
+      interests.slice(0, 5).forEach(i => {
+        notifications.push({
+          id: `interest_${i.profile.id}`,
+          type: 'interest_received',
+          title: `${i.profile.name} sent you an interest!`,
+          message: `${i.profile.age} yrs, ${i.profile.occupation || 'Professional'}`,
+          timestamp: i.interest.timestamp,
+          read: i.interest.status !== 'pending',
+          profileId: i.profile.id,
+          profilePhoto: i.profile.photos?.[0] || null,
+          actionRequired: i.interest.status === 'pending',
+        })
+      })
+    } catch {}
+
+    try {
+      const mutuals = getMutualMatches(userId)
+      mutuals.slice(0, 3).forEach(m => {
+        notifications.push({
+          id: `match_${m.id}`,
+          type: 'mutual_match',
+          title: `It's a match! You and ${m.name} like each other`,
+          message: 'Start chatting now!',
+          timestamp: new Date().toISOString(),
+          read: false,
+          profileId: m.id,
+          profilePhoto: m.photos?.[0] || null,
+        })
+      })
+    } catch {}
+
+    if (user.premium && user.premiumExpiry) {
+      const daysLeft = Math.ceil((new Date(user.premiumExpiry).getTime() - Date.now()) / 86400000)
+      if (daysLeft <= 7 && daysLeft > 0) {
+        notifications.push({
+          id: 'premium_expiry',
+          type: 'system',
+          title: 'Premium expiring soon',
+          message: `Your plan expires in ${daysLeft} day${daysLeft > 1 ? 's' : ''}`,
+          timestamp: new Date().toISOString(),
+          read: false,
+        })
+      }
+    }
+
+    notifications.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    return NextResponse.json({ notifications, unreadCount: notifications.filter(n => !n.read).length })
+  }
+
+  // Default: return preferences
 
   // Default preferences
   const preferences = {

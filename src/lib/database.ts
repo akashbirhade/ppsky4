@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import fs from 'fs'
 import path from 'path'
 
-// ============ HYBRID PERSISTENCE (File + In-Memory for Vercel) ============
+// ============ HYBRID PERSISTENCE (Memory + JSON + Supabase) ============
 const DATA_DIR = path.join(process.cwd(), 'data')
 const USERS_FILE = path.join(DATA_DIR, 'users.json')
 const MESSAGES_FILE = path.join(DATA_DIR, 'messages.json')
@@ -12,11 +12,183 @@ const COUPONS_FILE = path.join(DATA_DIR, 'coupons.json')
 
 // In-memory cache for serverless environments (Vercel)
 // Use globalThis to survive module reloads in Next.js dev mode
-const globalForDb = globalThis as unknown as { __dbMemoryStore?: Record<string, any> }
+const globalForDb = globalThis as unknown as { 
+  __dbMemoryStore?: Record<string, any>
+  __supabaseSynced?: boolean
+}
 if (!globalForDb.__dbMemoryStore) {
   globalForDb.__dbMemoryStore = {}
 }
 const memoryStore: Record<string, any> = globalForDb.__dbMemoryStore
+
+// ============ SUPABASE SYNC LAYER ============
+let supabaseClient: any = null
+
+function getSupabase() {
+  if (supabaseClient) return supabaseClient
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+  if (!url || !key) return null
+  try {
+    const { createClient } = require('@supabase/supabase-js')
+    supabaseClient = createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    })
+    return supabaseClient
+  } catch {
+    return null
+  }
+}
+
+// Map UserProfile (camelCase) → Supabase row (snake_case)
+function toSupabaseRow(user: any) {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    password: user.password,
+    phone: user.phone,
+    gender: user.gender,
+    date_of_birth: user.dateOfBirth,
+    age: user.age,
+    religion: user.religion,
+    caste: user.caste,
+    mother_tongue: user.motherTongue,
+    height: user.height,
+    education: user.education,
+    occupation: user.occupation,
+    income: user.income,
+    city: user.city,
+    state: user.state,
+    country: user.country,
+    about: user.about,
+    marital_status: user.maritalStatus,
+    diet: user.diet,
+    hobbies: JSON.stringify(user.hobbies || []),
+    family_details: JSON.stringify(user.familyDetails || {}),
+    partner_preferences: JSON.stringify(user.partnerPreferences || {}),
+    photos: JSON.stringify(user.photos || []),
+    verified: user.verified || false,
+    premium: user.premium || false,
+    premium_plan: user.premiumPlan,
+    premium_expiry: user.premiumExpiry,
+    created_at: user.createdAt,
+    last_active: user.lastActive,
+    profile_complete: user.profileComplete || false,
+    online: user.online || false,
+    blocked_users: JSON.stringify(user.blockedUsers || []),
+    referral_code: user.referralCode || null,
+    verification_status: user.verificationStatus || null,
+    photo_privacy: user.photoPrivacy || 'public',
+  }
+}
+
+// Map Supabase row (snake_case) → UserProfile (camelCase)
+function fromSupabaseRow(row: any): any {
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    password: row.password,
+    phone: row.phone,
+    gender: row.gender,
+    dateOfBirth: row.date_of_birth,
+    age: row.age,
+    religion: row.religion,
+    caste: row.caste,
+    motherTongue: row.mother_tongue,
+    height: row.height,
+    education: row.education,
+    occupation: row.occupation,
+    income: row.income,
+    city: row.city,
+    state: row.state,
+    country: row.country,
+    about: row.about,
+    maritalStatus: row.marital_status,
+    diet: row.diet,
+    hobbies: typeof row.hobbies === 'string' ? JSON.parse(row.hobbies) : (row.hobbies || []),
+    familyDetails: typeof row.family_details === 'string' ? JSON.parse(row.family_details) : (row.family_details || {}),
+    partnerPreferences: typeof row.partner_preferences === 'string' ? JSON.parse(row.partner_preferences) : (row.partner_preferences || {}),
+    photos: typeof row.photos === 'string' ? JSON.parse(row.photos) : (row.photos || []),
+    verified: row.verified || false,
+    premium: row.premium || false,
+    premiumPlan: row.premium_plan,
+    premiumExpiry: row.premium_expiry,
+    createdAt: row.created_at,
+    lastActive: row.last_active,
+    profileComplete: row.profile_complete || false,
+    online: row.online || false,
+    blockedUsers: typeof row.blocked_users === 'string' ? JSON.parse(row.blocked_users) : (row.blocked_users || []),
+    referralCode: row.referral_code,
+    verificationStatus: row.verification_status,
+    photoPrivacy: row.photo_privacy || 'public',
+  }
+}
+
+// Background sync: upsert a user to Supabase (fire-and-forget)
+function syncUserToSupabase(user: any) {
+  const sb = getSupabase()
+  if (!sb) return
+  sb.from('user_profiles')
+    .upsert(toSupabaseRow(user), { onConflict: 'id' })
+    .then(({ error }: any) => {
+      if (error) console.error('Supabase sync error:', error.message)
+    })
+    .catch(() => {})
+}
+
+// Background sync: delete a user from Supabase
+function deleteUserFromSupabase(id: string) {
+  const sb = getSupabase()
+  if (!sb) return
+  sb.from('user_profiles').delete().eq('id', id).catch(() => {})
+}
+
+// Load all users from Supabase (called once on cold start)
+async function loadFromSupabase() {
+  if (globalForDb.__supabaseSynced) return
+  const sb = getSupabase()
+  if (!sb) return
+  try {
+    const { data, error } = await sb.from('user_profiles').select('*')
+    if (error) {
+      console.error('Supabase load error:', error.message)
+      return
+    }
+    if (data && data.length > 0) {
+      const users = data.map(fromSupabaseRow)
+      // Merge: Supabase is source of truth, but keep local-only users
+      const localUsers = getStoredUsers()
+      const supabaseIds = new Set(users.map((u: any) => u.id))
+      const localOnly = localUsers.filter(u => !supabaseIds.has(u.id))
+      const merged = [...users, ...localOnly]
+      memoryStore[USERS_FILE] = merged
+      writeJSON(USERS_FILE, merged)
+      // Sync local-only users back to Supabase
+      localOnly.forEach(u => syncUserToSupabase(u))
+      console.log(`✓ Loaded ${data.length} users from Supabase, ${localOnly.length} local-only synced back`)
+    } else {
+      // Supabase is empty — push local data to it
+      const localUsers = getStoredUsers()
+      if (localUsers.length > 0) {
+        const rows = localUsers.map(toSupabaseRow)
+        const { error: insertError } = await sb.from('user_profiles').upsert(rows, { onConflict: 'id' })
+        if (insertError) {
+          console.error('Supabase initial push error:', insertError.message)
+        } else {
+          console.log(`✓ Pushed ${localUsers.length} users to Supabase`)
+        }
+      }
+    }
+    globalForDb.__supabaseSynced = true
+  } catch (e) {
+    console.error('Supabase sync failed, using local data:', e)
+  }
+}
+
+// Trigger initial sync (fire-and-forget, non-blocking)
+loadFromSupabase()
 
 function ensureDataDir() {
   try {
@@ -501,6 +673,8 @@ export function createUser(data: Partial<UserProfile>): UserProfile {
   }
   users.push(newUser)
   saveUsers(users)
+  // Sync to Supabase in background
+  syncUserToSupabase(newUser)
   return newUser
 }
 
@@ -510,6 +684,8 @@ export function updateUser(id: string, data: Partial<UserProfile>): UserProfile 
   if (index === -1) return null
   users[index] = { ...users[index], ...data }
   saveUsers(users)
+  // Sync to Supabase in background
+  syncUserToSupabase(users[index])
   return users[index]
 }
 
@@ -630,6 +806,14 @@ export function sendMessage(senderId: string, receiverId: string, content: strin
   }
   messages.push(msg)
   saveMessages(messages)
+  // Sync message to Supabase
+  const sb = getSupabase()
+  if (sb) {
+    sb.from('app_messages').insert({
+      id: msg.id, sender_id: msg.senderId, receiver_id: msg.receiverId,
+      content: msg.content, timestamp: msg.timestamp, read: msg.read, type: msg.type
+    }).catch(() => {})
+  }
   return msg
 }
 
@@ -953,4 +1137,288 @@ export function getCallHistory(userId: string): CallRecord[] {
   return callRecords
     .filter(c => c.callerId === userId || c.receiverId === userId)
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+}
+
+// ============ ADMIN FUNCTIONS ============
+const ADMIN_FILE = path.join(DATA_DIR, 'admin.json')
+
+interface Report {
+  id: string
+  reportedUserId: string
+  reportedByUserId: string
+  reason: string
+  description: string
+  status: 'pending' | 'investigating' | 'resolved' | 'dismissed'
+  createdAt: string
+  updatedAt: string
+  adminNote?: string
+  resolvedBy?: string
+}
+
+interface Ban {
+  id: string
+  userId: string
+  reason: string
+  bannedBy: string
+  bannedAt: string
+  expiresAt?: string | null
+  permanent: boolean
+}
+
+interface VerificationRequest {
+  id: string
+  userId: string
+  type: 'id_proof' | 'photo' | 'education' | 'employment'
+  documentUrl: string
+  status: 'pending' | 'approved' | 'rejected'
+  submittedAt: string
+  reviewedAt?: string
+  reviewedBy?: string
+  rejectionReason?: string
+}
+
+interface SystemConfig {
+  maxPhotos: number
+  maxMessageLength: number
+  dailyInterestLimit: number
+  premiumDailyInterestLimit: number
+  enableAIChatbot: boolean
+  enableVideoCalls: boolean
+  enableKundali: boolean
+  maintenanceMode: boolean
+  registrationOpen: boolean
+  minAge: number
+  maxAge: number
+}
+
+interface AdminData {
+  reports: Report[]
+  bans: Ban[]
+  verificationRequests: VerificationRequest[]
+  systemConfig: SystemConfig
+  announcements: { id: string; title: string; message: string; createdAt: string; active: boolean }[]
+}
+
+function getAdminData(): AdminData {
+  return readJSON(ADMIN_FILE, { reports: [], bans: [], verificationRequests: [], systemConfig: { maxPhotos: 6, maxMessageLength: 1000, dailyInterestLimit: 10, premiumDailyInterestLimit: 50, enableAIChatbot: true, enableVideoCalls: true, enableKundali: true, maintenanceMode: false, registrationOpen: true, minAge: 18, maxAge: 70 }, announcements: [] })
+}
+
+function saveAdminData(data: AdminData) {
+  writeJSON(ADMIN_FILE, data)
+}
+
+// --- Reports ---
+export function getReports(status?: string): Report[] {
+  const data = getAdminData()
+  if (status) return data.reports.filter(r => r.status === status)
+  return data.reports
+}
+
+export function createReport(reportedUserId: string, reportedByUserId: string, reason: string, description: string): Report {
+  const data = getAdminData()
+  const report: Report = {
+    id: `rpt_${uuidv4().slice(0, 8)}`,
+    reportedUserId,
+    reportedByUserId,
+    reason,
+    description,
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+  data.reports.push(report)
+  saveAdminData(data)
+  return report
+}
+
+export function updateReportStatus(reportId: string, status: Report['status'], adminNote?: string, resolvedBy?: string): Report | null {
+  const data = getAdminData()
+  const report = data.reports.find(r => r.id === reportId)
+  if (!report) return null
+  report.status = status
+  report.updatedAt = new Date().toISOString()
+  if (adminNote) report.adminNote = adminNote
+  if (resolvedBy) report.resolvedBy = resolvedBy
+  saveAdminData(data)
+  return report
+}
+
+// --- Bans ---
+export function getBans(): Ban[] {
+  return getAdminData().bans
+}
+
+export function banUser(userId: string, reason: string, bannedBy: string, permanent: boolean = false, durationDays?: number): Ban {
+  const data = getAdminData()
+  const ban: Ban = {
+    id: `ban_${uuidv4().slice(0, 8)}`,
+    userId,
+    reason,
+    bannedBy,
+    bannedAt: new Date().toISOString(),
+    expiresAt: permanent ? null : (durationDays ? new Date(Date.now() + durationDays * 86400000).toISOString() : null),
+    permanent,
+  }
+  data.bans.push(ban)
+  saveAdminData(data)
+  // Also mark user as banned
+  const users = getStoredUsers()
+  const user = users.find(u => u.id === userId)
+  if (user) {
+    (user as any).banned = true;
+    (user as any).banReason = reason
+    saveUsers(users)
+  }
+  return ban
+}
+
+export function unbanUser(userId: string): boolean {
+  const data = getAdminData()
+  data.bans = data.bans.filter(b => b.userId !== userId)
+  saveAdminData(data)
+  const users = getStoredUsers()
+  const user = users.find(u => u.id === userId)
+  if (user) {
+    delete (user as any).banned
+    delete (user as any).banReason
+    saveUsers(users)
+  }
+  return true
+}
+
+export function isUserBanned(userId: string): boolean {
+  const bans = getAdminData().bans
+  return bans.some(b => b.userId === userId && (b.permanent || !b.expiresAt || new Date(b.expiresAt) > new Date()))
+}
+
+// --- Verification ---
+export function getVerificationRequests(status?: string): VerificationRequest[] {
+  const data = getAdminData()
+  if (status) return data.verificationRequests.filter(v => v.status === status)
+  return data.verificationRequests
+}
+
+export function submitVerification(userId: string, type: VerificationRequest['type'], documentUrl: string): VerificationRequest {
+  const data = getAdminData()
+  const req: VerificationRequest = {
+    id: `ver_${uuidv4().slice(0, 8)}`,
+    userId,
+    type,
+    documentUrl,
+    status: 'pending',
+    submittedAt: new Date().toISOString(),
+  }
+  data.verificationRequests.push(req)
+  saveAdminData(data)
+  return req
+}
+
+export function reviewVerification(verificationId: string, approved: boolean, reviewedBy: string, rejectionReason?: string): VerificationRequest | null {
+  const data = getAdminData()
+  const req = data.verificationRequests.find(v => v.id === verificationId)
+  if (!req) return null
+  req.status = approved ? 'approved' : 'rejected'
+  req.reviewedAt = new Date().toISOString()
+  req.reviewedBy = reviewedBy
+  if (rejectionReason) req.rejectionReason = rejectionReason
+  saveAdminData(data)
+  // If approved, mark user as verified
+  if (approved) {
+    const users = getStoredUsers()
+    const user = users.find(u => u.id === req.userId)
+    if (user) {
+      user.verified = true
+      saveUsers(users)
+    }
+  }
+  return req
+}
+
+// --- System Config ---
+export function getSystemConfig(): SystemConfig {
+  return getAdminData().systemConfig
+}
+
+export function updateSystemConfig(updates: Partial<SystemConfig>): SystemConfig {
+  const data = getAdminData()
+  data.systemConfig = { ...data.systemConfig, ...updates }
+  saveAdminData(data)
+  return data.systemConfig
+}
+
+// --- Announcements ---
+export function getAnnouncements(activeOnly: boolean = false) {
+  const data = getAdminData()
+  if (activeOnly) return data.announcements.filter(a => a.active)
+  return data.announcements
+}
+
+export function createAnnouncement(title: string, message: string) {
+  const data = getAdminData()
+  const announcement = { id: `ann_${uuidv4().slice(0, 8)}`, title, message, createdAt: new Date().toISOString(), active: true }
+  data.announcements.push(announcement)
+  saveAdminData(data)
+  return announcement
+}
+
+export function toggleAnnouncement(id: string) {
+  const data = getAdminData()
+  const ann = data.announcements.find(a => a.id === id)
+  if (ann) { ann.active = !ann.active; saveAdminData(data) }
+  return ann
+}
+
+// --- Admin Analytics ---
+export function getAdminAnalytics() {
+  const users = getStoredUsers()
+  const messages = getStoredMessages()
+  const subscriptions = getStoredSubscriptions()
+  const reports = getAdminData().reports
+  const now = new Date()
+  const weekAgo = new Date(now.getTime() - 7 * 86400000)
+  const monthAgo = new Date(now.getTime() - 30 * 86400000)
+
+  const totalUsers = users.length
+  const premiumUsers = users.filter(u => u.premium).length
+  const verifiedUsers = users.filter(u => u.verified).length
+  const maleUsers = users.filter(u => u.gender === 'Male').length
+  const femaleUsers = users.filter(u => u.gender === 'Female').length
+
+  const recentRegistrations = users.filter(u => u.createdAt && new Date(u.createdAt) > weekAgo).length
+  const recentMessages = messages.filter(m => new Date(m.timestamp) > weekAgo).length
+  const pendingReports = reports.filter(r => r.status === 'pending').length
+
+  // Revenue from subscriptions
+  const monthlyRevenue = subscriptions
+    .filter(s => new Date(s.startDate || s.createdAt || '') > monthAgo)
+    .reduce((sum, s) => sum + (s.amount || 0), 0)
+
+  // Registrations per day (last 7 days)
+  const registrationsWeek: number[] = []
+  for (let i = 6; i >= 0; i--) {
+    const dayStart = new Date(now.getTime() - i * 86400000)
+    dayStart.setHours(0, 0, 0, 0)
+    const dayEnd = new Date(dayStart.getTime() + 86400000)
+    registrationsWeek.push(users.filter(u => {
+      const created = new Date(u.createdAt || '')
+      return created >= dayStart && created < dayEnd
+    }).length)
+  }
+
+  return {
+    totalUsers,
+    premiumUsers,
+    verifiedUsers,
+    maleUsers,
+    femaleUsers,
+    genderRatio: totalUsers > 0 ? `${Math.round(maleUsers / totalUsers * 100)}:${Math.round(femaleUsers / totalUsers * 100)}` : '0:0',
+    recentRegistrations,
+    recentMessages,
+    pendingReports,
+    monthlyRevenue,
+    registrationsWeek,
+    totalMessages: messages.length,
+    totalSubscriptions: subscriptions.length,
+    activeSubscriptions: subscriptions.filter(s => s.status === 'active').length,
+  }
 }

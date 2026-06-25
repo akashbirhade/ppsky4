@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getMessages, getConversations, sendMessage, markMessagesRead } from '@/lib/database'
+import { getMessages, getConversations, sendMessage, markMessagesRead, getUserById } from '@/lib/database'
 import { authenticateRequest } from '@/lib/auth'
+import { notifyNewMessage } from '@/lib/push-notifications'
 
 export const dynamic = 'force-dynamic'
 
@@ -61,6 +62,9 @@ export async function POST(req: NextRequest) {
     }
 
     const message = sendMessage(senderId, receiverId, content)
+    // Send push notification to receiver
+    const sender = getUserById(senderId)
+    if (sender) notifyNewMessage(receiverId, sender.name).catch(() => {})
     return NextResponse.json({ message }, { status: 201 })
   } catch (error) {
     console.error('Send message error:', error)

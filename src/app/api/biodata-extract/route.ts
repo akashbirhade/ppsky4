@@ -4,6 +4,7 @@ import { existsSync } from 'fs'
 import path from 'path'
 import { authenticateRequest } from '@/lib/auth'
 import { extractProfileFromText } from '@/lib/biodata-extractor'
+import { uploadBiodata } from '@/lib/cloudinary'
 
 export async function POST(req: NextRequest) {
   try {
@@ -49,32 +50,35 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'File size must be less than 10MB' }, { status: 400 })
     }
 
-    // Create biodata directory for the user
-    const biodataDir = path.join(process.cwd(), 'public', 'uploads', 'biodata')
-    if (!existsSync(biodataDir)) {
-      await mkdir(biodataDir, { recursive: true })
-    }
-
-    // Generate unique filename and save
-    const ext = file.name.split('.').pop() || 'pdf'
-    const sanitizedExt = ext.replace(/[^a-zA-Z0-9]/g, '')
-    const filename = `${userId}_biodata_${Date.now()}.${sanitizedExt}`
-    const filepath = path.join(biodataDir, filename)
-
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
-    await writeFile(filepath, buffer)
 
-    const savedFileUrl = `/uploads/biodata/${filename}`
+    let savedFileUrl: string
+
+    // Upload to Cloudinary if configured, else save locally
+    if (process.env.CLOUDINARY_CLOUD_NAME) {
+      try {
+        const result = await uploadBiodata(buffer, userId, file.name)
+        savedFileUrl = result.url
+      } catch (cloudErr) {
+        console.error('Cloudinary upload failed, saving locally:', cloudErr)
+        savedFileUrl = await saveLocalBiodata(buffer, userId, file.name)
+      }
+    } else {
+      savedFileUrl = await saveLocalBiodata(buffer, userId, file.name)
+    }
 
     // Extract text based on file type
     let extractedText = ''
 
     if (file.type === 'application/pdf') {
+      // pdf-parse v2.x uses PDFParse class
       // eslint-disable-next-line
-      const pdfParse = require('pdf-parse')
-      const pdfData = await pdfParse(buffer)
-      extractedText = pdfData.text
+      const { PDFParse } = require('pdf-parse')
+      const parser = new PDFParse({ data: buffer })
+      const result = await parser.getText()
+      extractedText = result.text || ''
+      await parser.destroy()
     } else if (file.type === 'text/plain') {
       extractedText = buffer.toString('utf-8')
     } else if (file.type.startsWith('image/')) {
@@ -108,4 +112,16 @@ export async function POST(req: NextRequest) {
     console.error('Biodata extraction error:', error)
     return NextResponse.json({ error: 'Failed to process biodata document' }, { status: 500 })
   }
+}
+
+async function saveLocalBiodata(buffer: Buffer, userId: string, originalName: string): Promise<string> {
+  const biodataDir = path.join(process.cwd(), 'public', 'uploads', 'biodata')
+  if (!existsSync(biodataDir)) {
+    await mkdir(biodataDir, { recursive: true })
+  }
+  const ext = originalName.split('.').pop()?.replace(/[^a-zA-Z0-9]/g, '') || 'pdf'
+  const filename = `${userId}_biodata_${Date.now()}.${ext}`
+  const filepath = path.join(biodataDir, filename)
+  await writeFile(filepath, buffer)
+  return `/uploads/biodata/${filename}`
 }
