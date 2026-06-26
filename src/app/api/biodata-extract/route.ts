@@ -72,13 +72,23 @@ export async function POST(req: NextRequest) {
     let extractedText = ''
 
     if (file.type === 'application/pdf') {
-      // pdf-parse v2.x uses PDFParse class
-      // eslint-disable-next-line
-      const { PDFParse } = require('pdf-parse')
-      const parser = new PDFParse({ data: buffer })
-      const result = await parser.getText()
-      extractedText = result.text || ''
-      await parser.destroy()
+      try {
+        // pdf-parse v2.x uses PDFParse class
+        // eslint-disable-next-line
+        const { PDFParse } = require('pdf-parse')
+        const parser = new PDFParse({ data: buffer })
+        const result = await parser.getText()
+        extractedText = result?.text || ''
+        try { parser.destroy() } catch {}
+      } catch (pdfErr: any) {
+        console.error('PDF parse error:', pdfErr?.message)
+        return NextResponse.json({
+          success: false,
+          savedFileUrl,
+          error: 'Could not read PDF content. The file may be corrupted, password-protected, or scanned (image-only). Please upload a text-based PDF or try a different format.',
+          extractedData: {},
+        }, { status: 422 })
+      }
     } else if (file.type === 'text/plain') {
       extractedText = buffer.toString('utf-8')
     } else if (file.type.startsWith('image/')) {
@@ -99,6 +109,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Extract profile data from text
+    if (!extractedText || extractedText.trim().length < 10) {
+      return NextResponse.json({
+        success: true,
+        savedFileUrl,
+        extractedData: {},
+        message: 'File saved but no readable text found. This may be a scanned document. Please upload a text-based PDF or fill in your details manually.',
+      })
+    }
+
     const extractedData = extractProfileFromText(extractedText)
 
     return NextResponse.json({

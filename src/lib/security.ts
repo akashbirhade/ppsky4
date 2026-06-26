@@ -63,7 +63,13 @@ export function sanitizeProfileData(data: Record<string, any>): Record<string, a
   if (Array.isArray(data.photos)) {
     sanitized.photos = data.photos
       .slice(0, 10)
-      .filter((p: any) => typeof p === 'string' && (p.startsWith('/uploads/') || p.startsWith('data:image/')))
+      .filter((p: any) => typeof p === 'string' && (
+        p.startsWith('/uploads/') || 
+        p.startsWith('data:image/') || 
+        p.startsWith('/avatars/') ||
+        p.startsWith('https://res.cloudinary.com/') ||
+        p.startsWith('https://') 
+      ))
   }
 
   // Partner preferences

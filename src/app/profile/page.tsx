@@ -7,7 +7,7 @@ import { User, Save, Camera, Upload, BadgeCheck, MapPin, GraduationCap, Briefcas
 import BiodataUpload from '@/components/BiodataUpload'
 
 export default function ProfilePage() {
-  const { user, authFetch } = useAuth()
+  const { user, authFetch, updateUserData } = useAuth()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [profileLoading, setProfileLoading] = useState(true)
@@ -87,16 +87,33 @@ export default function ProfilePage() {
     setProfile(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
-    if (files) {
-      Array.from(files).forEach(file => {
-        const reader = new FileReader()
-        reader.onloadend = () => {
-          setPhotos(prev => [...prev, reader.result as string])
+    if (!files || !user) return
+
+    for (const file of Array.from(files)) {
+      if (file.size > 5 * 1024 * 1024) {
+        setSaveError('Photo must be less than 5MB')
+        continue
+      }
+      try {
+        const formData = new FormData()
+        formData.append('photo', file)
+        formData.append('userId', user.id)
+        const res = await authFetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setPhotos(data.photos || [])
+        } else {
+          const err = await res.json().catch(() => ({}))
+          setSaveError(err.error || 'Photo upload failed')
         }
-        reader.readAsDataURL(file)
-      })
+      } catch {
+        setSaveError('Photo upload failed')
+      }
     }
   }
 
@@ -105,22 +122,36 @@ export default function ProfilePage() {
     setLoading(true)
     setSaveError(null)
     try {
+      // Only send URL-based photos (not base64) — photos are already uploaded via /api/upload
+      const cleanPhotos = photos.filter(p => !p.startsWith('data:'))
+
       const res = await authFetch('/api/profiles', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...profile, photos, userId: user?.id })
+        body: JSON.stringify({ ...profile, photos: cleanPhotos, userId: user?.id })
       })
 
+      const data = await res.json().catch(() => ({}))
+
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
         throw new Error(data.error || 'Unable to save profile details')
+      }
+
+      // Update AuthContext user with latest data from server
+      if (data.profile) {
+        updateUserData({
+          photos: data.profile.photos || cleanPhotos,
+          profileComplete: data.profile.profileComplete,
+          verified: data.profile.verified,
+          premium: data.profile.premium,
+        })
       }
 
       // Save to localStorage cache for persistence across refreshes
       if (user?.id) {
         localStorage.setItem(`profile_data_${user.id}`, JSON.stringify({
           profile,
-          photos,
+          photos: data.profile?.photos || cleanPhotos,
         }))
       }
 
