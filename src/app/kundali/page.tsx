@@ -170,7 +170,10 @@ export default function KundaliPage() {
               </h4>
               <div className="space-y-3">
                 {gunaCategories.map((guna, i) => {
-                  const earned = Math.ceil((result!.gunaScore / 36) * guna.max * (0.5 + Math.random() * 0.5))
+                  // Deterministic distribution based on guna index and total score
+                  const seed = (result!.gunaScore * 7 + i * 13) % 100
+                  const ratio = (seed / 100) * 0.5 + 0.5 // range 0.5 to 1.0 deterministically
+                  const earned = Math.ceil((result!.gunaScore / 36) * guna.max * ratio)
                   const clamped = Math.min(earned, guna.max)
                   return (
                     <div key={i} className="flex items-center gap-3">

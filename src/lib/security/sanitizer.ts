@@ -220,9 +220,6 @@ export function validateFileUpload(file: { name: string; type: string; size: num
  * Generate CSRF token
  */
 export function generateCSRFToken(): string {
-  const array = new Uint8Array(32)
-  for (let i = 0; i < 32; i++) {
-    array[i] = Math.floor(Math.random() * 256)
-  }
-  return Array.from(array, b => b.toString(16).padStart(2, '0')).join('')
+  const crypto = require('crypto')
+  return crypto.randomBytes(32).toString('hex')
 }

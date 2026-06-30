@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { checkPhonePePaymentStatus } from '@/lib/phonepe'
+import { checkPhonePePaymentStatus, verifyPhonePeSignature } from '@/lib/phonepe'
 import { activatePremium, getUserById } from '@/lib/database'
 
 export const dynamic = 'force-dynamic'
@@ -15,6 +15,13 @@ export async function POST(req: NextRequest) {
 
     if (!responseBase64) {
       return NextResponse.json({ error: 'Missing response payload' }, { status: 400 })
+    }
+
+    // Verify callback signature to prevent spoofed callbacks
+    const receivedChecksum = req.headers.get('x-verify') || ''
+    if (receivedChecksum && !verifyPhonePeSignature(responseBase64, receivedChecksum)) {
+      console.error('PhonePe callback: checksum verification failed')
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 403 })
     }
 
     // Decode the base64 response

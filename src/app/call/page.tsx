@@ -73,11 +73,20 @@ function CallPageInner() {
 
     socket.on('call:offer', async (data: any) => {
       console.log('Received offer')
-      if (data.sdp && peerConnectionRef.current) {
+      if (data.sdp) {
         try {
-          await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data.sdp))
-          const answer = await peerConnectionRef.current.createAnswer()
-          await peerConnectionRef.current.setLocalDescription(answer)
+          // Ensure peer connection is set up for receiving calls
+          let pc = peerConnectionRef.current
+          if (!pc) {
+            setCallState('calling')
+            if (data.callerName) setCallerName(data.callerName)
+            if (data.callType) setCallType(data.callType)
+            pc = await setupPeerConnection()
+            if (!pc) return
+          }
+          await pc.setRemoteDescription(new RTCSessionDescription(data.sdp))
+          const answer = await pc.createAnswer()
+          await pc.setLocalDescription(answer)
           socket.emit('call:answer', { roomId: data.roomId, sdp: answer })
         } catch (err) {
           console.error('Error handling offer:', err)
@@ -108,7 +117,7 @@ function CallPageInner() {
 
     socket.on('call:ended', () => {
       console.log('Call ended by remote peer')
-      // Will trigger cleanup
+      endCall()
     })
 
     return () => {

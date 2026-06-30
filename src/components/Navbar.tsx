@@ -42,8 +42,8 @@ export default function Navbar() {
       const res = await authFetch(`/api/activity/interests?userId=${user.id}&type=received`)
       const data = await res.json()
       const interests = data.interests || []
-      const notifs = interests.slice(0, 5).map((item: any) => ({
-        id: item.interest?.id || item.profile?.id || Math.random().toString(),
+      const notifs = interests.slice(0, 5).map((item: any, idx: number) => ({
+        id: item.interest?.id || item.profile?.id || `notif-${idx}`,
         type: item.interest?.status === 'pending' ? 'interest_received' : 'interest_' + item.interest?.status,
         title: item.interest?.status === 'pending' ? 'New Interest!' : 'Interest ' + (item.interest?.status || ''),
         message: `${item.profile?.name || 'Someone'} sent you an interest`,

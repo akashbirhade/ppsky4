@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserById, updateUser, getUserByEmail } from '@/lib/database'
 import { authenticateRequest } from '@/lib/auth'
+import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
 
@@ -38,7 +39,8 @@ function saveReferrals(referrals: Referral[]) {
 
 function generateReferralCode(userId: string): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-  const random = Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+  const bytes = crypto.randomBytes(4)
+  const random = Array.from(bytes, b => chars[b % chars.length]).join('')
   return `SS${userId.slice(-3).toUpperCase()}${random}`
 }
 

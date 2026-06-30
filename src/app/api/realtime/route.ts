@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { getUserById } from '@/lib/database'
+import { getUserById, getInterestsReceived, getWhoViewedMe } from '@/lib/database'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,24 +67,41 @@ export async function GET(req: NextRequest) {
   })
 }
 
-// Simulates real-time events (in production, poll database for changes)
+// Poll real activity data instead of generating fake events
 function generateRealTimeEvents(userId: string): any[] {
   const events: any[] = []
+  const now = Date.now()
+  const oneMinuteAgo = new Date(now - 60_000).toISOString()
   
-  // Random chance of generating an event (simulates real activity)
-  if (Math.random() > 0.7) {
-    const eventTypes = [
-      { type: 'profile_view', message: 'Someone viewed your profile' },
-      { type: 'online_status', message: 'A match is now online' },
-      { type: 'new_recommendation', message: 'New match recommendation available' },
-    ]
-    const event = eventTypes[Math.floor(Math.random() * eventTypes.length)]
-    events.push({
-      ...event,
-      timestamp: new Date().toISOString(),
-      userId
+  // Check for recent profile views (last 60 seconds)
+  try {
+    const viewers = getWhoViewedMe(userId)
+    const recentViews = viewers.filter(v => v.timestamp > oneMinuteAgo)
+    recentViews.forEach(v => {
+      events.push({
+        type: 'profile_view',
+        message: `${v.profile?.name || 'Someone'} viewed your profile`,
+        timestamp: v.timestamp,
+        userId,
+        fromUserId: v.profile?.id,
+      })
     })
-  }
+  } catch {}
+  
+  // Check for recent interests received (last 60 seconds)
+  try {
+    const interests = getInterestsReceived(userId)
+    const recentInterests = interests.filter(i => i.interest.timestamp > oneMinuteAgo && i.interest.status === 'pending')
+    recentInterests.forEach(i => {
+      events.push({
+        type: 'interest_received',
+        message: `${i.profile?.name || 'Someone'} sent you an interest!`,
+        timestamp: i.interest.timestamp,
+        userId,
+        fromUserId: i.profile?.id,
+      })
+    })
+  } catch {}
   
   return events
 }

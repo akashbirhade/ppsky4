@@ -546,12 +546,12 @@ const SEED_USERS: UserProfile[] = [
 ]
 
 const SEED_COUPONS: Coupon[] = [
-  { code: 'SHADI50', discount: 50, maxUses: 100, usedCount: 12, validTill: '2025-12-31', minPlan: null, active: true },
-  { code: 'FIRST25', discount: 25, maxUses: 500, usedCount: 89, validTill: '2025-12-31', minPlan: null, active: true },
-  { code: 'GOLD70', discount: 70, maxUses: 50, usedCount: 5, validTill: '2025-06-30', minPlan: 'gold', active: true },
-  { code: 'PLAT60', discount: 60, maxUses: 30, usedCount: 3, validTill: '2025-12-31', minPlan: 'platinum', active: true },
-  { code: 'WELCOME30', discount: 30, maxUses: 1000, usedCount: 234, validTill: '2025-12-31', minPlan: null, active: true },
-  { code: 'PREMIUM80', discount: 80, maxUses: 10, usedCount: 2, validTill: '2025-03-31', minPlan: 'platinum', active: true },
+  { code: 'SHADI50', discount: 50, maxUses: 100, usedCount: 12, validTill: '2027-12-31', minPlan: null, active: true },
+  { code: 'FIRST25', discount: 25, maxUses: 500, usedCount: 89, validTill: '2027-12-31', minPlan: null, active: true },
+  { code: 'GOLD70', discount: 70, maxUses: 50, usedCount: 5, validTill: '2027-06-30', minPlan: 'gold', active: true },
+  { code: 'PLAT60', discount: 60, maxUses: 30, usedCount: 3, validTill: '2027-12-31', minPlan: 'platinum', active: true },
+  { code: 'WELCOME30', discount: 30, maxUses: 1000, usedCount: 234, validTill: '2027-12-31', minPlan: null, active: true },
+  { code: 'PREMIUM80', discount: 80, maxUses: 10, usedCount: 2, validTill: '2027-03-31', minPlan: 'platinum', active: true },
 ]
 
 // ============ INITIALIZE DATA ============

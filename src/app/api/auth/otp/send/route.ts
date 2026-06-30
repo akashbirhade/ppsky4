@@ -40,15 +40,21 @@ export async function POST(req: NextRequest) {
     const { otp, otpToken } = generateStatelessOtp(cleanPhone, purpose as 'login' | 'register')
 
     // In production with SMS provider, send OTP via SMS here.
-    // Since no SMS service is configured, we return the OTP for demo purposes.
+    // OTP is logged server-side only for demo/development purposes.
     console.log(`[OTP] ${cleanPhone}: ${otp} (purpose: ${purpose})`)
 
-    return NextResponse.json({
+    const response: Record<string, any> = {
       success: true,
       message: 'OTP sent successfully to your mobile number',
       otpToken, // Stateless verification token (required for verify step)
-      demo_otp: otp, // Remove this when SMS service is configured
-    })
+    }
+
+    // Only include OTP in response during development (NEVER in production)
+    if (process.env.NODE_ENV === 'development') {
+      response.demo_otp = otp
+    }
+
+    return NextResponse.json(response)
   } catch (error) {
     console.error('OTP send error:', error)
     return NextResponse.json({ error: 'Failed to send OTP' }, { status: 500 })

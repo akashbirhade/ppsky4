@@ -19,7 +19,9 @@ export default function ProfileCard({ profile, compatibility, interestStatus = '
   const { showToast } = useToast()
   const [sending, setSending] = useState(false)
   const [currentStatus, setCurrentStatus] = useState(interestStatus)
-  const score = compatibility || Math.floor(70 + Math.random() * 25)
+  // Use a deterministic score based on profile ID hash instead of Math.random()
+  const fallbackScore = compatibility ? 0 : (profile.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 25 + 70)
+  const score = compatibility || fallbackScore
   const isPremium = user?.premium === true
   const photoVisible = currentStatus === 'accepted'
 

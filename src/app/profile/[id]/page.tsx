@@ -301,7 +301,9 @@ export default function ProfileDetailPage() {
   }
   // ── End locked view ─────────────────────────────────────────────────────────
 
-  const score = compatibility?.score || Math.floor(75 + Math.random() * 20)
+  // Deterministic fallback score based on profile ID hash
+  const fallbackScore = profile.id.split('').reduce((a: number, c: string) => a + c.charCodeAt(0), 0) % 20 + 75
+  const score = compatibility?.score || fallbackScore
   const profileId = `Sh${profile.id.replace(/\D/g, '').slice(0, 8).padEnd(8, '0')}`
 
   // Mock extended data

@@ -18,14 +18,17 @@ export function getOtpStore() {
 // ─── Stateless OTP (works on serverless / Vercel) ─────────────────────
 // Uses HMAC to create a verifiable token without server-side state.
 
-const OTP_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'soulmatesync-otp-secret-2024'
+const OTP_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || (() => {
+  if (process.env.NODE_ENV === 'production') throw new Error('JWT_SECRET or NEXTAUTH_SECRET must be set in production')
+  return 'soulmatesync-dev-otp-secret-not-for-production'
+})()
 
 /**
  * Generate a stateless OTP token.
  * Returns the OTP and a signed hash that can be verified later without server state.
  */
 export function generateStatelessOtp(phone: string, purpose: OtpPurpose): { otp: string; otpToken: string; expiresAt: number } {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString()
+  const otp = crypto.randomInt(100000, 999999).toString()
   const expiresAt = Date.now() + 5 * 60 * 1000 // 5 minutes
 
   // Create HMAC signature: phone + otp + purpose + expiresAt

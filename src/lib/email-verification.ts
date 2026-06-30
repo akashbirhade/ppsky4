@@ -47,7 +47,8 @@ export function verifyEmailToken(token: string): { success: boolean; userId?: st
  * Generate OTP for phone verification
  */
 export function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString()
+  const crypto = require('crypto')
+  return crypto.randomInt(100000, 999999).toString()
 }
 
 // OTP store

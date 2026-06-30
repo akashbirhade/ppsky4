@@ -13,6 +13,9 @@ import { Server, Socket } from 'socket.io';
 import prisma from '@config/prisma';
 import logger from '@utils/logger';
 
+// Track auto-miss timers so they can be cancelled when a call is answered/rejected/ended
+const callTimers = new Map<string, NodeJS.Timeout>();
+
 export function setupCallSocket(io: Server, socket: Socket, userId: string): void {
   // ─── JOIN CALL ROOM ──────────────────────────────────────────────────────────
   socket.on('call:join-room', ({ roomId }: { roomId: string }) => {
@@ -50,7 +53,8 @@ export function setupCallSocket(io: Server, socket: Socket, userId: string): voi
       });
 
       // Auto-miss after 45 seconds if not answered
-      setTimeout(async () => {
+      const timer = setTimeout(async () => {
+        callTimers.delete(callId);
         const current = await prisma.call.findUnique({ where: { id: callId } });
         if (current?.status === 'RINGING') {
           await prisma.call.update({ where: { id: callId }, data: { status: 'MISSED' } });
@@ -58,6 +62,7 @@ export function setupCallSocket(io: Server, socket: Socket, userId: string): voi
           io.to(`user:${userId}`).emit('call:missed', { callId });
         }
       }, 45000);
+      callTimers.set(callId, timer);
     } catch (err) {
       logger.error('call:notify error', err);
     }
@@ -66,6 +71,10 @@ export function setupCallSocket(io: Server, socket: Socket, userId: string): voi
   // ─── ACCEPT CALL ─────────────────────────────────────────────────────────────
   socket.on('call:accept', async ({ callId }: { callId: string }) => {
     try {
+      // Cancel auto-miss timer
+      const timer = callTimers.get(callId);
+      if (timer) { clearTimeout(timer); callTimers.delete(callId); }
+
       const call = await prisma.call.findUnique({ where: { id: callId } });
       if (!call || call.receiverId !== userId) return;
 
@@ -84,6 +93,10 @@ export function setupCallSocket(io: Server, socket: Socket, userId: string): voi
   // ─── REJECT CALL ─────────────────────────────────────────────────────────────
   socket.on('call:reject', async ({ callId }: { callId: string }) => {
     try {
+      // Cancel auto-miss timer
+      const timer = callTimers.get(callId);
+      if (timer) { clearTimeout(timer); callTimers.delete(callId); }
+
       const call = await prisma.call.findUnique({ where: { id: callId } });
       if (!call || call.receiverId !== userId) return;
 
@@ -97,6 +110,10 @@ export function setupCallSocket(io: Server, socket: Socket, userId: string): voi
   // ─── END CALL ─────────────────────────────────────────────────────────────────
   socket.on('call:end', async ({ callId }: { callId: string }) => {
     try {
+      // Cancel auto-miss timer
+      const timer = callTimers.get(callId);
+      if (timer) { clearTimeout(timer); callTimers.delete(callId); }
+
       const call = await prisma.call.findUnique({ where: { id: callId } });
       if (!call || (call.callerId !== userId && call.receiverId !== userId)) return;
 
