@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     const message = sendMessage(senderId, receiverId, content)
     // Send push notification to receiver
     const sender = getUserById(senderId)
-    if (sender) notifyNewMessage(receiverId, sender.name).catch(() => {})
+    if (sender) notifyNewMessage(receiverId, sender.name).catch(e => console.error('notifyNewMessage failed:', e.message))
     return NextResponse.json({ message }, { status: 201 })
   } catch (error) {
     console.error('Send message error:', error)

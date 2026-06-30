@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
       // Notify on acceptance (mutual match)
       if (action === 'accepted' && result) {
         const sender = getUserById(result.senderId)
-        if (sender) notifyNewMatch(result.senderId, 'your interest was accepted').catch(() => {})
+        if (sender) notifyNewMatch(result.senderId, 'your interest was accepted').catch(e => console.error('notifyNewMatch failed:', e.message))
       }
       return NextResponse.json({ interest: result })
     }
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
 
     // Send push notification to receiver
     if (senderProfile) {
-      notifyInterestReceived(receiverId, senderProfile.name).catch(() => {})
+      notifyInterestReceived(receiverId, senderProfile.name).catch(e => console.error('notifyInterestReceived failed:', e.message))
     }
     
     return NextResponse.json({ 

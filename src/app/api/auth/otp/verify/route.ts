@@ -4,6 +4,9 @@ import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '@/lib/auth'
 import { verifyStatelessOtp, getOtpStore } from '@/lib/otp-store'
 
+// Rate limit OTP verification attempts (max 5 per phone per 15 min)
+const verifyAttempts = new Map<string, { count: number; resetAt: number }>()
+
 export async function POST(req: NextRequest) {
   try {
     const { phone, otp, purpose, otpToken } = await req.json()
@@ -13,6 +16,21 @@ export async function POST(req: NextRequest) {
     }
 
     const cleanPhone = phone.replace(/\D/g, '')
+
+    // Rate limit: max 5 verify attempts per phone per 15 min
+    const now = Date.now()
+    const entry = verifyAttempts.get(cleanPhone)
+    if (entry && now < entry.resetAt) {
+      entry.count++
+      if (entry.count > 5) {
+        return NextResponse.json(
+          { error: 'Too many verification attempts. Please request a new OTP.' },
+          { status: 429 }
+        )
+      }
+    } else {
+      verifyAttempts.set(cleanPhone, { count: 1, resetAt: now + 15 * 60 * 1000 })
+    }
 
     // Try stateless verification first (works on serverless)
     if (otpToken) {
