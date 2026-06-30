@@ -1,7 +1,8 @@
 'use client'
 
 import { useMemo } from 'react'
-import { CheckCircle, AlertCircle } from 'lucide-react'
+import { CheckCircle, AlertCircle, ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 
 interface ProfileCompletionProps {
   user: {
@@ -90,17 +91,22 @@ export default function ProfileCompletion({ user }: ProfileCompletionProps) {
 
       <p className="text-xs text-slate-500 dark:text-purple-200/60 mb-2">{getMessage()}</p>
 
-      {/* Missing fields */}
+      {/* Missing fields with action */}
       {missing.length > 0 && percentage < 100 && (
-        <div className="flex flex-wrap gap-1.5">
-          {missing.slice(0, 4).map(field => (
-            <span key={field} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-500/10 text-xs text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-500/20">
-              <AlertCircle className="h-3 w-3" /> {field}
-            </span>
-          ))}
-          {missing.length > 4 && (
-            <span className="text-xs text-slate-400">+{missing.length - 4} more</span>
-          )}
+        <div className="space-y-1.5">
+          <div className="flex flex-wrap gap-1.5">
+            {missing.slice(0, 4).map(field => (
+              <Link key={field} href="/profile" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-500/10 text-xs text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-500/20 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors">
+                <AlertCircle className="h-3 w-3" /> {field}
+              </Link>
+            ))}
+            {missing.length > 4 && (
+              <span className="text-xs text-slate-400">+{missing.length - 4} more</span>
+            )}
+          </div>
+          <Link href="/profile" className="inline-flex items-center gap-1 text-[11px] text-purple-400 hover:text-purple-300 transition-colors mt-1">
+            Complete your profile <ArrowRight className="h-3 w-3" />
+          </Link>
         </div>
       )}
 

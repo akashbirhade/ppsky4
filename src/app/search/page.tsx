@@ -153,7 +153,9 @@ export default function SearchPage() {
   const handleSearch = (e: React.FormEvent) => { e.preventDefault(); fetchProfiles() }
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const value = e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value
-    setFilters(prev => ({ ...prev, [e.target.name]: value }))
+    const updated = { ...filters, [e.target.name]: value }
+    setFilters(updated)
+    fetchProfiles(updated, ageRange)
   }
 
   const handleProfileIdSearch = () => { if (profileIdSearch.trim()) window.location.href = `/profile/${profileIdSearch.trim()}` }
@@ -385,6 +387,24 @@ export default function SearchPage() {
 
       {/* Results */}
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Active Filter Chips */}
+        {activeFilterCount > 0 && (
+          <div className="flex flex-wrap items-center gap-2 mb-4 animate-fade-in-up">
+            <span className="text-[10px] text-slate-400 dark:text-purple-300/40 uppercase tracking-wider">Active:</span>
+            {Object.entries(filters).filter(([, v]) => typeof v === 'boolean' ? v : v !== '').map(([key, val]) => (
+              <span key={key} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                {typeof val === 'boolean' ? key.replace(/([A-Z])/g, ' $1').trim() : `${key}: ${val}`}
+                <button type="button" onClick={() => { const updated = { ...filters, [key]: typeof val === 'boolean' ? false : '' }; setFilters(updated); fetchProfiles(updated, ageRange) }} className="hover:text-white transition-colors">
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            ))}
+            <button type="button" onClick={clearFilters} className="text-[10px] text-red-300/60 hover:text-red-300 transition-colors ml-2">
+              Clear all
+            </button>
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-6">
           <p className="text-sm text-slate-400 dark:text-purple-300/50">
             {loading ? 'Searching...' : `${profiles.filter(p => {
