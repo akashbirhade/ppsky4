@@ -16,7 +16,7 @@ interface Profile {
 }
 
 export default function KundaliPage() {
-  const { user, authFetch } = useAuth()
+  const { user, authFetch, loading: authLoading } = useAuth()
   const router = useRouter()
   const [profiles, setProfiles] = useState<Profile[]>([])
   const [selectedProfile, setSelectedProfile] = useState<string>('')
@@ -33,7 +33,7 @@ export default function KundaliPage() {
     } catch {}
   }, [user, authFetch])
 
-  useEffect(() => { if (!user) router.push('/login'); else fetchProfiles() }, [user, router, fetchProfiles])
+  useEffect(() => { if (!authLoading && !user) router.push('/login'); else if (user) fetchProfiles() }, [user, authLoading, router, fetchProfiles])
 
   const checkKundali = async () => {
     if (!selectedProfile) return

@@ -103,11 +103,12 @@ export function middleware(request: NextRequest) {
   // CSP header
   response.headers.set('Content-Security-Policy', [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-    "style-src 'self' 'unsafe-inline'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com",
+    "style-src 'self' 'unsafe-inline' https://accounts.google.com",
     "img-src 'self' data: blob: https:",
-    "font-src 'self' data:",
-    "connect-src 'self' ws: wss:",
+    "font-src 'self' data: https://fonts.gstatic.com",
+    "connect-src 'self' ws: wss: https://accounts.google.com https://oauth2.googleapis.com",
+    "frame-src https://accounts.google.com",
     "media-src 'self'",
     "frame-ancestors 'none'",
   ].join('; '))

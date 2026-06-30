@@ -9,7 +9,7 @@ import HalfHeart from '@/components/HalfHeart'
 
 interface Notification {
   id: string
-  type: 'interest_received' | 'interest_accepted' | 'interest_declined' | 'profile_view' | 'match' | 'message' | 'contact_viewed' | 'shortlisted' | 'photo_request' | 'system' | 'reminder'
+  type: 'interest_received' | 'interest_accepted' | 'interest_declined' | 'profile_view' | 'match' | 'message' | 'contact_viewed' | 'shortlisted' | 'photo_request' | 'system' | 'reminder' | 'mutual_match'
   title: string
   message: string
   time: string
@@ -19,32 +19,14 @@ interface Notification {
   emailSent?: boolean
 }
 
-// Comprehensive notifications
-const MOCK_NOTIFICATIONS: Notification[] = [
-  { id: '1', type: 'interest_received', title: 'New Interest Received!', message: 'Priya Sharma (Sh28491035) has sent you an interest', time: '2 min ago', read: false, link: '/profile/1', avatar: 'PS', emailSent: true },
-  { id: '2', type: 'interest_accepted', title: 'Interest Accepted! 🎉', message: 'Ananya Desai has accepted your interest. Start chatting now!', time: '10 min ago', read: false, link: '/messages', avatar: 'AD', emailSent: true },
-  { id: '3', type: 'profile_view', title: 'Profile Viewed', message: 'Meera Patel viewed your profile', time: '30 min ago', read: false, link: '/profile/3', avatar: 'MP', emailSent: true },
-  { id: '4', type: 'message', title: 'New Message', message: 'Kavitha Rao sent you a message: "Hi! I liked your profile..."', time: '1 hour ago', read: false, link: '/messages', avatar: 'KR', emailSent: true },
-  { id: '5', type: 'match', title: 'Mutual Match! 💜', message: 'You and Neha Gupta both liked each other! It\'s a match!', time: '2 hours ago', read: false, link: '/matches', avatar: 'NG', emailSent: true },
-  { id: '6', type: 'contact_viewed', title: 'Contact Viewed', message: 'Riya Kapoor viewed your contact number', time: '3 hours ago', read: true, link: '/profile/2', avatar: 'RK', emailSent: true },
-  { id: '7', type: 'interest_declined', title: 'Interest Declined', message: 'Simran Kaur has declined your interest', time: '5 hours ago', read: true, link: '/search', avatar: 'SK', emailSent: true },
-  { id: '8', type: 'shortlisted', title: 'You\'re Shortlisted! ⭐', message: 'Divya Sharma has shortlisted your profile', time: '6 hours ago', read: true, link: '/profile/4', avatar: 'DS', emailSent: true },
-  { id: '9', type: 'photo_request', title: 'Photo Request', message: 'Aisha Begum has requested to see your photos', time: '8 hours ago', read: true, avatar: 'AB' },
-  { id: '10', type: 'profile_view', title: 'Premium Member Viewed', message: 'A Premium member (Sh19283746) viewed your profile', time: '1 day ago', read: true, link: '/premium', avatar: '👑', emailSent: true },
-  { id: '11', type: 'reminder', title: 'Complete Your Profile', message: 'Add hobbies & interests to get 3x more matches', time: '1 day ago', read: true, link: '/profile' },
-  { id: '12', type: 'system', title: 'Weekly Match Report', message: '18 profile views, 5 interests received, 2 mutual matches this week!', time: '2 days ago', read: true, emailSent: true },
-  { id: '13', type: 'message', title: 'New Message', message: 'Rohan Verma: "Thank you for accepting! When are you free to..."', time: '2 days ago', read: true, link: '/messages', avatar: 'RV', emailSent: true },
-  { id: '14', type: 'interest_received', title: 'New Interest!', message: 'Tanvi Reddy (Sh38571920) has sent you an interest', time: '3 days ago', read: true, link: '/profile/5', avatar: 'TR', emailSent: true },
-  { id: '15', type: 'contact_viewed', title: 'Email Viewed', message: 'Pooja Nair viewed your email address', time: '3 days ago', read: true, avatar: 'PN', emailSent: true },
-]
-
 type FilterType = 'all' | 'unread' | 'interests' | 'messages' | 'views' | 'matches'
 
 export default function NotificationsPage() {
-  const { user } = useAuth()
+  const { user, authFetch, loading: authLoading } = useAuth()
   const router = useRouter()
-  const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS)
+  const [notifications, setNotifications] = useState<Notification[]>([])
   const [filter, setFilter] = useState<FilterType>('all')
+  const [loadingNotifs, setLoadingNotifs] = useState(true)
   const [emailPrefs, setEmailPrefs] = useState({
     newMatch: true,
     newMessage: true,
@@ -57,8 +39,50 @@ export default function NotificationsPage() {
   const [showEmailSettings, setShowEmailSettings] = useState(false)
 
   useEffect(() => {
-    if (!user) router.push('/login')
-  }, [user, router])
+    if (!authLoading && !user) router.push('/login')
+  }, [user, authLoading, router])
+
+  // Fetch real notifications from API
+  useEffect(() => {
+    if (!user) return
+    const fetchNotifications = async () => {
+      try {
+        const res = await authFetch(`/api/notifications?userId=${user.id}&type=feed`)
+        if (res.ok) {
+          const data = await res.json()
+          const mapped: Notification[] = (data.notifications || []).map((n: any) => ({
+            id: n.id,
+            type: n.type === 'mutual_match' ? 'match' : n.type,
+            title: n.title,
+            message: n.message,
+            time: n.timestamp ? getTimeAgo(n.timestamp) : '',
+            read: n.read,
+            link: n.profileId ? `/profile/${n.profileId}` : n.type === 'match' || n.type === 'mutual_match' ? '/matches' : undefined,
+            avatar: n.profilePhoto || undefined,
+            emailSent: true,
+          }))
+          setNotifications(mapped)
+        }
+      } catch (err) {
+        console.error('Failed to fetch notifications:', err)
+      } finally {
+        setLoadingNotifs(false)
+      }
+    }
+    fetchNotifications()
+  }, [user, authFetch])
+
+  function getTimeAgo(ts: string) {
+    const diff = Date.now() - new Date(ts).getTime()
+    const mins = Math.floor(diff / 60000)
+    if (mins < 1) return 'just now'
+    if (mins < 60) return `${mins}m ago`
+    const hrs = Math.floor(mins / 60)
+    if (hrs < 24) return `${hrs}h ago`
+    const days = Math.floor(hrs / 24)
+    if (days < 7) return `${days}d ago`
+    return `${Math.floor(days / 7)}w ago`
+  }
 
   const getFilteredNotifications = () => {
     switch (filter) {
@@ -201,7 +225,21 @@ export default function NotificationsPage() {
         </div>
 
         {/* Notifications List */}
-        {filtered.length === 0 ? (
+        {loadingNotifs ? (
+          <div className="space-y-3">
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="glass-card !p-4 animate-pulse">
+                <div className="flex gap-3">
+                  <div className="w-10 h-10 rounded-full bg-purple-500/10" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-purple-500/10 rounded w-2/3" />
+                    <div className="h-3 bg-purple-500/10 rounded w-1/2" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="glass-card p-12 text-center animate-fade-in-up">
             <Bell className="h-16 w-16 text-purple-300/15 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">All caught up!</h3>

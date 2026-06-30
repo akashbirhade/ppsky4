@@ -8,7 +8,7 @@ import { SlidersHorizontal, User, Users, MapPin, GraduationCap, Settings, Check,
 type Tab = 'basic' | 'community' | 'location' | 'education' | 'other'
 
 export default function PreferencesPage() {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('basic')
   const [saved, setSaved] = useState(false)
@@ -38,7 +38,7 @@ export default function PreferencesPage() {
     diet: 'Vegetarian',
   })
 
-  useEffect(() => { if (!user) router.push('/login') }, [user, router])
+  useEffect(() => { if (!authLoading && !user) router.push('/login') }, [user, authLoading, router])
 
   const handleSave = () => {
     localStorage.setItem('soulmateSync_preferences', JSON.stringify(prefs))

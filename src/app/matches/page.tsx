@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Eye, Heart, Users, Star, MapPin, Clock, Send, Inbox, HandHeart, Bookmark, Brain, Sparkles, Crown, Check, X, User, BadgeCheck } from 'lucide-react'
 import { useProfileSlide } from '@/hooks/useGsap'
+import { useSwipe } from '@/hooks/useSwipe'
 import { useChatSidebar } from '@/context/ChatSidebarContext'
 
 interface ProfileItem {
@@ -15,7 +16,7 @@ interface ProfileItem {
 }
 
 export default function MatchesPage() {
-  const { user, authFetch } = useAuth()
+  const { user, authFetch, loading: authLoading } = useAuth()
   const router = useRouter()
   const { isOpen: chatSidebarOpen } = useChatSidebar()
   const [activeTab, setActiveTab] = useState('daily')
@@ -30,7 +31,7 @@ export default function MatchesPage() {
   const [likedProfiles, setLikedProfiles] = useState<Set<string>>(new Set())
   const [timeLeft, setTimeLeft] = useState('')
 
-  useEffect(() => { if (!user) router.push('/login') }, [user, router])
+  useEffect(() => { if (!authLoading && !user) router.push('/login') }, [user, authLoading, router])
 
   // Countdown timer - resets daily at midnight
   useEffect(() => {
@@ -60,6 +61,8 @@ export default function MatchesPage() {
     setCurrentIndex(currentIndex - 1)
     animateSlide('prev')
   }
+
+  const swipeHandlers = useSwipe(handleNext, handlePrev)
 
   const fetchCounts = useCallback(async () => {
     try {
@@ -245,15 +248,16 @@ export default function MatchesPage() {
                   Next →
                 </button>
               </div>
+              <span className="text-[10px] text-purple-300/40 lg:hidden">← Swipe to navigate →</span>
             </div>
 
-            <div ref={profileSlideRef} className="flex flex-col lg:flex-row">
+            <div ref={profileSlideRef} className="flex flex-col lg:flex-row" {...swipeHandlers}>
               {/* Left: Large Photo */}
               <div className="lg:w-80 shrink-0 p-4">
                 <div className="relative rounded-xl overflow-hidden">
                   {currentProfile.photos && currentProfile.photos.length > 0 ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={currentProfile.photos[0]} alt={currentProfile.name} className="w-full h-80 object-cover rounded-xl" />
+                    <img src={currentProfile.photos[0]} alt={currentProfile.name} className="w-full h-80 object-cover rounded-xl" onError={(e) => { (e.target as HTMLImageElement).src = currentProfile.gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg' }} />
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={currentProfile.gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg'} alt={currentProfile.name} className="w-full h-80 object-cover rounded-xl" />

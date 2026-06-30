@@ -21,6 +21,8 @@ interface AuthContextType {
   user: User | null
   token: string | null
   login: (email: string, password: string) => Promise<boolean>
+  loginWithGoogle: (credential: string) => Promise<{ success: boolean; isNewUser?: boolean; error?: string }>
+  setSession: (user: User, token: string) => void
   register: (data: RegisterData) => Promise<{ success: boolean; error?: string }>
   logout: () => void
   loading: boolean
@@ -114,6 +116,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const setSession = (userData: User, newToken: string) => {
+    setUser(userData)
+    setToken(newToken)
+    localStorage.setItem('soulmateSync_user', JSON.stringify(userData))
+    localStorage.setItem('soulmateSync_token', newToken)
+  }
+
+  const loginWithGoogle = async (credential: string): Promise<{ success: boolean; isNewUser?: boolean; error?: string }> => {
+    try {
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential })
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        setUser(data.user)
+        setToken(data.token)
+        localStorage.setItem('soulmateSync_user', JSON.stringify(data.user))
+        localStorage.setItem('soulmateSync_token', data.token)
+        return { success: true, isNewUser: data.isNewUser }
+      }
+      return { success: false, error: data.error || 'Google login failed' }
+    } catch {
+      return { success: false, error: 'Network error. Please try again.' }
+    }
+  }
+
   const register = async (data: RegisterData): Promise<{ success: boolean; error?: string }> => {
     try {
       const res = await fetch('/api/auth/register', {
@@ -167,7 +197,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, loading, updateUserData, checkPremium, authFetch }}>
+    <AuthContext.Provider value={{ user, token, login, loginWithGoogle, setSession, register, logout, loading, updateUserData, checkPremium, authFetch }}>
       {children}
     </AuthContext.Provider>
   )

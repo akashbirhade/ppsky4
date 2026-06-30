@@ -115,16 +115,16 @@ const DAILY_AFFIRMATION = [
 ]
 
 export default function CoachPage() {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const [expandedTopic, setExpandedTopic] = useState<string | null>('first-impressions')
   const [affirmation] = useState(() => DAILY_AFFIRMATION[Math.floor(Math.random() * DAILY_AFFIRMATION.length)])
 
   useEffect(() => {
-    if (!user) router.push('/login')
-  }, [user, router])
+    if (!authLoading && !user) router.push('/login')
+  }, [user, authLoading, router])
 
-  if (!user) return null
+  if (authLoading || !user) return null
 
   return (
     <div className="min-h-screen bg-mesh pt-[104px] pb-12 px-4">

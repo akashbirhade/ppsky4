@@ -174,7 +174,7 @@ export default function BiodataUpload({ userId, authFetch, onExtracted }: Biodat
         <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-sm text-red-400">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
-          <button onClick={() => setError(null)} className="ml-auto">
+          <button type="button" onClick={() => setError(null)} className="ml-auto">
             <X className="h-4 w-4" />
           </button>
         </div>

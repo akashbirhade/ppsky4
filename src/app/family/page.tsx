@@ -39,7 +39,7 @@ const MANAGED_PROFILES: ManagedProfile[] = [
 ]
 
 export default function FamilyPage() {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const [members, setMembers] = useState(FAMILY_MEMBERS)
   const [profiles, setProfiles] = useState(MANAGED_PROFILES)
@@ -47,8 +47,8 @@ export default function FamilyPage() {
   const [newMember, setNewMember] = useState({ name: '', email: '', relation: '', role: 'viewer' as const })
 
   useEffect(() => {
-    if (!user) router.push('/login')
-  }, [user, router])
+    if (!authLoading && !user) router.push('/login')
+  }, [user, authLoading, router])
 
   const addMember = () => {
     if (!newMember.name || !newMember.email) return

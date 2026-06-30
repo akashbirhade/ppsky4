@@ -1,15 +1,19 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
 import { User, Save, Camera, Upload, BadgeCheck, MapPin, GraduationCap, Briefcase, Heart, Globe, BookOpen, Sparkles, TrendingUp, Star, Video, Share2, FileText } from 'lucide-react'
 import BiodataUpload from '@/components/BiodataUpload'
+import LocationSelector from '@/components/LocationSelector'
 
 export default function ProfilePage() {
-  const { user, authFetch, updateUserData } = useAuth()
+  const { user, authFetch, updateUserData, loading: authLoading } = useAuth()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const submittingRef = useRef(false)
+  const savedProfileRef = useRef('')
+  const savedPhotosRef = useRef('')
   const [profileLoading, setProfileLoading] = useState(true)
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -18,12 +22,12 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState({
     religion: '', caste: '', motherTongue: '', height: '',
     education: '', occupation: '', income: '',
-    city: '', state: '', country: 'India', about: '',
+    city: '', state: '', country: 'India', district: '', taluka: '', pincode: '', about: '',
     partnerAgeMin: '22', partnerAgeMax: '35',
     partnerReligion: 'Any', partnerEducation: 'Any', partnerCity: 'Any'
   })
 
-  useEffect(() => { if (!user) router.push('/login') }, [user, router])
+  useEffect(() => { if (!authLoading && !user) router.push('/login') }, [user, authLoading, router])
 
   // Fetch existing profile data on load
   useEffect(() => {
@@ -58,6 +62,9 @@ export default function ProfilePage() {
             city: p.city || '',
             state: p.state || '',
             country: p.country || 'India',
+            district: p.district || '',
+            taluka: p.taluka || '',
+            pincode: p.pincode || '',
             about: p.about || '',
             partnerAgeMin: String(p.partnerPreferences?.ageMin || '22'),
             partnerAgeMax: String(p.partnerPreferences?.ageMax || '35'),
@@ -68,6 +75,8 @@ export default function ProfilePage() {
           setProfile(loadedProfile)
           const loadedPhotos = p.photos && p.photos.length > 0 ? p.photos : []
           if (loadedPhotos.length > 0) setPhotos(loadedPhotos)
+          savedProfileRef.current = JSON.stringify(loadedProfile)
+          savedPhotosRef.current = JSON.stringify(loadedPhotos)
           
           // Cache in localStorage
           localStorage.setItem(`profile_data_${user.id}`, JSON.stringify({
@@ -81,6 +90,7 @@ export default function ProfilePage() {
       setProfileLoading(false)
     }
     loadProfile()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -119,6 +129,8 @@ export default function ProfilePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (submittingRef.current) return
+    submittingRef.current = true
     setLoading(true)
     setSaveError(null)
     try {
@@ -155,6 +167,8 @@ export default function ProfilePage() {
         }))
       }
 
+      savedProfileRef.current = JSON.stringify(profile)
+      savedPhotosRef.current = JSON.stringify(cleanPhotos)
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } catch (err) {
@@ -162,7 +176,10 @@ export default function ProfilePage() {
       setSaveError(err instanceof Error ? err.message : 'Unable to save profile details')
     }
     setLoading(false)
+    submittingRef.current = false
   }
+
+  const isDirty = JSON.stringify(profile) !== savedProfileRef.current || JSON.stringify(photos.filter(p => !p.startsWith('data:'))) !== savedPhotosRef.current
 
   if (!user) return null
 
@@ -328,7 +345,16 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="relative">
+          {/* Loading overlay while saving */}
+          {loading && (
+            <div className="absolute inset-0 bg-white/30 dark:bg-black/40 backdrop-blur-[2px] z-20 rounded-2xl flex items-center justify-center">
+              <div className="flex flex-col items-center gap-3 bg-white dark:bg-dark-900/90 px-6 py-4 rounded-2xl border border-teal-200/50 dark:border-purple-500/20 shadow-xl">
+                <div className="w-8 h-8 border-3 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                <p className="text-sm font-medium text-slate-700 dark:text-purple-200">Saving profile...</p>
+              </div>
+            </div>
+          )}
           {/* Personal Tab */}
           {activeTab === 'personal' && (
             <div className="glass-card animate-fade-in-up">
@@ -389,7 +415,7 @@ export default function ProfilePage() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={photo} alt={`Photo ${i+1}`} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <button onClick={() => setPhotos(prev => prev.filter((_, idx) => idx !== i))} className="text-slate-800 dark:text-white text-xs bg-red-500/80 px-3 py-1.5 rounded-lg">
+                      <button type="button" onClick={() => setPhotos(prev => prev.filter((_, idx) => idx !== i))} className="text-slate-800 dark:text-white text-xs bg-red-500/80 px-3 py-1.5 rounded-lg">
                         Remove
                       </button>
                     </div>
@@ -446,11 +472,26 @@ export default function ProfilePage() {
               <h3 className="text-sm font-semibold text-slate-800 dark:text-white mt-6 mb-3 flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-teal-600 dark:text-purple-400" /> Location
               </h3>
-              <div className="grid sm:grid-cols-3 gap-4">
-                <input type="text" name="city" value={profile.city} onChange={handleChange} className="input-field" placeholder="City" />
-                <input type="text" name="state" value={profile.state} onChange={handleChange} className="input-field" placeholder="State" />
-                <input type="text" name="country" value={profile.country} onChange={handleChange} className="input-field" placeholder="Country" />
-              </div>
+              <LocationSelector
+                value={{
+                  city: profile.city,
+                  stateCode: profile.state,
+                  countryCode: profile.country === 'India' ? 'IN' : '',
+                  country: profile.country,
+                  state: profile.state,
+                }}
+                onChange={(loc) => {
+                  setProfile(prev => ({
+                    ...prev,
+                    city: loc.city,
+                    state: loc.state || loc.stateCode,
+                    country: loc.country || loc.countryCode,
+                    district: loc.district,
+                    taluka: loc.taluka,
+                    pincode: loc.pincode,
+                  }))
+                }}
+              />
             </div>
           )}
 
@@ -585,9 +626,9 @@ export default function ProfilePage() {
           )}
 
           {/* Save Button */}
-          <button type="submit" disabled={loading} className="w-full mt-6 btn-primary py-4 flex items-center justify-center gap-2 disabled:opacity-50 text-base">
+          <button type="submit" disabled={loading || !isDirty} className="w-full mt-6 btn-primary py-4 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-base">
             <Save className="h-5 w-5" />
-            {loading ? 'Saving...' : 'Save Profile'}
+            {loading ? 'Saving...' : isDirty ? 'Update Profile' : 'Profile Saved'}
           </button>
         </form>
       </div>

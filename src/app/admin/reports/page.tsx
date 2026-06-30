@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { AlertTriangle, CheckCircle, Eye, Ban, X, MessageCircle } from 'lucide-react'
 
 interface Report {
@@ -39,11 +39,7 @@ export default function AdminReportsPage() {
   const [actionModal, setActionModal] = useState<{ report: Report; action: string } | null>(null)
   const [adminNote, setAdminNote] = useState('')
 
-  useEffect(() => {
-    fetchReports()
-  }, [filter])
-
-  async function fetchReports() {
+  const fetchReports = useCallback(async () => {
     setLoading(true)
     try {
       const token = localStorage.getItem('soulmateSync_token')
@@ -58,7 +54,11 @@ export default function AdminReportsPage() {
     } catch {} finally {
       setLoading(false)
     }
-  }
+  }, [filter])
+
+  useEffect(() => {
+    fetchReports()
+  }, [fetchReports])
 
   async function updateReport(reportId: string, status: string, note?: string) {
     try {

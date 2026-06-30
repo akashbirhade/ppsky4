@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useChatSidebar } from '@/context/ChatSidebarContext'
+import { useVisibilityPolling } from '@/hooks/useVisibilityPolling'
 import Link from 'next/link'
 import { Volume2, VolumeX, MessageCircle, Minus, Search, ChevronDown, CheckCircle2, Circle } from 'lucide-react'
 
@@ -77,33 +78,30 @@ export default function ChatSidebar() {
   const [chatUsers, setChatUsers] = useState<ChatUser[]>([])
   const statusMenuRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
+  const fetchChats = useCallback(async () => {
     if (!user) return
-    const fetchChats = async () => {
-      try {
-        const res = await authFetch(`/api/messages?userId=${user.id}`)
-        const data = await res.json()
-        const convos = data.conversations || []
-        const mapped: ChatUser[] = convos.map((c: any) => ({
-          id: c.user?.id || '',
-          name: c.user?.name || 'Unknown',
-          photo: c.user?.photos?.[0] || undefined,
-          gender: c.user?.gender?.toLowerCase() === 'female' ? 'female' : 'male',
-          message: c.lastMessage?.content || 'No messages yet',
-          time: c.lastMessage?.timestamp ? new Date(c.lastMessage.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '',
-          unread: c.unreadCount || 0,
-          online: Math.random() > 0.5,
-          verified: c.user?.verified || false,
-        }))
-        setChatUsers(mapped)
-      } catch (err) {
-        console.error('Failed to fetch chats:', err)
-      }
+    try {
+      const res = await authFetch(`/api/messages?userId=${user.id}`)
+      const data = await res.json()
+      const convos = data.conversations || []
+      const mapped: ChatUser[] = convos.map((c: any) => ({
+        id: c.user?.id || '',
+        name: c.user?.name || 'Unknown',
+        photo: c.user?.photos?.[0] || undefined,
+        gender: c.user?.gender?.toLowerCase() === 'female' ? 'female' : 'male',
+        message: c.lastMessage?.content || 'No messages yet',
+        time: c.lastMessage?.timestamp ? new Date(c.lastMessage.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '',
+        unread: c.unreadCount || 0,
+        online: Math.random() > 0.5,
+        verified: c.user?.verified || false,
+      }))
+      setChatUsers(mapped)
+    } catch (err) {
+      console.error('Failed to fetch chats:', err)
     }
-    fetchChats()
-    const interval = setInterval(fetchChats, 15000)
-    return () => clearInterval(interval)
   }, [user, authFetch])
+
+  useVisibilityPolling(fetchChats, 20000, !!user)
 
   // Close status dropdown when clicking outside
   useEffect(() => {

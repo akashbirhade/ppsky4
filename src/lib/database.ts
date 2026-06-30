@@ -272,6 +272,8 @@ export interface UserProfile {
   lastActive: string
   profileComplete: boolean
   online: boolean
+  authProvider?: string
+  googleId?: string
 }
 
 export interface FamilyDetails {
@@ -662,7 +664,7 @@ export function createUser(data: Partial<UserProfile>): UserProfile {
     familyDetails: data.familyDetails || { father: '', mother: '', siblings: '', familyType: '', familyStatus: '', familyIncome: '' },
     partnerPreferences: data.partnerPreferences || { ageMin: 20, ageMax: 40, heightMin: "5'0\"", heightMax: "6'5\"", religion: 'Any', education: 'Any', occupation: 'Any', city: 'Any' },
     photos: data.photos || [],
-    verified: false,
+    verified: data.verified ?? false,
     premium: false,
     premiumPlan: null,
     premiumExpiry: null,

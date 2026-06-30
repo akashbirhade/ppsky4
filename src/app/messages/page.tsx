@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useVisibilityPolling } from '@/hooks/useVisibilityPolling'
 import Link from 'next/link'
 import {
   Send, Search, Phone, Video, ArrowLeft,
@@ -70,7 +71,7 @@ function formatDate(ts: string) {
 }
 
 function MessagesInner() {
-  const { user, authFetch } = useAuth()
+  const { user, authFetch, loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const chatParam = searchParams.get('chat')
@@ -85,10 +86,8 @@ function MessagesInner() {
   const [loadingMsgs, setLoadingMsgs] = useState(false)
   const [sending, setSending] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const pollRef = useRef<NodeJS.Timeout | null>(null)
-  const convPollRef = useRef<NodeJS.Timeout | null>(null)
 
-  useEffect(() => { if (!user) router.push('/login') }, [user, router])
+  useEffect(() => { if (!authLoading && !user) router.push('/login') }, [user, authLoading, router])
 
   const fetchConversations = useCallback(async () => {
     if (!user) return
@@ -123,12 +122,8 @@ function MessagesInner() {
     }).catch(() => { /* ignore */ })
   }, [user, authFetch])
 
-  // Poll conversations every 5s
-  useEffect(() => {
-    fetchConversations()
-    convPollRef.current = setInterval(fetchConversations, 5000)
-    return () => { if (convPollRef.current) clearInterval(convPollRef.current) }
-  }, [fetchConversations])
+  // Poll conversations every 10s (only when tab visible)
+  useVisibilityPolling(fetchConversations, 10000, !!user)
 
   // Handle ?chat= URL param — auto-open that profile's chat
   useEffect(() => {
@@ -156,13 +151,12 @@ function MessagesInner() {
     window.history.replaceState(null, '', `/messages?chat=${conv.user.id}`)
   }, [fetchMessages, markRead])
 
-  // Poll messages in active chat every 2.5s
-  useEffect(() => {
-    if (!selectedId) return
-    if (pollRef.current) clearInterval(pollRef.current)
-    pollRef.current = setInterval(() => fetchMessages(selectedId), 2500)
-    return () => { if (pollRef.current) clearInterval(pollRef.current) }
-  }, [selectedId, fetchMessages])
+  // Poll messages in active chat every 5s (only when tab visible)
+  useVisibilityPolling(
+    useCallback(() => { if (selectedId) fetchMessages(selectedId) }, [selectedId, fetchMessages]),
+    5000,
+    !!selectedId
+  )
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })

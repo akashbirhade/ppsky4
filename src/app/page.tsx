@@ -239,17 +239,17 @@ export default function Home() {
             <div>
               <h4 className="text-sm font-semibold text-slate-800 dark:text-white mb-3">Safety</h4>
               <div className="space-y-2">
-                <a href="#" className="block text-xs text-slate-500 dark:text-purple-300/50 hover:text-teal-600 dark:hover:text-purple-200 transition-colors">Safety Tips</a>
-                <a href="#" className="block text-xs text-slate-500 dark:text-purple-300/50 hover:text-teal-600 dark:hover:text-purple-200 transition-colors">Privacy Policy</a>
-                <a href="#" className="block text-xs text-slate-500 dark:text-purple-300/50 hover:text-teal-600 dark:hover:text-purple-200 transition-colors">Terms of Use</a>
+                <Link href="/legal" className="block text-xs text-slate-500 dark:text-purple-300/50 hover:text-teal-600 dark:hover:text-purple-200 transition-colors">Safety Tips</Link>
+                <Link href="/legal/privacy-policy" className="block text-xs text-slate-500 dark:text-purple-300/50 hover:text-teal-600 dark:hover:text-purple-200 transition-colors">Privacy Policy</Link>
+                <Link href="/legal/terms-and-conditions" className="block text-xs text-slate-500 dark:text-purple-300/50 hover:text-teal-600 dark:hover:text-purple-200 transition-colors">Terms of Use</Link>
               </div>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-slate-800 dark:text-white mb-3">Support</h4>
               <div className="space-y-2">
-                <a href="#" className="block text-xs text-slate-500 dark:text-purple-300/50 hover:text-teal-600 dark:hover:text-purple-200 transition-colors">Help Center</a>
-                <a href="#" className="block text-xs text-slate-500 dark:text-purple-300/50 hover:text-teal-600 dark:hover:text-purple-200 transition-colors">Contact Us</a>
-                <a href="#" className="block text-xs text-slate-500 dark:text-purple-300/50 hover:text-teal-600 dark:hover:text-purple-200 transition-colors">Report Issue</a>
+                <Link href="/legal" className="block text-xs text-slate-500 dark:text-purple-300/50 hover:text-teal-600 dark:hover:text-purple-200 transition-colors">Help Center</Link>
+                <Link href="/legal" className="block text-xs text-slate-500 dark:text-purple-300/50 hover:text-teal-600 dark:hover:text-purple-200 transition-colors">Contact Us</Link>
+                <Link href="/legal" className="block text-xs text-slate-500 dark:text-purple-300/50 hover:text-teal-600 dark:hover:text-purple-200 transition-colors">Report Issue</Link>
               </div>
             </div>
           </div>

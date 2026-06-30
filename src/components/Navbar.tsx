@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useTheme } from '@/context/ThemeContext'
+import { useVisibilityPolling } from '@/hooks/useVisibilityPolling'
 import { Menu, X, User, LogOut, Search, MessageCircle, Crown, Users, Settings, Bell, Mail, Shield, SlidersHorizontal, ChevronDown, HelpCircle, Sun, Moon } from 'lucide-react'
 import HalfHeart from './HalfHeart'
 
@@ -35,55 +36,49 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  useEffect(() => {
+  const fetchNotifs = useCallback(async () => {
     if (!user) return
-    const fetchNotifs = async () => {
-      try {
-        const res = await authFetch(`/api/activity/interests?userId=${user.id}&type=received`)
-        const data = await res.json()
-        const interests = data.interests || []
-        const notifs = interests.slice(0, 5).map((item: any) => ({
-          id: item.interest?.id || item.profile?.id || Math.random().toString(),
-          type: item.interest?.status === 'pending' ? 'interest_received' : 'interest_' + item.interest?.status,
-          title: item.interest?.status === 'pending' ? 'New Interest!' : 'Interest ' + (item.interest?.status || ''),
-          message: `${item.profile?.name || 'Someone'} sent you an interest`,
-          time: item.interest?.timestamp ? getTimeAgo(item.interest.timestamp) : 'recently',
-          read: item.interest?.status !== 'pending',
-          link: `/profile/${item.profile?.id}`,
-        }))
-        setNotifications(notifs)
-        setNotifCount(notifs.filter((n: any) => !n.read).length)
-      } catch {}
-    }
-    fetchNotifs()
-    const interval = setInterval(fetchNotifs, 15000)
-    return () => clearInterval(interval)
+    try {
+      const res = await authFetch(`/api/activity/interests?userId=${user.id}&type=received`)
+      const data = await res.json()
+      const interests = data.interests || []
+      const notifs = interests.slice(0, 5).map((item: any) => ({
+        id: item.interest?.id || item.profile?.id || Math.random().toString(),
+        type: item.interest?.status === 'pending' ? 'interest_received' : 'interest_' + item.interest?.status,
+        title: item.interest?.status === 'pending' ? 'New Interest!' : 'Interest ' + (item.interest?.status || ''),
+        message: `${item.profile?.name || 'Someone'} sent you an interest`,
+        time: item.interest?.timestamp ? getTimeAgo(item.interest.timestamp) : 'recently',
+        read: item.interest?.status !== 'pending',
+        link: `/profile/${item.profile?.id}`,
+      }))
+      setNotifications(notifs)
+      setNotifCount(notifs.filter((n: any) => !n.read).length)
+    } catch {}
   }, [user, authFetch])
 
+  useVisibilityPolling(fetchNotifs, 30000, !!user)
+
   // Fetch dynamic inbox and match counts
-  useEffect(() => {
+  const fetchCounts = useCallback(async () => {
     if (!user) return
-    const fetchCounts = async () => {
-      try {
-        const [msgRes, matchRes] = await Promise.all([
-          authFetch(`/api/messages?userId=${user.id}`),
-          authFetch(`/api/activity/matches?userId=${user.id}&type=counts`)
-        ])
-        if (msgRes.ok) {
-          const msgData = await msgRes.json()
-          const unread = (msgData.conversations || []).reduce((acc: number, c: any) => acc + (c.unreadCount || 0), 0)
-          setInboxCount(unread)
-        }
-        if (matchRes.ok) {
-          const matchData = await matchRes.json()
-          setMatchCount(matchData.counts?.interestsReceived || 0)
-        }
-      } catch {}
-    }
-    fetchCounts()
-    const interval = setInterval(fetchCounts, 30000)
-    return () => clearInterval(interval)
+    try {
+      const [msgRes, matchRes] = await Promise.all([
+        authFetch(`/api/messages?userId=${user.id}`),
+        authFetch(`/api/activity/matches?userId=${user.id}&type=counts`)
+      ])
+      if (msgRes.ok) {
+        const msgData = await msgRes.json()
+        const unread = (msgData.conversations || []).reduce((acc: number, c: any) => acc + (c.unreadCount || 0), 0)
+        setInboxCount(unread)
+      }
+      if (matchRes.ok) {
+        const matchData = await matchRes.json()
+        setMatchCount(matchData.counts?.interestsReceived || 0)
+      }
+    } catch {}
   }, [user, authFetch])
+
+  useVisibilityPolling(fetchCounts, 60000, !!user)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -103,6 +98,18 @@ export default function Navbar() {
     <nav aria-label="Primary navigation" className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-dark-900/90 backdrop-blur-xl border-b border-teal-100/60 dark:border-purple-500/10 shadow-sm dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-center lg:justify-between items-center h-14 lg:h-16 relative">
+          {/* Mobile menu toggle for non-logged-in users - left side */}
+          {!user && (
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="lg:hidden absolute left-0 w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 dark:bg-purple-500/10 border border-slate-200 dark:border-purple-500/20 hover:bg-slate-200 dark:hover:bg-purple-500/20 transition-all"
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isOpen}
+            >
+              {isOpen ? <X className="h-4 w-4 text-slate-700 dark:text-purple-300" /> : <Menu className="h-4 w-4 text-slate-700 dark:text-purple-300" />}
+            </button>
+          )}
+
           {/* Theme toggle - mobile only, right side */}
           <button
             onClick={toggleTheme}
@@ -142,14 +149,14 @@ export default function Navbar() {
                   </button>
                   {helpOpen && (
                     <div className="absolute right-0 top-full mt-2 w-48 bg-dark-800 rounded-lg shadow-xl border border-purple-500/20 py-2 z-50 animate-fade-in-down">
-                      <a href="#" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10">Help Center</a>
-                      <a href="#" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10">Contact Us</a>
-                      <a href="#" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10">FAQs</a>
-                      <a href="#" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10">Safety Tips</a>
+                      <Link href="/legal" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Help Center</Link>
+                      <Link href="/legal" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Contact Us</Link>
+                      <Link href="/legal" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>FAQs</Link>
+                      <Link href="/legal" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Safety Tips</Link>
                       <div className="border-t border-purple-500/10 my-1"></div>
-                      <Link href="/legal" className="block px-4 py-2 text-sm text-purple-300 hover:bg-purple-500/10">Legal Center</Link>
-                      <Link href="/legal/terms-and-conditions" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10">Terms & Conditions</Link>
-                      <Link href="/legal/privacy-policy" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10">Privacy Policy</Link>
+                      <Link href="/legal" className="block px-4 py-2 text-sm text-purple-300 hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Legal Center</Link>
+                      <Link href="/legal/terms-and-conditions" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Terms & Conditions</Link>
+                      <Link href="/legal/privacy-policy" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Privacy Policy</Link>
                     </div>
                   )}
                 </div>
@@ -220,7 +227,7 @@ export default function Navbar() {
                     <div className="w-9 h-9 rounded-full bg-purple-500/20 border-2 border-purple-400/30 flex items-center justify-center overflow-hidden group-hover:border-purple-300/50 transition-all">
                       {user.photos && user.photos.length > 0 ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={user.photos[0]} alt="" className="w-full h-full object-cover" />
+                        <img src={user.photos[0]} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = user.gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg' }} />
                       ) : (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={user.gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg'} alt="" className="w-full h-full object-cover" />
@@ -302,6 +309,18 @@ export default function Navbar() {
           </div>
         )}
       </div>
+
+      {/* Mobile Menu for non-logged-in users */}
+      {!user && isOpen && (
+        <div className="lg:hidden border-t border-slate-100 dark:border-purple-500/10 py-3 px-2 animate-fade-in-down">
+          <div className="flex flex-col space-y-1">
+            <MobileLink href="/search" label="Browse Profiles" onClick={() => setIsOpen(false)} />
+            <MobileLink href="/hosts" label="Be a Host" onClick={() => setIsOpen(false)} />
+            <MobileLink href="/login" label="Login" onClick={() => setIsOpen(false)} />
+            <MobileLink href="/register" label="Register Free" onClick={() => setIsOpen(false)} />
+          </div>
+        </div>
+      )}
 
 
     </nav>

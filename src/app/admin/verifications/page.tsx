@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { CheckCircle, X, FileText, Camera, GraduationCap, Briefcase, Clock, XCircle } from 'lucide-react'
 
 interface Verification {
@@ -36,11 +36,7 @@ export default function AdminVerificationsPage() {
   const [rejectModal, setRejectModal] = useState<Verification | null>(null)
   const [rejectionReason, setRejectionReason] = useState('')
 
-  useEffect(() => {
-    fetchVerifications()
-  }, [filter])
-
-  async function fetchVerifications() {
+  const fetchVerifications = useCallback(async () => {
     setLoading(true)
     try {
       const token = localStorage.getItem('soulmateSync_token')
@@ -54,7 +50,11 @@ export default function AdminVerificationsPage() {
     } catch {} finally {
       setLoading(false)
     }
-  }
+  }, [filter])
+
+  useEffect(() => {
+    fetchVerifications()
+  }, [fetchVerifications])
 
   async function reviewVerification(id: string, approved: boolean, reason?: string) {
     try {

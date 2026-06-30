@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserByPhone } from '@/lib/database'
-import { getOtpStore } from '@/lib/otp-store'
-
-const otpStore = getOtpStore()
+import { generateStatelessOtp } from '@/lib/otp-store'
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,39 +36,19 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Rate limiting: prevent resend within 30 seconds
-    const existingOtp = otpStore.get(cleanPhone)
-    if (existingOtp && existingOtp.expiresAt - Date.now() > 4.5 * 60 * 1000) {
-      return NextResponse.json({ error: 'Please wait 30 seconds before requesting a new OTP' }, { status: 429 })
-    }
+    // Generate stateless OTP (works on serverless)
+    const { otp, otpToken } = generateStatelessOtp(cleanPhone, purpose as 'login' | 'register')
 
-    // Generate 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString()
+    // In production with SMS provider, send OTP via SMS here.
+    // Since no SMS service is configured, we return the OTP for demo purposes.
+    console.log(`[OTP] ${cleanPhone}: ${otp} (purpose: ${purpose})`)
 
-    // Store OTP with 5 min expiry
-    otpStore.set(cleanPhone, {
-      otp,
-      expiresAt: Date.now() + 5 * 60 * 1000,
-      purpose,
-    })
-
-    // In production, send SMS via Twilio/MSG91/etc.
-    // Only log OTP in non-production environments.
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`[OTP] ${cleanPhone}: ${otp} (purpose: ${purpose})`)
-    }
-
-    const response: Record<string, unknown> = {
+    return NextResponse.json({
       success: true,
-      message: 'OTP sent successfully',
-    }
-
-    // Include OTP in API response only for local/demo environments.
-    if (process.env.NODE_ENV !== 'production') {
-      response.demo_otp = otp
-    }
-
-    return NextResponse.json(response)
+      message: 'OTP sent successfully to your mobile number',
+      otpToken, // Stateless verification token (required for verify step)
+      demo_otp: otp, // Remove this when SMS service is configured
+    })
   } catch (error) {
     console.error('OTP send error:', error)
     return NextResponse.json({ error: 'Failed to send OTP' }, { status: 500 })

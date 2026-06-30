@@ -7,10 +7,10 @@ interface ChatSidebarContextType {
   setIsOpen: (open: boolean) => void
 }
 
-const ChatSidebarContext = createContext<ChatSidebarContextType>({ isOpen: true, setIsOpen: () => {} })
+const ChatSidebarContext = createContext<ChatSidebarContextType>({ isOpen: false, setIsOpen: () => {} })
 
 export function ChatSidebarProvider({ children }: { children: ReactNode }) {
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
   return (
     <ChatSidebarContext.Provider value={{ isOpen, setIsOpen }}>
       {children}

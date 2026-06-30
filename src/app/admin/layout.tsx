@@ -2,13 +2,12 @@
 
 import { useAuth } from '@/context/AuthContext'
 import { useRouter, usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { 
   BarChart3, Users, Shield, AlertTriangle, CreditCard, Settings, 
-  CheckCircle, Bell, Home, LogOut, Menu, X 
+  CheckCircle, Home, LogOut, Menu, X 
 } from 'lucide-react'
-import { useState } from 'react'
 
 const ADMIN_EMAILS = ['admin@soulmatesync.com', 'priya@example.com']
 
@@ -23,15 +22,23 @@ const navItems = [
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
-    if (!user) router.push('/login')
-    else if (!ADMIN_EMAILS.includes(user.email || '')) router.push('/dashboard')
-  }, [user, router])
+    if (!authLoading && !user) router.push('/login')
+    else if (user && !ADMIN_EMAILS.includes(user.email || '')) router.push('/dashboard')
+  }, [user, authLoading, router])
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-mesh pt-[104px] pb-12 px-4 flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
 
   if (!user || !ADMIN_EMAILS.includes(user.email || '')) {
     return (

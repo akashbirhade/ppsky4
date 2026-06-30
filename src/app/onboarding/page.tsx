@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Camera, MapPin, GraduationCap, Briefcase, Users, Star, ArrowRight, ArrowLeft, CheckCircle, Sparkles, Moon, User } from 'lucide-react'
 import HalfHeart from '@/components/HalfHeart'
+import LocationSelector from '@/components/LocationSelector'
 
 const STEPS = [
   { title: 'Profile Photo', icon: Camera, subtitle: 'First impressions matter' },
@@ -27,7 +28,7 @@ const SECTION_TO_STEP: Record<string, number> = {
 }
 
 function OnboardingContent() {
-  const { user, authFetch } = useAuth()
+  const { user, authFetch, loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const section = searchParams.get('section') || 'basic'
@@ -63,8 +64,8 @@ function OnboardingContent() {
   })
 
   useEffect(() => {
-    if (!user) router.push('/login')
-  }, [user, router])
+    if (!authLoading && !user) router.push('/login')
+  }, [user, authLoading, router])
 
   useEffect(() => {
     // Update step when section parameter changes
@@ -341,17 +342,22 @@ function OnboardingContent() {
           {/* Step 3: Family & Lifestyle */}
           {step === 3 && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">City *</label>
-                  <input type="text" name="city" value={formData.city} onChange={handleChange}
-                    placeholder="e.g. Mumbai" className="input-field w-full" />
-                </div>
-                <div>
-                  <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">State *</label>
-                  <input type="text" name="state" value={formData.state} onChange={handleChange}
-                    placeholder="e.g. Maharashtra" className="input-field w-full" />
-                </div>
+              <div>
+                <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Location *</label>
+                <LocationSelector
+                  compact
+                  onChange={(loc) => {
+                    setFormData(prev => ({
+                      ...prev,
+                      city: loc.city,
+                      state: loc.state || loc.stateCode,
+                      country: loc.country || 'India',
+                      district: loc.district,
+                      taluka: loc.taluka,
+                      pincode: loc.pincode,
+                    }))
+                  }}
+                />
               </div>
               <div>
                 <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Family Type</label>

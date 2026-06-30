@@ -1,0 +1,184 @@
+{
+  "MH": {
+    "name": "Maharashtra",
+    "districts": {
+      "PUN": { "name": "Pune", "talukas": { "HVL": { "name": "Haveli", "cities": ["Pune", "Pimpri-Chinchwad", "Hinjewadi", "Wakad", "Baner"] }, "MUL": { "name": "Mulshi", "cities": ["Pirangut", "Paud", "Lavale", "Hinjewadi"] }, "MAV": { "name": "Maval", "cities": ["Talegaon Dabhade", "Lonavala", "Kamshet"] }, "BRM": { "name": "Baramati", "cities": ["Baramati", "Jejuri", "Indapur"] }, "JNR": { "name": "Junnar", "cities": ["Junnar", "Otur", "Narayangaon"] }, "SHP": { "name": "Shirur", "cities": ["Shirur", "Ranjangaon", "Koregaon Bhima"] }, "PUR": { "name": "Purandar", "cities": ["Saswad", "Jejuri", "Dive"] }, "VLH": { "name": "Velhe", "cities": ["Velhe", "Bhor"] }, "AMB": { "name": "Ambegaon", "cities": ["Ghodegaon", "Manchar"] }, "KHD": { "name": "Khed", "cities": ["Rajgurunagar", "Chakan", "Alandi"] }, "DAU": { "name": "Daund", "cities": ["Daund", "Yavat", "Kurkumbh"] }, "IND": { "name": "Indapur", "cities": ["Indapur", "Bhigwan"] }, "BHR": { "name": "Bhor", "cities": ["Bhor", "Velhe", "Kikvi"] } } },
+      "MUM": { "name": "Mumbai", "talukas": { "MUM": { "name": "Mumbai City", "cities": ["Mumbai", "Colaba", "Dadar", "Byculla", "Worli"] }, "MBS": { "name": "Mumbai Suburban", "cities": ["Andheri", "Bandra", "Borivali", "Malad", "Goregaon", "Kandivali"] } } },
+      "THN": { "name": "Thane", "talukas": { "THN": { "name": "Thane", "cities": ["Thane", "Kalwa", "Mumbra", "Diva"] }, "KLY": { "name": "Kalyan", "cities": ["Kalyan", "Dombivli", "Ulhasnagar", "Ambernath", "Badlapur"] }, "BHW": { "name": "Bhiwandi", "cities": ["Bhiwandi", "Wada", "Shahapur"] }, "MRB": { "name": "Murbad", "cities": ["Murbad", "Tokawade"] }, "SHP": { "name": "Shahapur", "cities": ["Shahapur", "Asangaon"] }, "AMB": { "name": "Ambarnath", "cities": ["Ambarnath", "Badlapur"] } } },
+      "NGP": { "name": "Nagpur", "talukas": { "NGP": { "name": "Nagpur Urban", "cities": ["Nagpur", "Kamptee", "Hingna"] }, "NRK": { "name": "Narkhed", "cities": ["Narkhed", "Mohpa"] }, "SVN": { "name": "Saoner", "cities": ["Saoner", "Parseoni"] }, "KLM": { "name": "Kalameshwar", "cities": ["Kalameshwar", "Kanhan"] }, "UMR": { "name": "Umred", "cities": ["Umred", "Pauni"] }, "KTL": { "name": "Katol", "cities": ["Katol", "Kalmeshwar"] }, "RMP": { "name": "Ramtek", "cities": ["Ramtek", "Mansar"] }, "HNG": { "name": "Hingna", "cities": ["Hingna", "Butibori"] } } },
+      "NSK": { "name": "Nashik", "talukas": { "NSK": { "name": "Nashik", "cities": ["Nashik", "Deolali", "Satpur", "CIDCO"] }, "MLD": { "name": "Malegaon", "cities": ["Malegaon", "Kalwan"] }, "SNN": { "name": "Sinnar", "cities": ["Sinnar", "Shirdi"] }, "IGT": { "name": "Igatpuri", "cities": ["Igatpuri", "Ghoti"] }, "TRB": { "name": "Trimbakeshwar", "cities": ["Trimbakeshwar", "Anjaneri"] }, "DND": { "name": "Dindori", "cities": ["Dindori", "Vani"] }, "YVL": { "name": "Yeola", "cities": ["Yeola", "Manmad"] }, "NPN": { "name": "Niphad", "cities": ["Niphad", "Lasalgaon"] } } },
+      "AUR": { "name": "Aurangabad", "talukas": { "AUR": { "name": "Aurangabad", "cities": ["Aurangabad", "Waluj", "Cidco"] }, "PHU": { "name": "Phulambri", "cities": ["Phulambri"] }, "KHD": { "name": "Khuldabad", "cities": ["Khuldabad", "Ellora"] }, "VJP": { "name": "Vaijapur", "cities": ["Vaijapur", "Lasur"] }, "PNG": { "name": "Paithan", "cities": ["Paithan", "Bidkin"] }, "GNG": { "name": "Gangapur", "cities": ["Gangapur"] }, "KNT": { "name": "Kannad", "cities": ["Kannad", "Daulatabad"] }, "SIL": { "name": "Sillod", "cities": ["Sillod", "Ajanta"] } } },
+      "KLH": { "name": "Kolhapur", "talukas": { "KLH": { "name": "Karvir", "cities": ["Kolhapur", "Ichalkaranji", "Jaysingpur"] }, "HKR": { "name": "Hatkanangle", "cities": ["Ichalkaranji", "Hatkanangle"] }, "SHR": { "name": "Shirol", "cities": ["Shirol", "Jaysingpur"] }, "PNH": { "name": "Panhala", "cities": ["Panhala", "Malkapur"] }, "KGL": { "name": "Kagal", "cities": ["Kagal", "Hupari"] }, "RDN": { "name": "Radhanagari", "cities": ["Radhanagari", "Dajipur"] }, "GDG": { "name": "Gadhinglaj", "cities": ["Gadhinglaj", "Nesari"] }, "CHN": { "name": "Chandgad", "cities": ["Chandgad", "Kowad"] }, "BVD": { "name": "Bavda", "cities": ["Bavda", "Malkapur"] }, "AJR": { "name": "Ajra", "cities": ["Ajra", "Uttur"] }, "SNG": { "name": "Shahuwadi", "cities": ["Shahuwadi", "Kodoli"] }, "BHD": { "name": "Bhudargad", "cities": ["Bhudargad", "Gargoti"] } } },
+      "STR": { "name": "Satara", "talukas": { "STR": { "name": "Satara", "cities": ["Satara", "Wai", "Karad"] }, "KRD": { "name": "Karad", "cities": ["Karad", "Vita"] }, "WAI": { "name": "Wai", "cities": ["Wai", "Panchgani", "Mahabaleshwar"] }, "PTN": { "name": "Patan", "cities": ["Patan", "Kaas"] }, "MAN": { "name": "Man", "cities": ["Dahiwadi", "Mhaswad"] }, "KTJ": { "name": "Khatav", "cities": ["Vaduj", "Khatav"] }, "PHL": { "name": "Phaltan", "cities": ["Phaltan", "Baramati"] }, "JVL": { "name": "Jaoli", "cities": ["Medha", "Jaoli"] } } },
+      "SNG": { "name": "Sangli", "talukas": { "SNG": { "name": "Miraj", "cities": ["Sangli", "Miraj", "Kupwad"] }, "TSG": { "name": "Tasgaon", "cities": ["Tasgaon", "Mhaisal"] }, "JTH": { "name": "Jath", "cities": ["Jath", "Dudhgaon"] }, "WAL": { "name": "Walwa", "cities": ["Islampur", "Walwa"] }, "KDG": { "name": "Kadegaon", "cities": ["Kadegaon", "Vita"] }, "PLU": { "name": "Palus", "cities": ["Palus", "Burli"] }, "KVT": { "name": "Kavathemahankal", "cities": ["Kavathemahankal"] }, "ATN": { "name": "Atpadi", "cities": ["Atpadi", "Digraj"] }, "SHL": { "name": "Shirala", "cities": ["Shirala"] }, "KHN": { "name": "Khanpur", "cities": ["Vita", "Khanapur"] } } },
+      "SOL": { "name": "Solapur", "talukas": { "SOL": { "name": "Solapur North", "cities": ["Solapur", "Barshi"] }, "SOS": { "name": "Solapur South", "cities": ["Solapur South", "Kurduwadi"] }, "PND": { "name": "Pandharpur", "cities": ["Pandharpur", "Mohol"] }, "AKK": { "name": "Akkalkot", "cities": ["Akkalkot", "Dudhani"] }, "BRS": { "name": "Barshi", "cities": ["Barshi", "Vairag"] }, "MDH": { "name": "Madha", "cities": ["Madha", "Karmala"] }, "MNG": { "name": "Mangalvedhe", "cities": ["Mangalvedhe"] }, "SNG": { "name": "Sangola", "cities": ["Sangola", "Mahud"] }, "MLH": { "name": "Malshiras", "cities": ["Akluj", "Malshiras"] }, "MHL": { "name": "Mohol", "cities": ["Mohol", "Nannaj"] }, "KRM": { "name": "Karmala", "cities": ["Karmala", "Tembhurni"] } } }
+    }
+  },
+  "KA": {
+    "name": "Karnataka",
+    "districts": {
+      "BLR": { "name": "Bangalore Urban", "talukas": { "BLR": { "name": "Bangalore North", "cities": ["Bangalore", "Yelahanka", "Hebbal"] }, "BLS": { "name": "Bangalore South", "cities": ["Bangalore South", "JP Nagar", "Banashankari", "Jayanagar"] }, "AKP": { "name": "Anekal", "cities": ["Anekal", "Electronic City", "Chandapura"] } } },
+      "MYS": { "name": "Mysore", "talukas": { "MYS": { "name": "Mysore", "cities": ["Mysore", "Srirangapatna"] }, "NNJ": { "name": "Nanjangud", "cities": ["Nanjangud", "Gundlupet"] }, "TNN": { "name": "T. Narasipura", "cities": ["T. Narasipura"] }, "HUN": { "name": "Hunsur", "cities": ["Hunsur", "Periyapatna"] }, "KRN": { "name": "K.R. Nagar", "cities": ["K.R. Nagar"] }, "HDN": { "name": "H.D. Kote", "cities": ["H.D. Kote"] } } },
+      "BLG": { "name": "Belgaum", "talukas": { "BLG": { "name": "Belgaum", "cities": ["Belgaum", "Shahapur"] }, "GKK": { "name": "Gokak", "cities": ["Gokak", "Gokak Falls"] }, "ATH": { "name": "Athani", "cities": ["Athani", "Kagwad"] }, "CHK": { "name": "Chikkodi", "cities": ["Chikkodi", "Nipani"] }, "RBG": { "name": "Raibag", "cities": ["Raibag"] }, "HKR": { "name": "Hukkeri", "cities": ["Hukkeri", "Murgod"] }, "SBR": { "name": "Saundatti", "cities": ["Saundatti", "Parasgad"] }, "KHN": { "name": "Khanapur", "cities": ["Khanapur", "Jamboti"] }, "BAL": { "name": "Bailhongal", "cities": ["Bailhongal", "Kittur"] }, "RAM": { "name": "Ramdurg", "cities": ["Ramdurg", "Mudalgi"] } } },
+      "HUB": { "name": "Hubli-Dharwad", "talukas": { "HUB": { "name": "Hubli", "cities": ["Hubli", "Gokul Road", "Vidyanagar"] }, "DHR": { "name": "Dharwad", "cities": ["Dharwad", "Alnavar"] }, "KLG": { "name": "Kalghatgi", "cities": ["Kalghatgi", "Mishrikoti"] }, "KUN": { "name": "Kundgol", "cities": ["Kundgol", "Annigeri"] }, "NVG": { "name": "Navalgund", "cities": ["Navalgund", "Nargund"] } } },
+      "MNG": { "name": "Mangalore", "talukas": { "MNG": { "name": "Mangalore", "cities": ["Mangalore", "Surathkal", "Ullal"] }, "BNT": { "name": "Bantwal", "cities": ["Bantwal", "Vittal"] }, "PUT": { "name": "Puttur", "cities": ["Puttur", "Vitla"] }, "BLT": { "name": "Belthangady", "cities": ["Belthangady", "Dharmasthala"] }, "SLP": { "name": "Sullia", "cities": ["Sullia", "Sampaje"] } } }
+    }
+  },
+  "DL": {
+    "name": "Delhi",
+    "districts": {
+      "NDL": { "name": "New Delhi", "talukas": { "NDL": { "name": "New Delhi", "cities": ["Connaught Place", "India Gate", "Chanakyapuri", "Lodhi Colony"] } } },
+      "CDL": { "name": "Central Delhi", "talukas": { "CDL": { "name": "Central Delhi", "cities": ["Karol Bagh", "Paharganj", "Rajendra Place", "Daryaganj"] } } },
+      "SDL": { "name": "South Delhi", "talukas": { "SDL": { "name": "South Delhi", "cities": ["Hauz Khas", "Greater Kailash", "Saket", "Malviya Nagar", "Lajpat Nagar"] } } },
+      "NDT": { "name": "North Delhi", "talukas": { "NDT": { "name": "North Delhi", "cities": ["Civil Lines", "Model Town", "GTB Nagar", "Kamla Nagar"] } } },
+      "EDL": { "name": "East Delhi", "talukas": { "EDL": { "name": "East Delhi", "cities": ["Preet Vihar", "Laxmi Nagar", "Mayur Vihar", "IP Extension"] } } },
+      "WDL": { "name": "West Delhi", "talukas": { "WDL": { "name": "West Delhi", "cities": ["Rajouri Garden", "Janakpuri", "Dwarka", "Vikaspuri", "Uttam Nagar"] } } },
+      "SWD": { "name": "South West Delhi", "talukas": { "SWD": { "name": "South West Delhi", "cities": ["Vasant Kunj", "Dwarka", "Najafgarh", "Kapashera"] } } },
+      "NWD": { "name": "North West Delhi", "talukas": { "NWD": { "name": "North West Delhi", "cities": ["Rohini", "Pitampura", "Shalimar Bagh", "Narela"] } } },
+      "NED": { "name": "North East Delhi", "talukas": { "NED": { "name": "North East Delhi", "cities": ["Seelampur", "Jafrabad", "Shastri Park", "Welcome"] } } },
+      "SHD": { "name": "Shahdara", "talukas": { "SHD": { "name": "Shahdara", "cities": ["Shahdara", "Vivek Vihar", "Anand Vihar", "Dilshad Garden"] } } },
+      "SED": { "name": "South East Delhi", "talukas": { "SED": { "name": "South East Delhi", "cities": ["Kalkaji", "Nehru Place", "Okhla", "Badarpur", "Tughlakabad"] } } }
+    }
+  },
+  "TN": {
+    "name": "Tamil Nadu",
+    "districts": {
+      "CHN": { "name": "Chennai", "talukas": { "CHN": { "name": "Chennai", "cities": ["Chennai", "T. Nagar", "Anna Nagar", "Adyar", "Velachery", "Tambaram"] } } },
+      "CBE": { "name": "Coimbatore", "talukas": { "CBE": { "name": "Coimbatore North", "cities": ["Coimbatore", "Gandhipuram", "RS Puram"] }, "CBS": { "name": "Coimbatore South", "cities": ["Singanallur", "Peelamedu", "Saravanampatti"] }, "MTP": { "name": "Mettupalayam", "cities": ["Mettupalayam", "Annur"] }, "PLI": { "name": "Pollachi", "cities": ["Pollachi", "Valparai"] }, "SLP": { "name": "Sulur", "cities": ["Sulur", "Kinathukadavu"] } } },
+      "MDR": { "name": "Madurai", "talukas": { "MDR": { "name": "Madurai North", "cities": ["Madurai", "Anna Nagar"] }, "MDS": { "name": "Madurai South", "cities": ["Madurai South", "Thiruparankundram"] }, "MLR": { "name": "Melur", "cities": ["Melur", "Kottampatti"] }, "VDS": { "name": "Vadipatti", "cities": ["Vadipatti", "T. Kallupatti"] }, "PNI": { "name": "Peraiyur", "cities": ["Peraiyur", "Sedapatti"] } } },
+      "TRC": { "name": "Tiruchirappalli", "talukas": { "TRC": { "name": "Trichy", "cities": ["Tiruchirappalli", "Srirangam", "Woraiyur"] }, "LLG": { "name": "Lalgudi", "cities": ["Lalgudi", "Pullambadi"] }, "MNP": { "name": "Manachanallur", "cities": ["Manachanallur", "Samayapuram"] }, "MSR": { "name": "Musiri", "cities": ["Musiri", "Thottiyam"] }, "THR": { "name": "Thuraiyur", "cities": ["Thuraiyur", "Uppiliapuram"] } } },
+      "SLM": { "name": "Salem", "talukas": { "SLM": { "name": "Salem", "cities": ["Salem", "Hasthampatti", "Suramangalam"] }, "ATR": { "name": "Attur", "cities": ["Attur", "Gangavalli"] }, "MHN": { "name": "Mettur", "cities": ["Mettur", "Mecheri"] }, "OML": { "name": "Omalur", "cities": ["Omalur", "Tharamangalam"] }, "SNK": { "name": "Sankagiri", "cities": ["Sankagiri", "Tiruchengode"] } } }
+    }
+  },
+  "UP": {
+    "name": "Uttar Pradesh",
+    "districts": {
+      "LKO": { "name": "Lucknow", "talukas": { "LKO": { "name": "Lucknow", "cities": ["Lucknow", "Hazratganj", "Gomti Nagar", "Aliganj", "Indira Nagar"] }, "MHP": { "name": "Mohanlalganj", "cities": ["Mohanlalganj", "Gosainganj"] }, "MLH": { "name": "Malihabad", "cities": ["Malihabad", "Kakori"] }, "BKS": { "name": "Bakshi Ka Talab", "cities": ["Bakshi Ka Talab", "Chinhat"] } } },
+      "NDA": { "name": "Noida", "talukas": { "NDA": { "name": "Gautam Buddha Nagar", "cities": ["Noida", "Greater Noida", "Dadri", "Jewar"] } } },
+      "AGR": { "name": "Agra", "talukas": { "AGR": { "name": "Agra", "cities": ["Agra", "Taj Ganj", "Kamla Nagar", "Sikandra"] }, "FTP": { "name": "Fatehpur Sikri", "cities": ["Fatehpur Sikri", "Kiraoli"] }, "ETM": { "name": "Etmadpur", "cities": ["Etmadpur", "Shamsabad"] }, "KHR": { "name": "Kheragarh", "cities": ["Kheragarh", "Bah"] } } },
+      "VNS": { "name": "Varanasi", "talukas": { "VNS": { "name": "Varanasi", "cities": ["Varanasi", "Assi Ghat", "Lanka", "BHU", "Sarnath"] }, "PRD": { "name": "Pindra", "cities": ["Pindra", "Cholapur"] } } },
+      "KNP": { "name": "Kanpur", "talukas": { "KNP": { "name": "Kanpur Nagar", "cities": ["Kanpur", "Govind Nagar", "Kidwai Nagar", "Swaroop Nagar"] }, "BHT": { "name": "Bhitargaon", "cities": ["Bhitargaon", "Ghatampur"] }, "BLR": { "name": "Bilhaur", "cities": ["Bilhaur", "Shivrajpur"] } } },
+      "PYG": { "name": "Prayagraj", "talukas": { "PYG": { "name": "Prayagraj", "cities": ["Prayagraj", "Civil Lines", "Sangam", "Naini"] }, "SRJ": { "name": "Soraon", "cities": ["Soraon", "Phaphamau"] }, "HND": { "name": "Handia", "cities": ["Handia", "Karchana"] } } }
+    }
+  },
+  "GJ": {
+    "name": "Gujarat",
+    "districts": {
+      "AHD": { "name": "Ahmedabad", "talukas": { "AHD": { "name": "Ahmedabad City", "cities": ["Ahmedabad", "Maninagar", "Navrangpura", "Satellite", "Bopal"] }, "DHD": { "name": "Dholka", "cities": ["Dholka", "Bavla"] }, "SNR": { "name": "Sanand", "cities": ["Sanand", "GIFT City"] }, "VRM": { "name": "Viramgam", "cities": ["Viramgam", "Mandal"] }, "DSK": { "name": "Daskroi", "cities": ["Daskroi", "Chandkheda", "Motera"] } } },
+      "SRT": { "name": "Surat", "talukas": { "SRT": { "name": "Surat City", "cities": ["Surat", "Adajan", "Vesu", "Varachha", "Katargam"] }, "BDL": { "name": "Bardoli", "cities": ["Bardoli", "Kadod"] }, "PLR": { "name": "Palsana", "cities": ["Palsana", "Sachin"] }, "CRY": { "name": "Chorasi", "cities": ["Chorasi", "Hazira"] }, "OLP": { "name": "Olpad", "cities": ["Olpad", "Kim"] }, "KMJ": { "name": "Kamrej", "cities": ["Kamrej", "Udhna"] } } },
+      "VDD": { "name": "Vadodara", "talukas": { "VDD": { "name": "Vadodara City", "cities": ["Vadodara", "Akota", "Alkapuri", "Manjalpur"] }, "PDR": { "name": "Padra", "cities": ["Padra", "Jambusar"] }, "SVL": { "name": "Savli", "cities": ["Savli", "Sankheda"] }, "VGD": { "name": "Vaghodia", "cities": ["Vaghodia", "Dabhoi"] } } },
+      "RJK": { "name": "Rajkot", "talukas": { "RJK": { "name": "Rajkot", "cities": ["Rajkot", "Kalawad Road", "University Road"] }, "GDL": { "name": "Gondal", "cities": ["Gondal", "Jetpur"] }, "DRJ": { "name": "Dhoraji", "cities": ["Dhoraji", "Upleta"] }, "JMP": { "name": "Jamkandorna", "cities": ["Jamkandorna", "Paddhari"] } } }
+    }
+  },
+  "RJ": {
+    "name": "Rajasthan",
+    "districts": {
+      "JPR": { "name": "Jaipur", "talukas": { "JPR": { "name": "Jaipur", "cities": ["Jaipur", "Malviya Nagar", "Vaishali Nagar", "Mansarovar", "C-Scheme"] }, "AMR": { "name": "Amber", "cities": ["Amber", "Jhotwara"] }, "SNG": { "name": "Sanganer", "cities": ["Sanganer", "Pratap Nagar"] }, "CHK": { "name": "Chaksu", "cities": ["Chaksu", "Bagru"] }, "BSL": { "name": "Bassi", "cities": ["Bassi", "Dausa Road"] } } },
+      "JDH": { "name": "Jodhpur", "talukas": { "JDH": { "name": "Jodhpur", "cities": ["Jodhpur", "Sardarpura", "Ratanada"] }, "OSN": { "name": "Osian", "cities": ["Osian", "Mandore"] }, "BLT": { "name": "Bilara", "cities": ["Bilara", "Pipar City"] }, "PHD": { "name": "Phalodi", "cities": ["Phalodi", "Lohawat"] } } },
+      "UDR": { "name": "Udaipur", "talukas": { "UDR": { "name": "Udaipur", "cities": ["Udaipur", "Hiran Magri", "Fateh Sagar"] }, "MVL": { "name": "Mavli", "cities": ["Mavli", "Nathdwara"] }, "VLR": { "name": "Vallabhnagar", "cities": ["Vallabhnagar", "Salumber"] }, "KKR": { "name": "Kotra", "cities": ["Kotra", "Jhadol"] } } }
+    }
+  },
+  "WB": {
+    "name": "West Bengal",
+    "districts": {
+      "KOL": { "name": "Kolkata", "talukas": { "KOL": { "name": "Kolkata", "cities": ["Kolkata", "Salt Lake", "New Town", "Howrah", "Park Street", "Dum Dum"] } } },
+      "NP": { "name": "North 24 Parganas", "talukas": { "BRK": { "name": "Barasat", "cities": ["Barasat", "Madhyamgram"] }, "BRN": { "name": "Baranagar", "cities": ["Baranagar", "Kamarhati"] }, "BNP": { "name": "Bidhannagar", "cities": ["Salt Lake", "New Town", "Rajarhat"] }, "BSR": { "name": "Basirhat", "cities": ["Basirhat", "Taki"] } } },
+      "HWR": { "name": "Howrah", "talukas": { "HWR": { "name": "Howrah", "cities": ["Howrah", "Shibpur", "Liluah"] }, "ULB": { "name": "Uluberia", "cities": ["Uluberia", "Bagnan"] }, "AMP": { "name": "Amta", "cities": ["Amta", "Udaynarayanpur"] } } }
+    }
+  },
+  "TG": {
+    "name": "Telangana",
+    "districts": {
+      "HYD": { "name": "Hyderabad", "talukas": { "HYD": { "name": "Hyderabad", "cities": ["Hyderabad", "Banjara Hills", "Jubilee Hills", "Begumpet", "Secunderabad", "Ameerpet"] } } },
+      "RNG": { "name": "Rangareddy", "talukas": { "RNG": { "name": "Rangareddy", "cities": ["Shamshabad", "Gachibowli", "HITEC City", "Kondapur", "Madhapur", "Miyapur"] }, "CHV": { "name": "Chevella", "cities": ["Chevella", "Moinabad"] }, "MHB": { "name": "Maheshwaram", "cities": ["Maheshwaram", "Kandukur"] } } },
+      "MDK": { "name": "Medchal-Malkajgiri", "talukas": { "MDK": { "name": "Medchal", "cities": ["Medchal", "Kompally", "Alwal"] }, "MLK": { "name": "Malkajgiri", "cities": ["Malkajgiri", "Uppal", "LB Nagar", "Dilsukhnagar"] } } }
+    }
+  },
+  "KL": {
+    "name": "Kerala",
+    "districts": {
+      "TVM": { "name": "Thiruvananthapuram", "talukas": { "TVM": { "name": "Thiruvananthapuram", "cities": ["Thiruvananthapuram", "Technopark", "Kazhakkoottam"] }, "NDM": { "name": "Nedumangad", "cities": ["Nedumangad", "Vithura"] }, "ATG": { "name": "Attingal", "cities": ["Attingal", "Varkala"] }, "NRR": { "name": "Neyyattinkara", "cities": ["Neyyattinkara", "Parassala"] } } },
+      "EKM": { "name": "Ernakulam", "talukas": { "EKM": { "name": "Kochi", "cities": ["Kochi", "Ernakulam", "Fort Kochi", "Edappally", "Kakkanad"] }, "ALP": { "name": "Aluva", "cities": ["Aluva", "Angamaly", "Perumbavoor"] }, "MKT": { "name": "Muvattupuzha", "cities": ["Muvattupuzha", "Thodupuzha"] }, "KNR": { "name": "Kunnathunad", "cities": ["Thrikkakara", "Kalamassery"] } } },
+      "KZK": { "name": "Kozhikode", "talukas": { "KZK": { "name": "Kozhikode", "cities": ["Kozhikode", "Beypore", "Feroke"] }, "VTM": { "name": "Vatakara", "cities": ["Vatakara", "Mahe"] }, "KYM": { "name": "Koyilandy", "cities": ["Koyilandy", "Payyoli"] } } }
+    }
+  },
+  "AP": {
+    "name": "Andhra Pradesh",
+    "districts": {
+      "VSK": { "name": "Visakhapatnam", "talukas": { "VSK": { "name": "Visakhapatnam", "cities": ["Visakhapatnam", "Gajuwaka", "MVP Colony", "Madhurawada"] }, "AKP": { "name": "Anakapalli", "cities": ["Anakapalli", "Narsipatnam"] }, "BHM": { "name": "Bheemunipatnam", "cities": ["Bheemunipatnam", "Rushikonda"] } } },
+      "VJW": { "name": "Vijayawada", "talukas": { "VJW": { "name": "Vijayawada", "cities": ["Vijayawada", "Benz Circle", "Labbipet", "Auto Nagar"] }, "GNT": { "name": "Guntur", "cities": ["Guntur", "Tenali", "Mangalagiri"] } } },
+      "TPT": { "name": "Tirupati", "talukas": { "TPT": { "name": "Tirupati", "cities": ["Tirupati", "Tirumala", "Renigunta"] }, "CHT": { "name": "Chittoor", "cities": ["Chittoor", "Madanapalle"] } } }
+    }
+  },
+  "MP": {
+    "name": "Madhya Pradesh",
+    "districts": {
+      "BPL": { "name": "Bhopal", "talukas": { "BPL": { "name": "Bhopal", "cities": ["Bhopal", "MP Nagar", "Arera Colony", "New Market", "Habibganj"] }, "HZG": { "name": "Huzur", "cities": ["Huzur", "Kolar"] }, "BRL": { "name": "Berasia", "cities": ["Berasia", "Sehore Road"] } } },
+      "IDR": { "name": "Indore", "talukas": { "IDR": { "name": "Indore", "cities": ["Indore", "Vijay Nagar", "Palasia", "Bhawarkuan", "Rau"] }, "MHW": { "name": "Mhow", "cities": ["Mhow", "Pithampur"] }, "SNR": { "name": "Sanwer", "cities": ["Sanwer", "Hatod"] }, "DPL": { "name": "Depalpur", "cities": ["Depalpur", "Gautampura"] } } },
+      "GWL": { "name": "Gwalior", "talukas": { "GWL": { "name": "Gwalior", "cities": ["Gwalior", "Lashkar", "Morar", "City Center"] }, "DBR": { "name": "Dabra", "cities": ["Dabra", "Bhander"] }, "BHP": { "name": "Bhitarwar", "cities": ["Bhitarwar", "Antri"] } } }
+    }
+  },
+  "PB": {
+    "name": "Punjab",
+    "districts": {
+      "CHD": { "name": "Chandigarh", "talukas": { "CHD": { "name": "Chandigarh", "cities": ["Chandigarh", "Sector 17", "Sector 22", "Sector 35", "Manimajra"] } } },
+      "LDH": { "name": "Ludhiana", "talukas": { "LDH": { "name": "Ludhiana", "cities": ["Ludhiana", "Dugri", "Model Town", "Civil Lines"] }, "KHN": { "name": "Khanna", "cities": ["Khanna", "Samrala"] }, "JGR": { "name": "Jagraon", "cities": ["Jagraon", "Raikot"] } } },
+      "AMR": { "name": "Amritsar", "talukas": { "AMR": { "name": "Amritsar", "cities": ["Amritsar", "Golden Temple", "Ranjit Avenue", "Lawrence Road"] }, "AJN": { "name": "Ajnala", "cities": ["Ajnala", "Ramdas"] }, "BBA": { "name": "Baba Bakala", "cities": ["Baba Bakala", "Rayya"] } } }
+    }
+  },
+  "HR": {
+    "name": "Haryana",
+    "districts": {
+      "GGN": { "name": "Gurugram", "talukas": { "GGN": { "name": "Gurugram", "cities": ["Gurugram", "DLF Cyber City", "Sector 29", "Sohna Road", "Golf Course Road"] }, "SHN": { "name": "Sohna", "cities": ["Sohna", "Pataudi"] }, "FBD": { "name": "Faridabad", "cities": ["Faridabad", "Ballabgarh", "NIT"] } } },
+      "PKL": { "name": "Panchkula", "talukas": { "PKL": { "name": "Panchkula", "cities": ["Panchkula", "Sector 12", "Sector 20"] }, "KLK": { "name": "Kalka", "cities": ["Kalka", "Pinjore"] } } }
+    }
+  },
+  "BR": {
+    "name": "Bihar",
+    "districts": {
+      "PTN": { "name": "Patna", "talukas": { "PTN": { "name": "Patna", "cities": ["Patna", "Boring Road", "Kankarbagh", "Rajendra Nagar", "Bailey Road"] }, "PHW": { "name": "Phulwari", "cities": ["Phulwari Sharif", "Danapur"] }, "BHT": { "name": "Bikram", "cities": ["Bikram", "Paliganj"] } } },
+      "GYA": { "name": "Gaya", "talukas": { "GYA": { "name": "Gaya", "cities": ["Gaya", "Bodh Gaya", "Manpur"] }, "SHG": { "name": "Sherghati", "cities": ["Sherghati", "Barachatti"] } } }
+    }
+  },
+  "OD": {
+    "name": "Odisha",
+    "districts": {
+      "BBR": { "name": "Bhubaneswar", "talukas": { "BBR": { "name": "Bhubaneswar", "cities": ["Bhubaneswar", "Saheed Nagar", "Patia", "Chandrasekharpur", "Nayapalli"] } } },
+      "CTK": { "name": "Cuttack", "talukas": { "CTK": { "name": "Cuttack", "cities": ["Cuttack", "Bidanasi", "College Square", "Buxi Bazar"] }, "BNK": { "name": "Banki", "cities": ["Banki", "Athagarh"] } } }
+    }
+  },
+  "JH": {
+    "name": "Jharkhand",
+    "districts": {
+      "RNC": { "name": "Ranchi", "talukas": { "RNC": { "name": "Ranchi", "cities": ["Ranchi", "Morabadi", "Doranda", "Kanke", "Ratu Road"] }, "KHL": { "name": "Khunti", "cities": ["Khunti", "Torpa"] } } },
+      "JDP": { "name": "Jamshedpur", "talukas": { "JDP": { "name": "Jamshedpur", "cities": ["Jamshedpur", "Sakchi", "Bistupur", "Telco"] } } }
+    }
+  },
+  "AS": {
+    "name": "Assam",
+    "districts": {
+      "GHT": { "name": "Guwahati", "talukas": { "GHT": { "name": "Kamrup Metro", "cities": ["Guwahati", "Dispur", "Paltan Bazar", "Zoo Road", "Chandmari"] } } }
+    }
+  },
+  "GA": {
+    "name": "Goa",
+    "districts": {
+      "NGO": { "name": "North Goa", "talukas": { "PNJ": { "name": "Panaji", "cities": ["Panaji", "Dona Paula", "Miramar", "Ponda"] }, "BRD": { "name": "Bardez", "cities": ["Mapusa", "Calangute", "Candolim", "Anjuna"] }, "BCL": { "name": "Bicholim", "cities": ["Bicholim", "Sanquelim"] }, "STR": { "name": "Satari", "cities": ["Valpoi", "Sanvordem"] }, "PND": { "name": "Ponda", "cities": ["Ponda", "Farmagudi"] } } },
+      "SGO": { "name": "South Goa", "talukas": { "MRM": { "name": "Mormugao", "cities": ["Vasco da Gama", "Dabolim"] }, "SLC": { "name": "Salcete", "cities": ["Margao", "Colva", "Benaulim"] }, "QPN": { "name": "Quepem", "cities": ["Quepem", "Cuncolim"] }, "SNG": { "name": "Sanguem", "cities": ["Sanguem", "Rivona"] }, "CNN": { "name": "Canacona", "cities": ["Canacona", "Palolem"] } } }
+    }
+  },
+  "CG": {
+    "name": "Chhattisgarh",
+    "districts": {
+      "RPR": { "name": "Raipur", "talukas": { "RPR": { "name": "Raipur", "cities": ["Raipur", "Shankar Nagar", "Telibandha", "Civil Lines", "Pandri"] } } },
+      "BLP": { "name": "Bilaspur", "talukas": { "BLP": { "name": "Bilaspur", "cities": ["Bilaspur", "Vyapar Vihar", "Torwa"] } } }
+    }
+  },
+  "UK": {
+    "name": "Uttarakhand",
+    "districts": {
+      "DDN": { "name": "Dehradun", "talukas": { "DDN": { "name": "Dehradun", "cities": ["Dehradun", "Rajpur Road", "Mussoorie", "Clement Town", "Premnagar"] }, "RKH": { "name": "Rishikesh", "cities": ["Rishikesh", "Haridwar Road"] } } },
+      "HRD": { "name": "Haridwar", "talukas": { "HRD": { "name": "Haridwar", "cities": ["Haridwar", "Roorkee", "BHEL Ranipur"] } } }
+    }
+  }
+}

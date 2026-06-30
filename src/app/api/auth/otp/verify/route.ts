@@ -2,39 +2,48 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getUserByPhone, updateUser } from '@/lib/database'
 import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '@/lib/auth'
-import { getOtpStore } from '@/lib/otp-store'
+import { verifyStatelessOtp, getOtpStore } from '@/lib/otp-store'
 
 export async function POST(req: NextRequest) {
   try {
-    const { phone, otp, purpose } = await req.json()
+    const { phone, otp, purpose, otpToken } = await req.json()
 
     if (!phone || !otp || !purpose) {
       return NextResponse.json({ error: 'Phone, OTP, and purpose are required' }, { status: 400 })
     }
 
     const cleanPhone = phone.replace(/\D/g, '')
-    const otpStore = getOtpStore()
-    const storedOtp = otpStore.get(cleanPhone)
 
-    if (!storedOtp) {
-      return NextResponse.json({ error: 'OTP expired or not found. Please request a new OTP.' }, { status: 400 })
-    }
+    // Try stateless verification first (works on serverless)
+    if (otpToken) {
+      const result = verifyStatelessOtp(cleanPhone, otp, purpose, otpToken)
+      if (!result.valid) {
+        return NextResponse.json({ error: result.error || 'Invalid OTP' }, { status: 400 })
+      }
+    } else {
+      // Fallback: check in-memory store (local dev)
+      const otpStore = getOtpStore()
+      const storedOtp = otpStore.get(cleanPhone)
 
-    if (storedOtp.expiresAt < Date.now()) {
+      if (!storedOtp) {
+        return NextResponse.json({ error: 'OTP expired or not found. Please request a new OTP.' }, { status: 400 })
+      }
+
+      if (storedOtp.expiresAt < Date.now()) {
+        otpStore.delete(cleanPhone)
+        return NextResponse.json({ error: 'OTP has expired. Please request a new one.' }, { status: 400 })
+      }
+
+      if (storedOtp.otp !== otp) {
+        return NextResponse.json({ error: 'Invalid OTP. Please try again.' }, { status: 400 })
+      }
+
+      if (storedOtp.purpose !== purpose) {
+        return NextResponse.json({ error: 'OTP was not generated for this purpose' }, { status: 400 })
+      }
+
       otpStore.delete(cleanPhone)
-      return NextResponse.json({ error: 'OTP has expired. Please request a new one.' }, { status: 400 })
     }
-
-    if (storedOtp.otp !== otp) {
-      return NextResponse.json({ error: 'Invalid OTP. Please try again.' }, { status: 400 })
-    }
-
-    if (storedOtp.purpose !== purpose) {
-      return NextResponse.json({ error: 'OTP was not generated for this purpose' }, { status: 400 })
-    }
-
-    // OTP verified - remove from store
-    otpStore.delete(cleanPhone)
 
     // For registration: just confirm verification
     if (purpose === 'register') {

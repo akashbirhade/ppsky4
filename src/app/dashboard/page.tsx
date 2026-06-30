@@ -12,7 +12,7 @@ import { useSlideIn, useStaggerCards } from '@/hooks/useGsap'
 import { useChatSidebar } from '@/context/ChatSidebarContext'
 
 export default function DashboardPage() {
-  const { user, authFetch } = useAuth()
+  const { user, authFetch, loading: authLoading } = useAuth()
   const router = useRouter()
   const { isOpen: chatOpen } = useChatSidebar()
   const [profiles, setProfiles] = useState<UserProfile[]>([])
@@ -47,6 +47,7 @@ export default function DashboardPage() {
   }, [user, filters, authFetch])
 
   useEffect(() => {
+    if (authLoading) return
     if (!user) { router.push('/login'); return }
     fetchProfiles()
     // Load already-sent interests
@@ -86,7 +87,7 @@ export default function DashboardPage() {
     const fields = [user.name, user.email, user.gender, user.age, (user as any).religion, (user as any).city, (user as any).education, (user as any).occupation, (user as any).about]
     const filled = fields.filter(Boolean).length
     setStats(prev => ({ ...prev, profileScore: Math.round((filled / fields.length) * 100) }))
-  }, [user, router, fetchProfiles, authFetch])
+  }, [user, authLoading, router, fetchProfiles, authFetch])
 
   const handleSendInterest = async (e: React.MouseEvent, profileId: string) => {
     e.preventDefault()
@@ -122,7 +123,7 @@ export default function DashboardPage() {
   const filtersRef = useSlideIn('right', 0.2)
   const gridRef = useStaggerCards()
 
-  if (!user) return null
+  if (authLoading || !user) return null
 
   return (
     <div className="min-h-screen bg-mesh pt-[104px] pb-12">

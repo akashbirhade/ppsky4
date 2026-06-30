@@ -80,6 +80,16 @@ export default function ProfileDetailPage() {
     if (profile) fetchSimilarProfiles()
   }, [profile, fetchSimilarProfiles])
 
+  // Record profile view
+  useEffect(() => {
+    if (!user || !profile || user.id === profile.id) return
+    authFetch('/api/activity/views', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ viewerId: user.id, viewedId: profile.id })
+    }).catch(() => {})
+  }, [user, profile, authFetch])
+
   const handleBlock = async () => {
     if (!user || !profile) return
     await authFetch('/api/safety', {
@@ -186,6 +196,7 @@ export default function ProfileDetailPage() {
                   src={profile.photos[0]}
                   alt="Locked profile"
                   className="w-full h-full object-cover blur-xl scale-110 opacity-50"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
@@ -564,7 +575,7 @@ export default function ProfileDetailPage() {
                 <div className="w-14 h-14 rounded-full overflow-hidden mx-auto border border-purple-500/10">
                   {sp.photos && sp.photos[0] ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={sp.photos[0]} alt={sp.name} className="w-full h-full object-cover" />
+                    <img src={sp.photos[0]} alt={sp.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
                   ) : (
                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
                       <circle cx="50" cy="50" r="50" fill={sp.gender === 'Female' ? '#3b1d6e' : '#1e2a5e'} />

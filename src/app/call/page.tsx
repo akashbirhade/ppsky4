@@ -16,7 +16,7 @@ const ICE_SERVERS = {
 }
 
 function CallPageInner() {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -38,7 +38,7 @@ function CallPageInner() {
   const localVideoRef = useRef<HTMLVideoElement>(null)
   const remoteVideoRef = useRef<HTMLVideoElement>(null)
 
-  useEffect(() => { if (!user) router.push('/login') }, [user, router])
+  useEffect(() => { if (!authLoading && !user) router.push('/login') }, [user, authLoading, router])
 
   // Initialize WebSocket and WebRTC
   useEffect(() => {

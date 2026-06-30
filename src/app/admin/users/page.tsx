@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Users, Search, Filter, Ban, CheckCircle, Crown, Eye, ChevronLeft, ChevronRight, X } from 'lucide-react'
 
 interface UserRow {
@@ -31,11 +31,7 @@ export default function AdminUsersPage() {
   const [actionModal, setActionModal] = useState<{ user: UserRow; action: string } | null>(null)
   const [banReason, setBanReason] = useState('')
 
-  useEffect(() => {
-    fetchUsers()
-  }, [page, filter, search])
-
-  async function fetchUsers() {
+  const fetchUsers = useCallback(async () => {
     setLoading(true)
     try {
       const token = localStorage.getItem('soulmateSync_token')
@@ -52,7 +48,11 @@ export default function AdminUsersPage() {
     } catch {} finally {
       setLoading(false)
     }
-  }
+  }, [page, filter, search])
+
+  useEffect(() => {
+    fetchUsers()
+  }, [fetchUsers])
 
   async function performAction(userId: string, action: string, reason?: string) {
     try {
