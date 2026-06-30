@@ -92,7 +92,7 @@ export default function ChatSidebar() {
         message: c.lastMessage?.content || 'No messages yet',
         time: c.lastMessage?.timestamp ? new Date(c.lastMessage.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '',
         unread: c.unreadCount || 0,
-        online: Math.random() > 0.5,
+        online: c.user?.online === true || (c.user?.lastActive && (Date.now() - new Date(c.user.lastActive).getTime()) < 15 * 60 * 1000),
         verified: c.user?.verified || false,
       }))
       setChatUsers(mapped)
