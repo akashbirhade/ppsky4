@@ -13,6 +13,7 @@ import AIChatBot from '@/components/AIChatBot'
 import VoiceAssistant from '@/components/VoiceAssistant'
 import ServiceWorkerRegistration from '@/components/ServiceWorker'
 import SideDrawer from '@/components/SideDrawer'
+import MobileDock from '@/components/MobileDock'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -110,6 +111,7 @@ export default function RootLayout({
             <AIChatBot />
             <VoiceAssistant />
             <SideDrawer />
+            <MobileDock />
             <PWAInstallPrompt />
             <ServiceWorkerRegistration />
               </div>
