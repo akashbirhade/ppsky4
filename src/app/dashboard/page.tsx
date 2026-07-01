@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -199,28 +200,77 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        {/* Filters Panel - Bottom sheet on mobile/tablet, inline on desktop */}
+        {/* Filters Panel - Desktop inline */}
         {showFilters && (
-          <>
-            {/* Backdrop for mobile/tablet */}
-            <div 
-              className="fixed inset-0 bg-black/50 z-40 md:hidden"
-              onClick={() => setShowFilters(false)}
-            />
-            <div className={`
-              fixed inset-x-0 bottom-0 z-50 rounded-t-2xl p-5 pb-8 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-purple-500/20 shadow-2xl animate-fade-in-up
-              md:relative md:inset-auto md:z-auto md:rounded-2xl md:p-5 md:pb-5 md:shadow-none md:border md:bg-transparent md:dark:bg-transparent
-              md:glass-card md:mb-6
-            `} ref={filtersRef}>
+          <div className="hidden md:block glass-card mb-6 animate-fade-in-up" ref={filtersRef}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-white">Filter Profiles</h3>
+              <button onClick={() => setShowFilters(false)} className="text-slate-400 dark:text-purple-300/50 hover:text-slate-700 dark:hover:text-white">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="grid grid-cols-5 gap-3">
+              <div>
+                <label className="text-[10px] text-slate-500 dark:text-purple-300/50 uppercase tracking-wider">Age From</label>
+                <input type="number" value={filters.ageMin} onChange={e => setFilters({...filters, ageMin: e.target.value})}
+                  className="w-full mt-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white focus:border-purple-400 outline-none" />
+              </div>
+              <div>
+                <label className="text-[10px] text-slate-500 dark:text-purple-300/50 uppercase tracking-wider">Age To</label>
+                <input type="number" value={filters.ageMax} onChange={e => setFilters({...filters, ageMax: e.target.value})}
+                  className="w-full mt-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white focus:border-purple-400 outline-none" />
+              </div>
+              <div>
+                <label className="text-[10px] text-slate-500 dark:text-purple-300/50 uppercase tracking-wider">Religion</label>
+                <select value={filters.religion} onChange={e => setFilters({...filters, religion: e.target.value})}
+                  className="w-full mt-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white focus:border-purple-400 outline-none">
+                  <option value="">Any</option>
+                  <option value="Hindu">Hindu</option>
+                  <option value="Muslim">Muslim</option>
+                  <option value="Christian">Christian</option>
+                  <option value="Sikh">Sikh</option>
+                  <option value="Buddhist">Buddhist</option>
+                  <option value="Jain">Jain</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-[10px] text-slate-500 dark:text-purple-300/50 uppercase tracking-wider">City</label>
+                <input type="text" value={filters.city} onChange={e => setFilters({...filters, city: e.target.value})} placeholder="Any city"
+                  className="w-full mt-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-purple-300/30 focus:border-purple-400 outline-none" />
+              </div>
+              <div>
+                <label className="text-[10px] text-slate-500 dark:text-purple-300/50 uppercase tracking-wider">Education</label>
+                <select value={filters.education} onChange={e => setFilters({...filters, education: e.target.value})}
+                  className="w-full mt-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white focus:border-purple-400 outline-none">
+                  <option value="">Any</option>
+                  <option value="B.Tech">B.Tech / B.E.</option>
+                  <option value="MBBS">MBBS / MD</option>
+                  <option value="MBA">MBA</option>
+                  <option value="M.Tech">M.Tech</option>
+                  <option value="CA">CA</option>
+                  <option value="PhD">PhD</option>
+                </select>
+              </div>
+            </div>
+            <button onClick={() => { fetchProfiles(); setShowFilters(false) }} className="mt-4 btn-primary text-sm py-2.5 px-6 flex items-center gap-2">
+              <Search className="h-4 w-4" /> Apply Filters
+            </button>
+          </div>
+        )}
+
+        {/* Filters Panel - Mobile/Tablet bottom sheet via portal */}
+        {showFilters && typeof document !== 'undefined' && createPortal(
+          <div className="md:hidden">
+            <div className="fixed inset-0 bg-black/50 z-[9998]" onClick={() => setShowFilters(false)} />
+            <div className="fixed inset-x-0 bottom-0 z-[9999] rounded-t-2xl p-5 pb-8 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-purple-500/20 shadow-2xl animate-fade-in-up">
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-slate-300 dark:bg-purple-500/30" />
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold text-slate-800 dark:text-white">Filter Profiles</h3>
                 <button onClick={() => setShowFilters(false)} className="text-slate-400 dark:text-purple-300/50 hover:text-slate-700 dark:hover:text-white">
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              {/* Drag handle - mobile only */}
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-slate-300 dark:bg-purple-500/30 md:hidden" />
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[10px] text-slate-500 dark:text-purple-300/50 uppercase tracking-wider">Age From</label>
                   <input type="number" value={filters.ageMin} onChange={e => setFilters({...filters, ageMin: e.target.value})}
@@ -249,7 +299,7 @@ export default function DashboardPage() {
                   <input type="text" value={filters.city} onChange={e => setFilters({...filters, city: e.target.value})} placeholder="Any city"
                     className="w-full mt-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-purple-300/30 focus:border-purple-400 outline-none" />
                 </div>
-                <div>
+                <div className="col-span-2">
                   <label className="text-[10px] text-slate-500 dark:text-purple-300/50 uppercase tracking-wider">Education</label>
                   <select value={filters.education} onChange={e => setFilters({...filters, education: e.target.value})}
                     className="w-full mt-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-purple-500/20 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-white focus:border-purple-400 outline-none">
@@ -263,11 +313,12 @@ export default function DashboardPage() {
                   </select>
                 </div>
               </div>
-              <button onClick={() => { fetchProfiles(); setShowFilters(false) }} className="mt-4 w-full md:w-auto btn-primary text-sm py-2.5 px-6 flex items-center justify-center gap-2">
+              <button onClick={() => { fetchProfiles(); setShowFilters(false) }} className="mt-4 w-full btn-primary text-sm py-2.5 px-6 flex items-center justify-center gap-2">
                 <Search className="h-4 w-4" /> Apply Filters
               </button>
             </div>
-          </>
+          </div>,
+          document.body
         )}
 
         {/* Tabs */}
