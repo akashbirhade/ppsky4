@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
 import {
@@ -12,6 +12,13 @@ import HalfHeart from './HalfHeart'
 export default function SideDrawer() {
   const [isOpen, setIsOpen] = useState(false)
   const { user, logout } = useAuth()
+
+  // Allow external components (e.g. MobileDock) to open the drawer
+  useEffect(() => {
+    const handler = () => setIsOpen(true)
+    window.addEventListener('open-side-drawer', handler)
+    return () => window.removeEventListener('open-side-drawer', handler)
+  }, [])
 
   if (!user) return null
 
