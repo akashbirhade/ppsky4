@@ -153,7 +153,31 @@ export default function DashboardPage() {
         </div>
 
         {/* Profile Analytics Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        {/* Mobile/Tablet: compact horizontal scroll strip */}
+        <div className="flex gap-2 mb-4 overflow-x-auto pb-1 md:hidden" style={{ scrollbarWidth: 'none' }}>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-purple-500/10 border border-purple-500/20 whitespace-nowrap">
+            <Eye className="h-3.5 w-3.5 text-purple-400" />
+            <span className="text-sm font-bold text-slate-800 dark:text-white">{stats.profileViews}</span>
+            <span className="text-[10px] text-slate-500 dark:text-purple-300/40">Views</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-pink-500/10 border border-pink-500/20 whitespace-nowrap">
+            <HalfHeart className="h-3.5 w-3.5" />
+            <span className="text-sm font-bold text-slate-800 dark:text-white">{stats.interestsReceived}</span>
+            <span className="text-[10px] text-slate-500 dark:text-purple-300/40">Interests</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 whitespace-nowrap">
+            <MessageCircle className="h-3.5 w-3.5 text-blue-400" />
+            <span className="text-sm font-bold text-slate-800 dark:text-white">{stats.conversations}</span>
+            <span className="text-[10px] text-slate-500 dark:text-purple-300/40">Chats</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-green-500/10 border border-green-500/20 whitespace-nowrap">
+            <TrendingUp className="h-3.5 w-3.5 text-green-400" />
+            <span className="text-sm font-bold text-slate-800 dark:text-white">{stats.profileScore}%</span>
+            <span className="text-[10px] text-slate-500 dark:text-purple-300/40">Score</span>
+          </div>
+        </div>
+        {/* Desktop: full grid cards */}
+        <div className="hidden md:grid grid-cols-4 gap-3 mb-6">
           <div className="glass-card !p-4 text-center">
             <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mx-auto mb-2">
               <Eye className="h-4 w-4 text-purple-400" />

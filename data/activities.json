@@ -1,5 +1,12 @@
 {
-  "profileViews": [],
+  "profileViews": [
+    {
+      "id": "df87db75-a902-446a-882f-6f32d80035b2",
+      "viewerId": "8",
+      "viewedId": "109",
+      "timestamp": "2026-07-01T07:11:27.512Z"
+    }
+  ],
   "interests": [
     {
       "id": "55d8a7a0-8a1c-466f-97a3-3d25ce902fc7",
