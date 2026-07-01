@@ -5,16 +5,13 @@ import { AuthProvider } from '@/context/AuthContext'
 import { LanguageProvider } from '@/context/LanguageContext'
 import { ThemeProvider } from '@/context/ThemeContext'
 import { ToastProvider } from '@/components/Toast'
-import Navbar from '@/components/Navbar'
-import ChatSidebar from '@/components/ChatSidebar'
 import { ChatSidebarProvider } from '@/context/ChatSidebarContext'
 import PageTransition from '@/components/PageTransition'
 import AIChatBot from '@/components/AIChatBot'
 import VoiceAssistant from '@/components/VoiceAssistant'
 import ServiceWorkerRegistration from '@/components/ServiceWorker'
-import SideDrawer from '@/components/SideDrawer'
-import MobileDock from '@/components/MobileDock'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
+import NavigationWrapper from '@/components/NavigationWrapper'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -100,8 +97,7 @@ export default function RootLayout({
             </div>
             
             <div className="relative z-10">
-              <Navbar />
-              <ChatSidebar />
+              <NavigationWrapper />
               <main id="main-content" className="min-h-screen">
                 <PageTransition>
                   {children}
@@ -110,8 +106,6 @@ export default function RootLayout({
             </div>
             <AIChatBot />
             <VoiceAssistant />
-            <SideDrawer />
-            <MobileDock />
             <PWAInstallPrompt />
             <ServiceWorkerRegistration />
               </div>

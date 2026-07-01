@@ -140,6 +140,13 @@
       "receiverId": "1",
       "status": "pending",
       "timestamp": "2026-06-30T18:10:12.348Z"
+    },
+    {
+      "id": "74db2f40-9bc1-42e3-8271-a60391bdce1c",
+      "senderId": "522cea54-ceb9-407f-b4a5-b61f71be966e",
+      "receiverId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+      "status": "pending",
+      "timestamp": "2026-07-01T08:29:10.444Z"
     }
   ],
   "shortlists": [

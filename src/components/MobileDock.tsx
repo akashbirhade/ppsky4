@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Settings, Menu, Crown } from 'lucide-react'
+import { Home, Settings, MessageCircle, Crown } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 
 export default function MobileDock() {
@@ -16,10 +16,6 @@ export default function MobileDock() {
   if (hiddenPaths.some(p => pathname.startsWith(p))) return null
 
   const isActive = (path: string) => pathname === path
-
-  const openDrawer = () => {
-    window.dispatchEvent(new Event('open-side-drawer'))
-  }
 
   return (
     <>
@@ -56,14 +52,18 @@ export default function MobileDock() {
               <span className="text-[10px] font-medium">Settings</span>
             </Link>
 
-            {/* Menu - opens SideDrawer */}
-            <button
-              onClick={openDrawer}
-              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all text-slate-500 dark:text-slate-400"
+            {/* Chat */}
+            <Link
+              href="/messages"
+              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all ${
+                isActive('/messages')
+                  ? 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-500/10'
+                  : 'text-slate-500 dark:text-slate-400'
+              }`}
             >
-              <Menu className="h-5 w-5" />
-              <span className="text-[10px] font-medium">Menu</span>
-            </button>
+              <MessageCircle className="h-5 w-5" />
+              <span className="text-[10px] font-medium">Chat</span>
+            </Link>
 
             {/* Upgrade */}
             <Link

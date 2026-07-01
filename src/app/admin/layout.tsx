@@ -6,10 +6,10 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { 
   BarChart3, Users, Shield, AlertTriangle, CreditCard, Settings, 
-  CheckCircle, Home, LogOut, Menu, X 
+  CheckCircle, Home, LogOut, Menu, X, Bell, Ticket, Eye, Mail, Calendar, ClipboardList
 } from 'lucide-react'
 
-const ADMIN_EMAILS = ['admin@soulmatesync.com', 'priya@example.com']
+const ADMIN_EMAILS = ['admin@soulmatesync.com', 'priya@example.com', 'skybirhade@gmail.com', 'yash@gmail.com']
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: Home },
@@ -18,6 +18,12 @@ const navItems = [
   { href: '/admin/reports', label: 'Reports', icon: AlertTriangle },
   { href: '/admin/payments', label: 'Payments', icon: CreditCard },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/admin/notifications', label: 'Push Notifications', icon: Bell },
+  { href: '/admin/coupons', label: 'Coupons', icon: Ticket },
+  { href: '/admin/moderation', label: 'Moderation', icon: Eye },
+  { href: '/admin/bulk-messaging', label: 'Bulk Email/SMS', icon: Mail },
+  { href: '/admin/events', label: 'Events', icon: Calendar },
+  { href: '/admin/audit-log', label: 'Audit Log', icon: ClipboardList },
   { href: '/admin/config', label: 'Settings', icon: Settings },
 ]
 
@@ -53,17 +59,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-mesh pt-[80px]">
-      {/* Mobile menu button */}
+    <div className="min-h-screen bg-mesh pt-[56px] lg:pt-[64px]">
+      {/* Mobile menu button - positioned below navbar */}
       <button 
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="lg:hidden fixed top-[88px] left-4 z-50 p-2 rounded-xl bg-purple-900/80 border border-purple-500/20 text-white"
+        className="lg:hidden fixed top-[64px] left-4 z-50 p-2 rounded-xl bg-purple-900/80 border border-purple-500/20 text-white shadow-lg"
       >
         {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
 
       {/* Sidebar */}
-      <aside className={`fixed top-[80px] left-0 h-[calc(100vh-80px)] w-64 bg-slate-900/95 dark:bg-[#0c0118]/95 backdrop-blur-xl border-r border-purple-500/10 z-40 transition-transform duration-300 ${
+      <aside className={`fixed top-[56px] lg:top-[64px] left-0 h-[calc(100vh-56px)] lg:h-[calc(100vh-64px)] w-64 bg-slate-900/95 dark:bg-[#0c0118]/95 backdrop-blur-xl border-r border-purple-500/10 z-40 transition-transform duration-300 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
         <div className="p-6">
@@ -106,7 +112,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main content */}
-      <main className="lg:ml-64 min-h-[calc(100vh-80px)] p-6">
+      <main className="lg:ml-64 min-h-[calc(100vh-56px)] lg:min-h-[calc(100vh-64px)] p-6 pt-16 lg:pt-6">
         {children}
       </main>
 
