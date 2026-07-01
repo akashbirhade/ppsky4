@@ -111,14 +111,29 @@ export default function Navbar() {
           )}
 
           {/* Theme toggle - mobile only, right side */}
-          <button
-            onClick={toggleTheme}
-            className="lg:hidden absolute right-0 w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 dark:bg-purple-500/10 border border-slate-200 dark:border-purple-500/20 hover:bg-slate-200 dark:hover:bg-purple-500/20 transition-all"
-            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
-            {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-purple-600" />}
-          </button>
+          <div className="lg:hidden absolute right-0 flex items-center gap-2">
+            {/* Notification bell - mobile, logged in */}
+            {user && (
+              <Link
+                href="/notifications"
+                className="relative w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 dark:bg-purple-500/10 border border-slate-200 dark:border-purple-500/20 hover:bg-slate-200 dark:hover:bg-purple-500/20 transition-all"
+                aria-label="Notifications"
+              >
+                <Bell className="h-4 w-4 text-slate-700 dark:text-purple-300" />
+                {notifCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-pink-500 text-[9px] font-bold text-white rounded-full flex items-center justify-center">{notifCount}</span>
+                )}
+              </Link>
+            )}
+            <button
+              onClick={toggleTheme}
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 dark:bg-purple-500/10 border border-slate-200 dark:border-purple-500/20 hover:bg-slate-200 dark:hover:bg-purple-500/20 transition-all"
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-purple-600" />}
+            </button>
+          </div>
 
           {/* Logo - centered on mobile, left on desktop */}
           <div className="flex items-center lg:flex-none">
