@@ -1,7 +1,10 @@
 import jwt from 'jsonwebtoken'
 import { NextRequest, NextResponse } from 'next/server'
 
-export const JWT_SECRET = process.env.JWT_SECRET || 'soulmatesync-secret-key-2024'
+export const JWT_SECRET = process.env.JWT_SECRET || (() => {
+  if (process.env.NODE_ENV === 'production') throw new Error('JWT_SECRET must be set in production')
+  return 'soulmatesync-secret-key-2024'
+})()
 
 export interface JWTPayload {
   userId: string

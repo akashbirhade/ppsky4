@@ -6,7 +6,10 @@
 import crypto from 'crypto'
 import { SECURITY_CONFIG } from './config'
 
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'sm-3ncrypt10n-k3y-2024-d3f4ult-k3y!'
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || (() => {
+  if (process.env.NODE_ENV === 'production') throw new Error('ENCRYPTION_KEY must be set in production')
+  return 'sm-3ncrypt10n-k3y-2024-d3f4ult-k3y!'
+})()
 const IV_LENGTH = 12
 const AUTH_TAG_LENGTH = 16
 const SALT_LENGTH = 16

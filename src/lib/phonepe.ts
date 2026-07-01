@@ -7,8 +7,14 @@ export const PHONEPE_CONFIG = {
   BASE_URL: process.env.PHONEPE_ENV === 'production'
     ? 'https://api.phonepe.com/apis/hermes'
     : 'https://api-preprod.phonepe.com/apis/pg-sandbox',
-  MERCHANT_ID: process.env.PHONEPE_MERCHANT_ID || 'PGTESTPAYUAT86',
-  SALT_KEY: process.env.PHONEPE_SALT_KEY || '96434309-7796-489d-8924-ab56988a6076',
+  MERCHANT_ID: process.env.PHONEPE_MERCHANT_ID || (() => {
+    if (process.env.NODE_ENV === 'production') throw new Error('PHONEPE_MERCHANT_ID must be set in production')
+    return 'PGTESTPAYUAT86'
+  })(),
+  SALT_KEY: process.env.PHONEPE_SALT_KEY || (() => {
+    if (process.env.NODE_ENV === 'production') throw new Error('PHONEPE_SALT_KEY must be set in production')
+    return '96434309-7796-489d-8924-ab56988a6076'
+  })(),
   SALT_INDEX: parseInt(process.env.PHONEPE_SALT_INDEX || '1'),
 }
 

@@ -6,8 +6,14 @@
 export const SECURITY_CONFIG = {
   // JWT Configuration
   jwt: {
-    accessTokenSecret: process.env.JWT_ACCESS_SECRET || 'sm-access-$3cr3t-k3y-2024-pr0duct10n',
-    refreshTokenSecret: process.env.JWT_REFRESH_SECRET || 'sm-refresh-$3cr3t-k3y-2024-pr0duct10n',
+    accessTokenSecret: process.env.JWT_ACCESS_SECRET || (() => {
+      if (process.env.NODE_ENV === 'production') throw new Error('JWT_ACCESS_SECRET must be set in production')
+      return 'sm-access-$3cr3t-k3y-2024-pr0duct10n'
+    })(),
+    refreshTokenSecret: process.env.JWT_REFRESH_SECRET || (() => {
+      if (process.env.NODE_ENV === 'production') throw new Error('JWT_REFRESH_SECRET must be set in production')
+      return 'sm-refresh-$3cr3t-k3y-2024-pr0duct10n'
+    })(),
     accessTokenExpiry: '15m',
     refreshTokenExpiry: '7d',
     issuer: 'soulmatesync.com',
