@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserByPhone, updateUser } from '@/lib/database'
+import { getUserByPhone, getUserByPhoneAsync, updateUser } from '@/lib/database'
 import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '@/lib/auth'
 import { verifyStatelessOtp, getOtpStore } from '@/lib/otp-store'
@@ -9,10 +9,10 @@ const verifyAttempts = new Map<string, { count: number; resetAt: number }>()
 
 export async function POST(req: NextRequest) {
   try {
-    const { phone, otp, purpose, otpToken } = await req.json()
+    const { phone, otp, purpose, otpToken, firebaseVerified, firebaseUid } = await req.json()
 
-    if (!phone || !otp || !purpose) {
-      return NextResponse.json({ error: 'Phone, OTP, and purpose are required' }, { status: 400 })
+    if (!phone || !purpose) {
+      return NextResponse.json({ error: 'Phone and purpose are required' }, { status: 400 })
     }
 
     const cleanPhone = phone.replace(/\D/g, '')
@@ -32,8 +32,14 @@ export async function POST(req: NextRequest) {
       verifyAttempts.set(cleanPhone, { count: 1, resetAt: now + 15 * 60 * 1000 })
     }
 
-    // Try stateless verification first (works on serverless)
-    if (otpToken) {
+    // Firebase-verified: skip OTP check (Firebase already verified the phone)
+    if (firebaseVerified && firebaseUid) {
+      // Firebase has already verified this phone number via real SMS
+      // Proceed directly to login/register logic below
+    } else if (!otp) {
+      return NextResponse.json({ error: 'OTP is required' }, { status: 400 })
+    } else if (otpToken) {
+      // Try stateless verification first (works on serverless)
       const result = verifyStatelessOtp(cleanPhone, otp, purpose, otpToken)
       if (!result.valid) {
         return NextResponse.json({ error: result.error || 'Invalid OTP' }, { status: 400 })
@@ -74,7 +80,7 @@ export async function POST(req: NextRequest) {
 
     // For login: find user and generate JWT
     if (purpose === 'login') {
-      const user = getUserByPhone(cleanPhone)
+      const user = getUserByPhone(cleanPhone) || await getUserByPhoneAsync(cleanPhone)
       if (!user) {
         return NextResponse.json({ error: 'No account found with this phone number' }, { status: 404 })
       }

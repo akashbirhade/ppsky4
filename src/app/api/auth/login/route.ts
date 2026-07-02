@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserByEmail, updateUser } from '@/lib/database'
+import { getUserByEmail, getUserByEmailAsync, updateUser } from '@/lib/database'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '@/lib/auth'
@@ -12,7 +12,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
     }
 
-    const user = getUserByEmail(email)
+    // Try local first, then Supabase (fixes cold-start on deployed)
+    const user = getUserByEmail(email) || await getUserByEmailAsync(email)
     if (!user) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }

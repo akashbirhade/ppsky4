@@ -138,6 +138,26 @@ function syncUserToSupabase(user: any) {
     .catch(() => {})
 }
 
+// Awaitable sync: ensures user is written to Supabase before returning
+// Used during registration to guarantee the user exists for subsequent login
+export async function syncUserToSupabaseAwait(user: any): Promise<boolean> {
+  const sb = getSupabase()
+  if (!sb) return false
+  try {
+    const { error } = await sb
+      .from('user_profiles')
+      .upsert(toSupabaseRow(user), { onConflict: 'id' })
+    if (error) {
+      console.error('Supabase awaited sync error:', error.message)
+      return false
+    }
+    return true
+  } catch (e) {
+    console.error('Supabase awaited sync failed:', e)
+    return false
+  }
+}
+
 // Background sync: delete a user from Supabase
 function deleteUserFromSupabase(id: string) {
   const sb = getSupabase()
@@ -634,6 +654,106 @@ export function getUserByEmail(email: string): UserProfile | undefined {
 
 export function getUserByPhone(phone: string): UserProfile | undefined {
   return getStoredUsers().find(u => u.phone === phone)
+}
+
+// ============ ASYNC SUPABASE-AWARE LOOKUPS (for auth on deployed) ============
+// These query Supabase directly if user not found in local/memory store,
+// fixing cold-start race conditions on Vercel serverless functions.
+
+export async function getUserByEmailAsync(email: string): Promise<UserProfile | undefined> {
+  // Check local/memory first
+  const local = getStoredUsers().find(u => u.email === email)
+  if (local) return local
+
+  // Fallback: query Supabase directly
+  const sb = getSupabase()
+  if (!sb) return undefined
+
+  try {
+    const { data, error } = await sb
+      .from('user_profiles')
+      .select('*')
+      .eq('email', email)
+      .limit(1)
+      .single()
+
+    if (error || !data) return undefined
+
+    const user = fromSupabaseRow(data)
+    // Cache in memory for subsequent calls in same invocation
+    const users = getStoredUsers()
+    if (!users.find(u => u.id === user.id)) {
+      users.push(user)
+      memoryStore[USERS_FILE] = users
+    }
+    return user
+  } catch {
+    return undefined
+  }
+}
+
+export async function getUserByIdAsync(id: string): Promise<UserProfile | undefined> {
+  // Check local/memory first
+  const local = getStoredUsers().find(u => u.id === id)
+  if (local) return local
+
+  // Fallback: query Supabase directly
+  const sb = getSupabase()
+  if (!sb) return undefined
+
+  try {
+    const { data, error } = await sb
+      .from('user_profiles')
+      .select('*')
+      .eq('id', id)
+      .limit(1)
+      .single()
+
+    if (error || !data) return undefined
+
+    const user = fromSupabaseRow(data)
+    // Cache in memory
+    const users = getStoredUsers()
+    if (!users.find(u => u.id === user.id)) {
+      users.push(user)
+      memoryStore[USERS_FILE] = users
+    }
+    return user
+  } catch {
+    return undefined
+  }
+}
+
+export async function getUserByPhoneAsync(phone: string): Promise<UserProfile | undefined> {
+  // Check local/memory first
+  const local = getStoredUsers().find(u => u.phone === phone)
+  if (local) return local
+
+  // Fallback: query Supabase directly
+  const sb = getSupabase()
+  if (!sb) return undefined
+
+  try {
+    const { data, error } = await sb
+      .from('user_profiles')
+      .select('*')
+      .eq('phone', phone)
+      .limit(1)
+      .single()
+
+    if (error || !data) return undefined
+
+    const user = fromSupabaseRow(data)
+    // Cache in memory
+    const users = getStoredUsers()
+    if (!users.find(u => u.id === user.id)) {
+      users.push(user)
+      memoryStore[USERS_FILE] = users
+    }
+    return user
+  } catch {
+    return undefined
+  }
 }
 
 export function createUser(data: Partial<UserProfile>): UserProfile {

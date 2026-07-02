@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserByPhone } from '@/lib/database'
+import { getUserByPhone, getUserByPhoneAsync } from '@/lib/database'
 import { generateStatelessOtp } from '@/lib/otp-store'
+import { sendOtpSms } from '@/lib/sms'
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
 
     // For login, check if user exists with this phone
     if (purpose === 'login') {
-      const user = getUserByPhone(cleanPhone)
+      const user = getUserByPhone(cleanPhone) || await getUserByPhoneAsync(cleanPhone)
       if (!user) {
         return NextResponse.json({ error: 'No account found with this mobile number' }, { status: 404 })
       }
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     // For register, check if phone already used
     if (purpose === 'register') {
-      const existing = getUserByPhone(cleanPhone)
+      const existing = getUserByPhone(cleanPhone) || await getUserByPhoneAsync(cleanPhone)
       if (existing) {
         return NextResponse.json({ error: 'This mobile number is already registered' }, { status: 409 })
       }
@@ -39,18 +40,23 @@ export async function POST(req: NextRequest) {
     // Generate stateless OTP (works on serverless)
     const { otp, otpToken } = generateStatelessOtp(cleanPhone, purpose as 'login' | 'register')
 
-    // In production with SMS provider, send OTP via SMS here.
-    // OTP is logged server-side only for demo/development purposes.
-    console.log(`[OTP] ${cleanPhone}: ${otp} (purpose: ${purpose})`)
+    // Send OTP via real SMS (Fast2SMS)
+    const smsResult = await sendOtpSms(cleanPhone, otp)
+    
+    // Log OTP server-side for debugging
+    console.log(`[OTP] ${cleanPhone}: ${otp} (purpose: ${purpose}, sms: ${smsResult.success ? 'sent' : 'fallback'})`)
 
     const response: Record<string, any> = {
       success: true,
-      message: 'OTP sent successfully to your mobile number',
+      message: smsResult.success 
+        ? 'OTP sent successfully to your mobile number' 
+        : 'OTP generated. Check your phone or use the code below.',
       otpToken, // Stateless verification token (required for verify step)
+      smsSent: smsResult.success,
     }
 
-    // Only include OTP in response during development (NEVER in production)
-    if (process.env.NODE_ENV === 'development') {
+    // Include OTP in response if SMS failed or in development (NEVER in production with working SMS)
+    if (!smsResult.success || process.env.NODE_ENV === 'development') {
       response.demo_otp = otp
     }
 

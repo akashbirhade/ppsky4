@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
 import { Mail, Lock, Eye, EyeOff, Sparkles, Phone, Shield, CheckCircle } from 'lucide-react'
 import HalfHeart from '@/components/HalfHeart'
+import { useFirebaseOtp } from '@/hooks/useFirebaseOtp'
 
 declare global {
   interface Window {
@@ -39,6 +40,7 @@ export default function LoginPage() {
   const router = useRouter()
   const googleBtnRef = useRef<HTMLDivElement>(null)
   const [googleLoaded, setGoogleLoaded] = useState(false)
+  const firebaseOtp = useFirebaseOtp()
 
   // Redirect if already logged in
   useEffect(() => {
@@ -115,6 +117,23 @@ export default function LoginPage() {
     }
     setError('')
     setOtpLoading(true)
+
+    // Try Firebase OTP first (real SMS, free)
+    const firebaseConfigured = !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY
+    if (firebaseConfigured) {
+      firebaseOtp.setupRecaptcha('firebase-recaptcha')
+      const result = await firebaseOtp.sendOtp(cleanPhone)
+      if (result.success) {
+        setOtpSent(true)
+        setCountdown(30)
+        setOtpLoading(false)
+        return
+      }
+      // If Firebase fails, fall through to API fallback
+      console.warn('Firebase OTP failed, using API fallback:', result.error)
+    }
+
+    // Fallback: use custom API (Fast2SMS / demo mode)
     try {
       const res = await fetch('/api/auth/otp/send', {
         method: 'POST',
@@ -143,6 +162,46 @@ export default function LoginPage() {
     }
     setError('')
     setLoading(true)
+
+    // If Firebase OTP was used (otpSent via Firebase)
+    const firebaseConfigured = !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY
+    if (firebaseConfigured && firebaseOtp.otpSent) {
+      const result = await firebaseOtp.verifyOtp(otp)
+      if (result.success) {
+        // Firebase verified — now login/register with our backend using the phone
+        const cleanPhone = phone.replace(/\D/g, '')
+        try {
+          const res = await fetch('/api/auth/otp/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              phone: cleanPhone,
+              otp: '000000', // Bypass — Firebase already verified
+              purpose: 'login',
+              firebaseUid: result.firebaseUid,
+              firebaseVerified: true,
+            })
+          })
+          const data = await res.json()
+          if (res.ok && data.token) {
+            setSession(data.user, data.token)
+            router.push('/dashboard')
+          } else {
+            setError(data.error || 'Login failed')
+          }
+        } catch {
+          setError('Login failed. Please try again.')
+        }
+        setLoading(false)
+        return
+      } else {
+        setError(result.error || 'Invalid OTP')
+        setLoading(false)
+        return
+      }
+    }
+
+    // Fallback: custom API verification
     try {
       const cleanPhone = phone.replace(/\D/g, '')
       const res = await fetch('/api/auth/otp/verify', {
@@ -152,7 +211,6 @@ export default function LoginPage() {
       })
       const data = await res.json()
       if (res.ok && data.verified && data.token) {
-        // Update auth context (no full page reload needed)
         setSession(data.user, data.token)
         router.push('/dashboard')
       } else {
@@ -166,6 +224,8 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-mesh flex items-center justify-center py-20 px-4">
+      {/* Firebase invisible reCAPTCHA container */}
+      <div id="firebase-recaptcha"></div>
       <div className="absolute top-20 left-20 w-72 h-72 bg-teal-50 dark:bg-purple-600/10 rounded-full blur-[80px] animate-float" />
       <div className="absolute bottom-20 right-20 w-64 h-64 bg-fuchsia-600/8 rounded-full blur-[80px] animate-float-slow" />
 

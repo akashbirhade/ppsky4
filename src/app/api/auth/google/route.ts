@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserByEmail, createUser, updateUser } from '@/lib/database'
+import { getUserByEmail, getUserByEmailAsync, createUser, updateUser } from '@/lib/database'
 import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '@/lib/auth'
 
@@ -45,8 +45,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Google account must have an email' }, { status: 400 })
     }
 
-    // Check if user already exists
-    let user = getUserByEmail(googleUser.email)
+    // Check if user already exists (local first, then Supabase for deployed)
+    let user = getUserByEmail(googleUser.email) || await getUserByEmailAsync(googleUser.email)
     let isNewUser = false
 
     if (!user) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createUser, getUserByEmail } from '@/lib/database'
+import { createUser, getUserByEmail, getUserByEmailAsync, syncUserToSupabaseAwait } from '@/lib/database'
 import { generateVerificationToken, sendVerificationEmail } from '@/lib/email-verification'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
@@ -14,8 +14,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Name, email, password, gender, and date of birth are required' }, { status: 400 })
     }
 
-    // Check if user exists
-    const existing = getUserByEmail(email)
+    // Check if user exists (local first, then Supabase for deployed)
+    const existing = getUserByEmail(email) || await getUserByEmailAsync(email)
     if (existing) {
       return NextResponse.json({ error: 'Email already registered' }, { status: 409 })
     }
@@ -65,6 +65,9 @@ export async function POST(req: NextRequest) {
       familyDetails: familyDetails || undefined,
       profileComplete: hasFullProfile,
     })
+
+    // Await Supabase sync to ensure user is available for login on deployed
+    await syncUserToSupabaseAwait(newUser)
 
     // Generate JWT token
     const token = jwt.sign(
