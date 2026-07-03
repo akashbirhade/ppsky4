@@ -19,6 +19,7 @@ export default function ProfilePage() {
   const [saveError, setSaveError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('biodata')
   const [photos, setPhotos] = useState<string[]>([])
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number; percent: number } | null>(null)
   const [profile, setProfile] = useState({
     religion: '', caste: '', motherTongue: '', height: '',
     education: '', occupation: '', income: '',
@@ -100,31 +101,67 @@ export default function ProfilePage() {
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || !user) return
+    const fileList = Array.from(files)
+    const total = fileList.length
 
-    for (const file of Array.from(files)) {
+    for (let i = 0; i < fileList.length; i++) {
+      const file = fileList[i]
       if (file.size > 5 * 1024 * 1024) {
         setSaveError('Photo must be less than 5MB')
         continue
       }
+      setUploadProgress({ current: i + 1, total, percent: 0 })
       try {
-        const formData = new FormData()
-        formData.append('photo', file)
-        formData.append('userId', user.id)
-        const res = await authFetch('/api/upload', {
-          method: 'POST',
-          body: formData,
+        const result = await uploadFileWithProgress(file, user.id, (percent) => {
+          setUploadProgress({ current: i + 1, total, percent })
         })
-        if (res.ok) {
-          const data = await res.json()
-          setPhotos(data.photos || [])
+        if (result.success) {
+          setPhotos(result.photos || [])
         } else {
-          const err = await res.json().catch(() => ({}))
-          setSaveError(err.error || 'Photo upload failed')
+          setSaveError(result.error || 'Photo upload failed')
         }
       } catch {
         setSaveError('Photo upload failed')
       }
     }
+    setUploadProgress(null)
+  }
+
+  const uploadFileWithProgress = (file: File, userId: string, onProgress: (percent: number) => void): Promise<{ success?: boolean; photos?: string[]; error?: string }> => {
+    return new Promise((resolve) => {
+      const xhr = new XMLHttpRequest()
+      const formData = new FormData()
+      formData.append('photo', file)
+      formData.append('userId', userId)
+
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+          const percent = Math.round((e.loaded / e.total) * 100)
+          onProgress(percent)
+        }
+      })
+
+      xhr.addEventListener('load', () => {
+        try {
+          const data = JSON.parse(xhr.responseText)
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve({ success: true, photos: data.photos })
+          } else {
+            resolve({ error: data.error || 'Upload failed' })
+          }
+        } catch {
+          resolve({ error: 'Upload failed' })
+        }
+      })
+
+      xhr.addEventListener('error', () => resolve({ error: 'Network error during upload' }))
+      xhr.addEventListener('abort', () => resolve({ error: 'Upload cancelled' }))
+
+      xhr.open('POST', '/api/upload')
+      const token = localStorage.getItem('soulmateSync_token')
+      if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+      xhr.send(formData)
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -415,7 +452,35 @@ export default function ProfilePage() {
                 <Camera className="h-5 w-5 text-teal-600 dark:text-purple-400" /> Photo Gallery
               </h2>
               <p className="text-xs text-slate-300 dark:text-purple-300/40 mb-4">Upload 4-6 photos for the best results. Profiles with photos get 10x more responses.</p>
-              
+
+              {/* Upload Progress Bar */}
+              {uploadProgress && (
+                <div className="mb-4 p-3 bg-purple-500/5 border border-purple-500/10 rounded-xl">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-slate-700 dark:text-purple-200">
+                      Uploading photo {uploadProgress.current} of {uploadProgress.total}
+                    </span>
+                    <span className="text-xs font-bold text-purple-600 dark:text-purple-400">
+                      {uploadProgress.percent}%
+                    </span>
+                  </div>
+                  <div className="w-full h-2.5 bg-slate-200 dark:bg-purple-900/30 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-purple-500 to-fuchsia-500 rounded-full transition-all duration-300 ease-out"
+                      style={{ width: `${uploadProgress.percent}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between mt-1.5">
+                    <span className="text-[10px] text-slate-400 dark:text-purple-300/40">
+                      {uploadProgress.percent < 100 ? 'Uploading...' : 'Processing...'}
+                    </span>
+                    <span className="text-[10px] text-slate-400 dark:text-purple-300/40">
+                      {uploadProgress.total - uploadProgress.current} remaining
+                    </span>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {photos.map((photo, i) => (
                   <div key={i} className="relative aspect-square rounded-2xl overflow-hidden border border-teal-200/50 dark:border-purple-500/20 group">

@@ -35,6 +35,7 @@ function OnboardingContent() {
   const initialStep = SECTION_TO_STEP[section] || 0
   const [step, setStep] = useState(initialStep)
   const [saving, setSaving] = useState(false)
+  const [photoUploadProgress, setPhotoUploadProgress] = useState<number | null>(null)
   const [formData, setFormData] = useState({
     // Step 1: Photo
     photoUrl: '',
@@ -127,15 +128,38 @@ function OnboardingContent() {
     fd.append('photo', file)
     fd.append('userId', user.id)
     
+    setPhotoUploadProgress(0)
     try {
-      const res = await authFetch('/api/upload', { method: 'POST', body: fd })
-      const data = await res.json()
-      if (data.success) {
-        setFormData(prev => ({ ...prev, photoUrl: data.photoUrl }))
+      const result = await new Promise<{ success?: boolean; photoUrl?: string; error?: string }>((resolve) => {
+        const xhr = new XMLHttpRequest()
+        xhr.upload.addEventListener('progress', (ev) => {
+          if (ev.lengthComputable) {
+            setPhotoUploadProgress(Math.round((ev.loaded / ev.total) * 100))
+          }
+        })
+        xhr.addEventListener('load', () => {
+          try {
+            const data = JSON.parse(xhr.responseText)
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve({ success: true, photoUrl: data.photoUrl })
+            } else {
+              resolve({ error: data.error || 'Upload failed' })
+            }
+          } catch { resolve({ error: 'Upload failed' }) }
+        })
+        xhr.addEventListener('error', () => resolve({ error: 'Network error' }))
+        xhr.open('POST', '/api/upload')
+        const token = localStorage.getItem('soulmateSync_token')
+        if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+        xhr.send(fd)
+      })
+      if (result.success && result.photoUrl) {
+        setFormData(prev => ({ ...prev, photoUrl: result.photoUrl! }))
       }
     } catch (err) {
       console.error('Upload failed:', err)
     }
+    setPhotoUploadProgress(null)
   }
 
   const canSkip = step < STEPS.length - 1
@@ -214,9 +238,26 @@ function OnboardingContent() {
                   )}
                 </label>
                 <input id="photo-upload" type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
-                <p className="text-xs text-slate-300 dark:text-purple-300/40 text-center">
-                  {formData.photoUrl ? '✓ Photo uploaded! Click to change' : 'Click to upload your photo (JPEG, PNG, WebP, max 5MB)'}
-                </p>
+                {photoUploadProgress !== null ? (
+                  <div className="w-full max-w-[200px] mt-2">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] text-slate-500 dark:text-purple-300/60">
+                        {photoUploadProgress < 100 ? 'Uploading...' : 'Processing...'}
+                      </span>
+                      <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">{photoUploadProgress}%</span>
+                    </div>
+                    <div className="w-full h-2 bg-slate-200 dark:bg-purple-900/30 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-purple-500 to-fuchsia-500 rounded-full transition-all duration-300 ease-out"
+                        style={{ width: `${photoUploadProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-300 dark:text-purple-300/40 text-center">
+                    {formData.photoUrl ? '✓ Photo uploaded! Click to change' : 'Click to upload your photo (JPEG, PNG, WebP, max 5MB)'}
+                  </p>
+                )}
                 <p className="text-[10px] text-teal-600 dark:text-purple-400/60 text-center">Photos increase profile views by 10x</p>
               </div>
             </div>
