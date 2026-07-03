@@ -196,8 +196,8 @@ function MessagesInner() {
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-mesh pt-[104px]">
-      <div className="max-w-6xl mx-auto h-[calc(100vh-6.5rem)]">
+    <div className="min-h-screen bg-mesh pt-16 sm:pt-[104px]">
+      <div className="max-w-6xl mx-auto h-[calc(100dvh-4rem)] sm:h-[calc(100dvh-6.5rem)]">
         <div className="glass-card h-full !p-0 !rounded-none sm:!rounded-3xl overflow-hidden flex">
 
           {/* ── Sidebar ── */}
