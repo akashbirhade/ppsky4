@@ -156,7 +156,7 @@ export default function DashboardPage() {
   if (authLoading || !user) return null
 
   return (
-    <div className="min-h-screen bg-mesh pt-[104px] pb-12">
+    <div className="min-h-screen bg-mesh pt-20 sm:pt-[104px] pb-12">
       <div className={`max-w-7xl mx-auto px-4 transition-all duration-300 ${chatOpen ? 'xl:pr-80' : 'xl:pr-4'}`}>
         
         {/* Header - What they're looking for */}
