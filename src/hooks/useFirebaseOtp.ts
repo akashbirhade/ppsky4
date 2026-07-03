@@ -12,22 +12,36 @@ export function useFirebaseOtp() {
 
   // Initialize invisible reCAPTCHA
   const setupRecaptcha = useCallback((buttonId: string) => {
-    if (recaptchaRef.current) return
-
-    recaptchaRef.current = new RecaptchaVerifier(getFirebaseAuth(), buttonId, {
-      size: 'invisible',
-      callback: () => {
-        // reCAPTCHA solved
-      },
-      'expired-callback': () => {
-        setError('reCAPTCHA expired. Please try again.')
+    try {
+      // Clear existing verifier if it's stale
+      if (recaptchaRef.current) {
+        try {
+          recaptchaRef.current.clear()
+        } catch {
+          // ignore clear errors
+        }
         recaptchaRef.current = null
-      },
-    })
+      }
+
+      const auth = getFirebaseAuth()
+      recaptchaRef.current = new RecaptchaVerifier(auth, buttonId, {
+        size: 'invisible',
+        callback: () => {
+          // reCAPTCHA solved
+        },
+        'expired-callback': () => {
+          setError('reCAPTCHA expired. Please try again.')
+          recaptchaRef.current = null
+        },
+      })
+    } catch (err: any) {
+      console.error('[Firebase OTP] RecaptchaVerifier init failed:', err.message)
+      setError('Failed to initialize verification. Please refresh the page.')
+    }
   }, [])
 
   // Send OTP to phone number
-  const sendOtp = useCallback(async (phoneNumber: string) => {
+  const sendOtp = useCallback(async (phoneNumber: string, buttonId?: string) => {
     setLoading(true)
     setError(null)
 
@@ -36,6 +50,12 @@ export function useFirebaseOtp() {
       const formattedPhone = phoneNumber.startsWith('+')
         ? phoneNumber
         : `+91${phoneNumber.replace(/\D/g, '')}`
+
+      // Auto-setup recaptcha if not done yet
+      if (!recaptchaRef.current && buttonId) {
+        const auth = getFirebaseAuth()
+        recaptchaRef.current = new RecaptchaVerifier(auth, buttonId, { size: 'invisible' })
+      }
 
       if (!recaptchaRef.current) {
         throw new Error('reCAPTCHA not initialized. Call setupRecaptcha first.')
@@ -46,7 +66,7 @@ export function useFirebaseOtp() {
       setOtpSent(true)
       return { success: true }
     } catch (err: any) {
-      const message = getFirebaseErrorMessage(err.code)
+      const message = getFirebaseErrorMessage(err.code || err.message)
       setError(message)
       // Reset reCAPTCHA on error
       recaptchaRef.current = null
@@ -90,13 +110,17 @@ export function useFirebaseOtp() {
     setOtpSent(false)
     setError(null)
     confirmationRef.current = null
-    recaptchaRef.current = null
+    if (recaptchaRef.current) {
+      try { recaptchaRef.current.clear() } catch { /* ignore */ }
+      recaptchaRef.current = null
+    }
   }, [])
 
   return { sendOtp, verifyOtp, setupRecaptcha, reset, loading, error, otpSent }
 }
 
 function getFirebaseErrorMessage(code: string): string {
+  if (!code) return 'Something went wrong. Please try again.'
   switch (code) {
     case 'auth/invalid-phone-number':
       return 'Invalid phone number. Please enter a valid Indian mobile number.'
@@ -112,7 +136,14 @@ function getFirebaseErrorMessage(code: string): string {
       return 'Please enter the OTP code.'
     case 'auth/captcha-check-failed':
       return 'reCAPTCHA verification failed. Please refresh and try again.'
+    case 'auth/network-request-failed':
+      return 'Network error. Check your internet connection and try again.'
+    case 'auth/invalid-app-credential':
+      return 'App verification failed. Please refresh the page and try again.'
+    case 'auth/missing-app-credential':
+      return 'reCAPTCHA token missing. Please refresh the page.'
     default:
-      return 'Something went wrong. Please try again.'
+      if (code.startsWith('auth/')) return 'Verification failed. Please try again.'
+      return code // Return raw message for non-Firebase errors
   }
 }
