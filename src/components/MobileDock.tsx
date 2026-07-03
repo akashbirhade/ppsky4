@@ -6,17 +6,8 @@ import { Home, Settings, MessageCircle, Crown } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 
 export default function MobileDock() {
-  const { user } = useAuth()
-  const pathname = usePathname()
-
-  if (!user) return null
-
-  // Hide on pages that don't need it (login, register, onboarding, chat, messages, profile detail)
-  const hiddenPaths = ['/login', '/register', '/onboarding', '/call', '/messages']
-  if (hiddenPaths.some(p => pathname.startsWith(p))) return null
-  if (pathname.match(/^\/profile\/[^/]+$/)) return null
-
-  const isActive = (path: string) => pathname === path
+  // Dock hidden globally for now
+  return null
 
   return (
     <>
