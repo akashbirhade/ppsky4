@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserByPhone, getUserByPhoneAsync, updateUser } from '@/lib/database'
+import { getUserByPhone, getUserByPhoneAsync, createUser, updateUser, syncUserToSupabaseAwait } from '@/lib/database'
 import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '@/lib/auth'
 import { verifyStatelessOtp, getOtpStore } from '@/lib/otp-store'
@@ -78,11 +78,25 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // For login: find user and generate JWT
+    // For login: find user and generate JWT (auto-register if not found)
     if (purpose === 'login') {
-      const user = getUserByPhone(cleanPhone) || await getUserByPhoneAsync(cleanPhone)
+      let user = getUserByPhone(cleanPhone) || await getUserByPhoneAsync(cleanPhone)
+      let isNewUser = false
+
+      // Auto-create account if phone not registered (mobile-first signup)
       if (!user) {
-        return NextResponse.json({ error: 'No account found with this phone number' }, { status: 404 })
+        isNewUser = true
+        user = createUser({
+          name: '',
+          email: '',
+          password: '',
+          phone: cleanPhone,
+          gender: '',
+          dateOfBirth: '',
+          age: 0,
+          profileComplete: false,
+        })
+        await syncUserToSupabaseAwait(user)
       }
 
       // Update last active
@@ -98,6 +112,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         verified: true,
+        isNewUser,
         user: {
           id: user.id,
           name: user.name,

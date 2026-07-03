@@ -212,7 +212,7 @@ export default function LoginPage() {
       const data = await res.json()
       if (res.ok && data.verified && data.token) {
         setSession(data.user, data.token)
-        router.push('/dashboard')
+        router.push(data.isNewUser ? '/onboarding' : '/dashboard')
       } else {
         setError(data.error || 'Invalid OTP')
       }
@@ -259,7 +259,7 @@ export default function LoginPage() {
                   : 'text-slate-400 dark:text-purple-300/50 hover:text-slate-600 dark:hover:text-purple-200'
               }`}
             >
-              Login with OTP
+              Phone / OTP
             </button>
           </div>
 
@@ -311,6 +311,7 @@ export default function LoginPage() {
           {/* OTP Login */}
           {mode === 'otp' && (
             <form onSubmit={handleOtpLogin} className="space-y-5">
+              <p className="text-xs text-slate-400 dark:text-purple-300/40 text-center -mt-2 mb-2">Sign in or create a new account with your mobile number</p>
               <div>
                 <label className="block text-sm text-slate-500 dark:text-purple-200/60 mb-1.5">Mobile Number</label>
                 <div className="relative">

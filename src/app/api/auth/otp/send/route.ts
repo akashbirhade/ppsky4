@@ -21,14 +21,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Please enter a valid 10-digit mobile number' }, { status: 400 })
     }
 
-    // For login, check if user exists with this phone
-    if (purpose === 'login') {
-      const user = getUserByPhone(cleanPhone) || await getUserByPhoneAsync(cleanPhone)
-      if (!user) {
-        return NextResponse.json({ error: 'No account found with this mobile number' }, { status: 404 })
-      }
-    }
-
+    // For login: no longer reject if user not found (auto-register on verify)
     // For register, check if phone already used
     if (purpose === 'register') {
       const existing = getUserByPhone(cleanPhone) || await getUserByPhoneAsync(cleanPhone)

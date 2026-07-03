@@ -408,6 +408,17 @@ export default function RegisterPage() {
           </form>
 
           <div className="mt-6 border-t border-teal-100 dark:border-purple-500/10 pt-5">
+            {/* Sign up with Mobile */}
+            {step === 1 && (
+              <button
+                type="button"
+                onClick={() => { setError(''); setStep(2) }}
+                className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-slate-200 dark:border-purple-500/20 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors text-sm font-medium text-slate-700 dark:text-purple-200 mb-3"
+              >
+                <Phone className="h-5 w-5 text-green-600" />
+                Sign up with Mobile
+              </button>
+            )}
             {/* Google Sign-In */}
             <div ref={googleBtnRef} className="flex justify-center mb-4" />
             {!googleLoaded && (
