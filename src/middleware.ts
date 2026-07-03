@@ -29,6 +29,7 @@ const PUBLIC_API_PATHS = [
   '/api/hosts/auth/login',
   '/api/hosts/auth/register',
   '/api/payment/phonepe/callback',
+  '/api/profiles',
 ]
 
 // Page paths that don't require authentication
@@ -168,7 +169,7 @@ export function middleware(request: NextRequest) {
   // CORS handling for API routes
   if (pathname.startsWith('/api/')) {
     const origin = request.headers.get('origin')
-    const allowedOrigins = ['http://localhost:3000', 'https://soulmatesync.com', 'https://www.soulmatesync.com']
+    const allowedOrigins = ['http://localhost:3000', 'http://localhost:3002', 'https://soulmatesync.com', 'https://www.soulmatesync.com']
     
     if (origin && allowedOrigins.includes(origin)) {
       response.headers.set('Access-Control-Allow-Origin', origin)

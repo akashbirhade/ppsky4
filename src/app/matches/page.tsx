@@ -337,7 +337,7 @@ export default function MatchesPage() {
                       <div className="flex items-center gap-2 animate-fade-in-up">
                         {/* WhatsApp */}
                         <button
-                          onClick={() => { const msg = encodeURIComponent(`Hi ${currentProfile.name}! I found your profile on Soulmate Sync and would love to connect. 💜`); window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank') }}
+                          onClick={() => { const phone = currentProfile.phone?.replace(/[^0-9]/g, '') || ''; const msg = encodeURIComponent(`Hi ${currentProfile.name}! I found your profile on Soulmate Sync and would love to connect. \uD83D\uDC9C`); window.open(phone ? `https://wa.me/${phone}?text=${msg}` : `https://api.whatsapp.com/send?text=${msg}`, '_blank') }}
                           className="w-11 h-11 rounded-full bg-[#25D366] hover:bg-[#20b957] flex items-center justify-center text-white shadow-lg transition-all hover:scale-110"
                           title="WhatsApp"
                         >

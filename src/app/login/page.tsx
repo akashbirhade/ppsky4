@@ -51,6 +51,7 @@ export default function LoginPage() {
   useEffect(() => {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
     if (!clientId || clientId === 'YOUR_GOOGLE_CLIENT_ID_HERE') return
+    if (googleLoaded) return // Prevent re-initialization
 
     const script = document.createElement('script')
     script.src = 'https://accounts.google.com/gsi/client'
@@ -98,7 +99,12 @@ export default function LoginPage() {
     }
   }, [countdown])
 
-  if (authLoading || user) return null
+  if (authLoading) return (
+    <div className="min-h-screen flex items-center justify-center bg-mesh">
+      <div className="animate-pulse text-purple-400">Loading...</div>
+    </div>
+  )
+  if (user) return null
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault()

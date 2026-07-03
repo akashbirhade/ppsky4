@@ -60,7 +60,7 @@ function HeightRangeSlider({ min, max, onChange }: { min: number; max: number; o
 }
 
 export default function SearchPage() {
-  const { user, authFetch } = useAuth()
+  const { user, authFetch, loading: authLoading } = useAuth()
   const [profiles, setProfiles] = useState<UserProfile[]>([])
   const [interestMap, setInterestMap] = useState<Record<string, 'pending' | 'accepted' | 'declined'>>({})
   const [loading, setLoading] = useState(true)
@@ -133,13 +133,27 @@ export default function SearchPage() {
   }, [filters, ageRange, oppositeGender, user?.id, authFetch, sortBy])
 
   useEffect(() => {
+    if (authLoading) return
     if (user) {
       fetchProfiles()
       fetchInterests()
       const saved = localStorage.getItem(`savedSearches_${user.id}`)
       if (saved) setSavedSearches(JSON.parse(saved))
+    } else {
+      // For non-logged-in users, fetch public profiles without auth
+      const fetchPublicProfiles = async () => {
+        try {
+          const res = await fetch('/api/profiles?gender=Female&ageMin=18&ageMax=60')
+          if (res.ok) {
+            const data = await res.json()
+            setProfiles(data.profiles || [])
+          }
+        } catch {}
+        setLoading(false)
+      }
+      fetchPublicProfiles()
     }
-  }, [user, fetchProfiles, fetchInterests])
+  }, [user, authLoading, fetchProfiles, fetchInterests])
 
   const saveAgeRange = useCallback((min: number, max: number) => {
     if (!user?.id) return

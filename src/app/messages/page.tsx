@@ -194,7 +194,14 @@ function MessagesInner() {
     c.user.name.toLowerCase().includes(searchQ.toLowerCase())
   )
 
-  if (!user) return null
+  if (authLoading || !user) return (
+    <div className="min-h-screen bg-mesh pt-16 sm:pt-[104px] flex items-center justify-center">
+      <div className="animate-pulse flex flex-col items-center gap-3">
+        <MessageCircle className="h-8 w-8 text-purple-400/50" />
+        <p className="text-sm text-slate-400 dark:text-purple-300/50">Loading messages...</p>
+      </div>
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-mesh pt-16 sm:pt-[104px]">

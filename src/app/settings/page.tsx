@@ -36,7 +36,7 @@ interface NotificationSettings {
 }
 
 export default function SettingsPage() {
-  const { user, authFetch, logout } = useAuth()
+  const { user, authFetch, logout, loading: authLoading } = useAuth()
   const { language, setLanguage, languages } = useLanguage()
   const router = useRouter()
   const [activeSection, setActiveSection] = useState<'privacy' | 'notifications' | 'security' | 'account'>('privacy')
@@ -80,10 +80,11 @@ export default function SettingsPage() {
   }, [authFetch, user])
 
   useEffect(() => {
+    if (authLoading) return
     if (!user) { router.push('/login'); return }
     fetchSettings()
     fetchBlocked()
-  }, [user, router, fetchSettings, fetchBlocked])
+  }, [user, authLoading, router, fetchSettings, fetchBlocked])
 
   const saveSettings = async () => {
     setSaving(true)

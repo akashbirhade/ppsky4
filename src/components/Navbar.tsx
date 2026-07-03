@@ -164,10 +164,10 @@ export default function Navbar() {
                   </button>
                   {helpOpen && (
                     <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-dark-800 rounded-lg shadow-xl border border-slate-200 dark:border-purple-500/20 py-2 z-50 animate-fade-in-down">
-                      <Link href="/legal" className="block px-4 py-2 text-sm text-slate-700 dark:text-purple-200 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Help Center</Link>
-                      <Link href="/legal" className="block px-4 py-2 text-sm text-slate-700 dark:text-purple-200 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Contact Us</Link>
-                      <Link href="/legal" className="block px-4 py-2 text-sm text-slate-700 dark:text-purple-200 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>FAQs</Link>
-                      <Link href="/legal" className="block px-4 py-2 text-sm text-slate-700 dark:text-purple-200 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Safety Tips</Link>
+                      <Link href="/legal#help" className="block px-4 py-2 text-sm text-slate-700 dark:text-purple-200 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Help Center</Link>
+                      <Link href="/legal#contact" className="block px-4 py-2 text-sm text-slate-700 dark:text-purple-200 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Contact Us</Link>
+                      <Link href="/legal#faq" className="block px-4 py-2 text-sm text-slate-700 dark:text-purple-200 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>FAQs</Link>
+                      <Link href="/legal#safety" className="block px-4 py-2 text-sm text-slate-700 dark:text-purple-200 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Safety Tips</Link>
                       <div className="border-t border-slate-200 dark:border-purple-500/10 my-1"></div>
                       <Link href="/legal" className="block px-4 py-2 text-sm text-slate-600 dark:text-purple-300 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Legal Center</Link>
                       <Link href="/legal/terms-and-conditions" className="block px-4 py-2 text-sm text-slate-700 dark:text-purple-200 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Terms & Conditions</Link>

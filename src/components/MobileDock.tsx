@@ -6,8 +6,12 @@ import { Home, Settings, MessageCircle, Crown } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 
 export default function MobileDock() {
-  // Dock hidden globally for now
-  return null
+  const pathname = usePathname()
+  const { user } = useAuth()
+
+  if (!user) return null
+
+  const isActive = (path: string) => pathname === path
 
   return (
     <>
