@@ -23,11 +23,11 @@ export const SECURITY_CONFIG = {
   // Rate Limiting
   rateLimit: {
     windowMs: 15 * 60 * 1000, // 15 minutes
-    maxRequests: 100,         // per window
+    maxRequests: 300,         // per window
     authMaxAttempts: 5,       // login attempts
     authLockoutMs: 30 * 60 * 1000, // 30 min lockout
-    apiMaxRequests: 200,
-    uploadMaxRequests: 10,
+    apiMaxRequests: 500,
+    uploadMaxRequests: 20,
   },
 
   // Password Policy
