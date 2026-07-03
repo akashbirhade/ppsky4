@@ -23,6 +23,7 @@ export default function ProfileDetailPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [interestSent, setInterestSent] = useState(false)
+  const [interestReceived, setInterestReceived] = useState<{ id: string; status: string } | null>(null)
   const [showReport, setShowReport] = useState(false)
   const [reportReason, setReportReason] = useState('')
   const [reportDetails, setReportDetails] = useState('')
@@ -89,6 +90,44 @@ export default function ProfileDetailPage() {
       body: JSON.stringify({ viewerId: user.id, viewedId: profile.id })
     }).catch(() => {})
   }, [user, profile, authFetch])
+
+  // Check if this profile has sent interest to logged-in user
+  useEffect(() => {
+    if (!user || !profile || user.id === profile.id) return
+    authFetch(`/api/activity/interests?userId=${user.id}&type=received`)
+      .then(res => res.json())
+      .then(data => {
+        const fromThisProfile = data.interests?.find((i: any) => i.interest?.senderId === profile.id && i.interest?.status === 'pending')
+        if (fromThisProfile) {
+          setInterestReceived({ id: fromThisProfile.interest.id, status: fromThisProfile.interest.status })
+        }
+      })
+      .catch(() => {})
+  }, [user, profile, authFetch])
+
+  const handleAcceptInterest = async () => {
+    if (!interestReceived) return
+    try {
+      await authFetch('/api/activity/interests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ interestId: interestReceived.id, action: 'accepted' })
+      })
+      setInterestReceived({ ...interestReceived, status: 'accepted' })
+    } catch {}
+  }
+
+  const handleDeclineInterest = async () => {
+    if (!interestReceived) return
+    try {
+      await authFetch('/api/activity/interests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ interestId: interestReceived.id, action: 'declined' })
+      })
+      setInterestReceived({ ...interestReceived, status: 'declined' })
+    } catch {}
+  }
 
   const handleBlock = async () => {
     if (!user || !profile) return
@@ -544,12 +583,29 @@ export default function ProfileDetailPage() {
 
               {/* Action Buttons */}
               <div className="hidden md:flex flex-wrap gap-2 mt-5">
-                <button 
-                  onClick={() => setInterestSent(true)}
-                  className={`btn-primary py-2 px-4 flex items-center gap-2 text-xs ${interestSent ? '!bg-green-600/50 !shadow-[0_0_15px_rgba(34,197,94,0.2)]' : ''}`}
-                >
-                  {interestSent ? <><Check className="h-3.5 w-3.5" /> Interest Sent</> : <><Heart className="h-3.5 w-3.5" /> Send Interest</>}
-                </button>
+                {interestReceived && interestReceived.status === 'pending' ? (
+                  <>
+                    <button onClick={handleAcceptInterest}
+                      className="btn-primary py-2 px-4 flex items-center gap-2 text-xs !bg-green-600 !shadow-[0_0_15px_rgba(34,197,94,0.3)]">
+                      <Check className="h-3.5 w-3.5" /> Accept Interest
+                    </button>
+                    <button onClick={handleDeclineInterest}
+                      className="btn-secondary py-2 px-4 flex items-center gap-2 text-xs text-red-300 border-red-500/30 hover:bg-red-500/10">
+                      <X className="h-3.5 w-3.5" /> Decline
+                    </button>
+                  </>
+                ) : interestReceived?.status === 'accepted' ? (
+                  <button className="btn-primary py-2 px-4 flex items-center gap-2 text-xs !bg-green-600/50 !shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                    <Check className="h-3.5 w-3.5" /> Interest Accepted
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => setInterestSent(true)}
+                    className={`btn-primary py-2 px-4 flex items-center gap-2 text-xs ${interestSent ? '!bg-green-600/50 !shadow-[0_0_15px_rgba(34,197,94,0.2)]' : ''}`}
+                  >
+                    {interestSent ? <><Check className="h-3.5 w-3.5" /> Interest Sent</> : <><Heart className="h-3.5 w-3.5" /> Send Interest</>}
+                  </button>
+                )}
                 <button onClick={() => setShortlisted(!shortlisted)}
                   className={`btn-secondary py-2 px-3 flex items-center gap-1.5 text-xs ${shortlisted ? 'text-amber-400 border-amber-500/30 bg-amber-500/10' : ''}`}>
                   {shortlisted ? <BookmarkCheck className="h-3.5 w-3.5" /> : <Bookmark className="h-3.5 w-3.5" />}
@@ -964,24 +1020,28 @@ export default function ProfileDetailPage() {
       {user && user.id !== profile.id && (
         <div className="fixed bottom-0 inset-x-0 z-[80] md:hidden px-4 pb-[env(safe-area-inset-bottom,8px)] pt-2">
           <div className="flex items-center justify-center gap-2 p-2 rounded-2xl bg-dark-900/95 backdrop-blur-xl border border-purple-500/20 shadow-xl shadow-purple-500/10">
-            {!interestSent ? (
+            {interestReceived && interestReceived.status === 'pending' ? (
               <>
                 <button onClick={() => setShortlisted(!shortlisted)}
-                  className={`flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all ${shortlisted ? 'bg-amber-500/10 text-amber-400' : 'text-purple-300/60 hover:bg-purple-500/10'}`}>
+                  className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all ${shortlisted ? 'bg-amber-500/10 text-amber-400' : 'text-purple-300/60 hover:bg-purple-500/10'}`}>
                   <Star className={`h-5 w-5 ${shortlisted ? 'fill-amber-400' : ''}`} />
-                  <span className="text-[10px] font-medium">{shortlisted ? 'Saved' : 'Shortlist'}</span>
+                  <span className="text-[10px] font-medium">{shortlisted ? 'Saved' : 'Save'}</span>
                 </button>
-                <button onClick={() => setInterestSent(true)}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-purple-600 text-white font-medium text-sm shadow-lg shadow-purple-500/30 hover:bg-purple-700 transition-all">
-                  <Heart className="h-4 w-4" /> Send Interest
+                <button onClick={handleAcceptInterest}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-green-600 text-white font-medium text-sm shadow-lg shadow-green-500/30 hover:bg-green-700 transition-all">
+                  <Check className="h-4 w-4" /> Accept
+                </button>
+                <button onClick={handleDeclineInterest}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-red-600/80 text-white font-medium text-sm shadow-lg shadow-red-500/20 hover:bg-red-700 transition-all">
+                  <X className="h-4 w-4" /> Decline
                 </button>
                 <button onClick={handleViewContact}
-                  className="flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl text-purple-300/60 hover:bg-purple-500/10 transition-all">
+                  className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-purple-300/60 hover:bg-purple-500/10 transition-all">
                   <Phone className="h-5 w-5" />
                   <span className="text-[10px] font-medium">Contact</span>
                 </button>
               </>
-            ) : (
+            ) : interestReceived?.status === 'accepted' || interestSent ? (
               <>
                 <a href={`https://wa.me/${contactData?.phone ? contactData.phone.replace(/[^0-9]/g, '') : ''}?text=${encodeURIComponent(`Hi ${profile.name}, I found your profile on Soulmate Sync and would like to connect!`)}`}
                   target="_blank" rel="noopener noreferrer"
@@ -1002,6 +1062,23 @@ export default function ProfileDetailPage() {
                   className={`flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all ${shortlisted ? 'text-amber-400' : 'text-purple-300/60 hover:bg-purple-500/10'}`}>
                   <Star className={`h-5 w-5 ${shortlisted ? 'fill-amber-400' : ''}`} />
                   <span className="text-[10px] font-medium">{shortlisted ? 'Saved' : 'Save'}</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button onClick={() => setShortlisted(!shortlisted)}
+                  className={`flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all ${shortlisted ? 'bg-amber-500/10 text-amber-400' : 'text-purple-300/60 hover:bg-purple-500/10'}`}>
+                  <Star className={`h-5 w-5 ${shortlisted ? 'fill-amber-400' : ''}`} />
+                  <span className="text-[10px] font-medium">{shortlisted ? 'Saved' : 'Shortlist'}</span>
+                </button>
+                <button onClick={() => setInterestSent(true)}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-purple-600 text-white font-medium text-sm shadow-lg shadow-purple-500/30 hover:bg-purple-700 transition-all">
+                  <Heart className="h-4 w-4" /> Send Interest
+                </button>
+                <button onClick={handleViewContact}
+                  className="flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl text-purple-300/60 hover:bg-purple-500/10 transition-all">
+                  <Phone className="h-5 w-5" />
+                  <span className="text-[10px] font-medium">Contact</span>
                 </button>
               </>
             )}
