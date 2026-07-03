@@ -17,6 +17,7 @@ interface Notification {
   link?: string
   avatar?: string
   emailSent?: boolean
+  interestId?: string
 }
 
 type FilterType = 'all' | 'unread' | 'interests' | 'messages' | 'views' | 'matches'
@@ -60,6 +61,7 @@ export default function NotificationsPage() {
             link: n.profileId ? `/profile/${n.profileId}` : n.type === 'match' || n.type === 'mutual_match' ? '/matches' : undefined,
             avatar: n.profilePhoto || undefined,
             emailSent: true,
+            interestId: n.interestId || undefined,
           }))
           setNotifications(mapped)
         }
@@ -104,6 +106,26 @@ export default function NotificationsPage() {
 
   const markRead = (id: string) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
+  }
+
+  const handleInterestAction = async (notification: Notification, action: 'accepted' | 'declined') => {
+    if (!notification.interestId) return
+    try {
+      const res = await authFetch('/api/activity/interests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ interestId: notification.interestId, action })
+      })
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => 
+          n.id === notification.id 
+            ? { ...n, read: true, type: action === 'accepted' ? 'interest_accepted' : 'interest_declined' }
+            : n
+        ))
+      }
+    } catch (err) {
+      console.error('Failed to respond to interest:', err)
+    }
   }
 
   const clearAll = () => {
@@ -205,7 +227,7 @@ export default function NotificationsPage() {
         )}
 
         {/* Filter Tabs */}
-        <div className="flex gap-1.5 overflow-x-auto pb-2 mb-6 animate-fade-in-up scrollbar-hide" style={{ animationDelay: '0.1s', opacity: 0, scrollbarWidth: 'none' }}>
+        <div className="flex gap-1.5 overflow-x-auto pb-2 mb-6 scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
           {([
             { id: 'all' as FilterType, label: 'All', count: notifications.length },
             { id: 'unread' as FilterType, label: 'Unread', count: unreadCount },
@@ -251,10 +273,9 @@ export default function NotificationsPage() {
               <div
                 key={n.id}
                 onClick={() => { markRead(n.id); if (n.link) router.push(n.link) }}
-                className={`glass-card !p-4 cursor-pointer hover:border-teal-200/50 dark:border-purple-400/30 transition-all animate-fade-in-up group ${
+                className={`glass-card !p-4 cursor-pointer hover:border-teal-200/50 dark:border-purple-400/30 transition-all group ${
                   !n.read ? 'border-teal-200 dark:border-purple-500/30 bg-teal-50/50 dark:bg-purple-500/5' : ''
                 }`}
-                style={{ animationDelay: `${i * 0.04}s`, opacity: 0 }}
               >
                 <div className="flex items-start gap-3">
                   {/* Icon */}
@@ -288,8 +309,8 @@ export default function NotificationsPage() {
                     )}
                     {n.type === 'interest_received' && !n.read && (
                       <div className="flex gap-1 mt-1">
-                        <button onClick={e => { e.stopPropagation(); markRead(n.id) }} className="text-[9px] bg-green-500/10 text-green-300 px-2 py-0.5 rounded-full border border-green-500/20 hover:bg-green-500/20">Accept</button>
-                        <button onClick={e => { e.stopPropagation(); markRead(n.id) }} className="text-[9px] bg-red-500/10 text-red-300 px-2 py-0.5 rounded-full border border-red-500/20 hover:bg-red-500/20">Decline</button>
+                        <button onClick={e => { e.stopPropagation(); handleInterestAction(n, 'accepted') }} className="text-[9px] bg-green-500/10 text-green-300 px-2 py-0.5 rounded-full border border-green-500/20 hover:bg-green-500/20">Accept</button>
+                        <button onClick={e => { e.stopPropagation(); handleInterestAction(n, 'declined') }} className="text-[9px] bg-red-500/10 text-red-300 px-2 py-0.5 rounded-full border border-red-500/20 hover:bg-red-500/20">Decline</button>
                       </div>
                     )}
                   </div>
@@ -300,7 +321,7 @@ export default function NotificationsPage() {
         )}
 
         {/* Push Notification Prompt */}
-        <div className="mt-8 glass-card p-5 border-teal-200/50 dark:border-purple-500/20 animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
+        <div className="mt-8 glass-card p-5 border-teal-200/50 dark:border-purple-500/20">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-teal-100/50 dark:bg-purple-500/20 flex items-center justify-center">
               <Bell className="h-5 w-5 text-teal-600 dark:text-purple-400" />

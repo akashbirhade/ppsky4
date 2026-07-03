@@ -484,5 +484,32 @@
     "timestamp": "2026-06-04T20:19:54.621Z",
     "read": false,
     "type": "text"
+  },
+  {
+    "id": "9d6921fa-b9cf-4335-97e8-62bc06a87b43",
+    "senderId": "2",
+    "receiverId": "1",
+    "content": "Hello, nice to meet you!",
+    "timestamp": "2026-07-03T08:56:44.199Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "827a20c9-3e6e-4c33-b4ab-17f5f8aae039",
+    "senderId": "2",
+    "receiverId": "1",
+    "content": "Hello, nice to meet you!",
+    "timestamp": "2026-07-03T08:57:57.773Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "bd049954-5f41-41bd-b499-168e547f01ae",
+    "senderId": "ec3a7724-11a3-4ca2-a21e-c18468fd42fa",
+    "receiverId": "3",
+    "content": "Hi Ananya! How are you?",
+    "timestamp": "2026-07-03T08:59:20.799Z",
+    "read": false,
+    "type": "text"
   }
 ]

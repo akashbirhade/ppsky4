@@ -70,6 +70,7 @@ export default function SearchPage() {
   const [savedSearches, setSavedSearches] = useState<string[]>([])
   const [showSavedSearches, setShowSavedSearches] = useState(false)
   const [profileIdSearch, setProfileIdSearch] = useState('')
+  const [sortBy, setSortBy] = useState('relevance')
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null)
   const oppositeGender = user?.gender === 'Male' ? 'Female' : 'Male'
 
@@ -99,7 +100,7 @@ export default function SearchPage() {
     } catch {}
   }, [user?.id, authFetch])
 
-  const fetchProfiles = useCallback(async (f?: typeof filters, age?: [number, number]) => {
+  const fetchProfiles = useCallback(async (f?: typeof filters, age?: [number, number], sort?: string) => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
@@ -112,16 +113,24 @@ export default function SearchPage() {
       if (sf.motherTongue) params.set('motherTongue', sf.motherTongue)
       if (sf.income) params.set('income', sf.income)
       if (sf.community) params.set('community', sf.community)
+      if (sf.manglik) params.set('manglik', sf.manglik)
+      if (sf.maritalStatus) params.set('maritalStatus', sf.maritalStatus)
+      if (sf.onlineNow) params.set('onlineNow', 'true')
+      if (sf.verifiedOnly) params.set('verifiedOnly', 'true')
+      if (sf.premiumOnly) params.set('premiumOnly', 'true')
+      if (sf.withPhoto) params.set('withPhoto', 'true')
       if (amin) params.set('ageMin', String(amin))
       if (amax) params.set('ageMax', String(amax))
       params.set('gender', oppositeGender)
       if (user?.id) params.set('excludeId', user.id)
+      const sortVal = sort || sortBy
+      if (sortVal && sortVal !== 'relevance') params.set('sort', sortVal)
       const res = await authFetch(`/api/profiles?${params.toString()}`)
       const data = await res.json()
       setProfiles(data.profiles || [])
     } catch (err) { console.error(err) }
     setLoading(false)
-  }, [filters, ageRange, oppositeGender, user?.id, authFetch])
+  }, [filters, ageRange, oppositeGender, user?.id, authFetch, sortBy])
 
   useEffect(() => {
     if (user) {
@@ -148,7 +157,7 @@ export default function SearchPage() {
     }, 800)
   }, [user?.id, authFetch])
 
-  const handleAgeChange = (min: number, max: number) => { setAgeRange([min, max]); fetchProfiles(filters, [min, max]); saveAgeRange(min, max) }
+  const handleAgeChange = (min: number, max: number) => { setAgeRange([min, max]); fetchProfiles(filters, [min, max]) ; saveAgeRange(min, max) }
   const handleHeightChange = (min: number, max: number) => { setHeightRange([min, max]) }
   const handleSearch = (e: React.FormEvent) => { e.preventDefault(); fetchProfiles() }
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -156,6 +165,44 @@ export default function SearchPage() {
     const updated = { ...filters, [e.target.name]: value }
     setFilters(updated)
     fetchProfiles(updated, ageRange)
+  }
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(e.target.value)
+    fetchProfiles(filters, ageRange, e.target.value)
+  }
+  const handleTabChange = (tab: FilterTab) => {
+    setActiveTab(tab)
+    let updatedFilters = { ...filters }
+    switch (tab) {
+      case 'all':
+        // Reset quick-filter booleans
+        updatedFilters = { ...updatedFilters, verifiedOnly: false, premiumOnly: false, onlineNow: false }
+        break
+      case 'new':
+        fetchProfiles(filters, ageRange, 'newest')
+        setSortBy('newest')
+        return
+      case 'nearMe':
+        if (user?.city) updatedFilters = { ...updatedFilters, city: user.city }
+        break
+      case 'premium':
+        updatedFilters = { ...updatedFilters, premiumOnly: true }
+        break
+      case 'verified':
+        updatedFilters = { ...updatedFilters, verifiedOnly: true }
+        break
+      case 'recentActive':
+        fetchProfiles(filters, ageRange, 'lastActive')
+        setSortBy('lastActive')
+        return
+      case 'daily':
+      case 'myMatch':
+      case 'moreMatch':
+        // These use default fetch with no special filter
+        break
+    }
+    setFilters(updatedFilters)
+    fetchProfiles(updatedFilters, ageRange)
   }
 
   const handleProfileIdSearch = () => { if (profileIdSearch.trim()) window.location.href = `/profile/${profileIdSearch.trim()}` }
@@ -195,7 +242,7 @@ export default function SearchPage() {
               { id: 'verified' as FilterTab, icon: BadgeCheck, label: 'Verified' },
               { id: 'recentActive' as FilterTab, icon: Zap, label: 'Recently Active' },
             ].map(tab => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              <button key={tab.id} onClick={() => handleTabChange(tab.id)}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 ${
                   activeTab === tab.id ? 'bg-purple-600/40 text-slate-800 dark:text-white border border-purple-500/40 shadow-[0_0_12px_rgba(147,51,234,0.2)]' : 'bg-white/[0.03] text-slate-400 dark:text-purple-300/50 border border-teal-100 dark:border-purple-500/10 hover:bg-teal-50 dark:bg-purple-500/10 hover:text-teal-600 dark:hover:text-purple-200'
                 }`}>
@@ -205,7 +252,7 @@ export default function SearchPage() {
           </div>
 
           {/* Quick Search */}
-          <form onSubmit={handleSearch} className="glass-card p-4 animate-fade-in-up delay-200" style={{opacity:0}}>
+          <form onSubmit={handleSearch} className="glass-card p-4">
             <div className="flex flex-wrap gap-3 mb-4 pb-4 border-b border-purple-500/10">
               <div className="w-full">
                 <label className="text-xs text-slate-400 dark:text-purple-300/50 mb-1 block">Search by Name or Profile ID</label>
@@ -415,11 +462,11 @@ export default function SearchPage() {
             {activeFilterCount > 0 && !loading && <span className="ml-2 text-teal-600 dark:text-purple-400">({activeFilterCount} filters)</span>}
           </p>
           <div className="flex items-center gap-3">
-            <select className="text-[11px] bg-transparent border border-teal-100 dark:border-purple-500/10 rounded-lg px-2 py-1 text-slate-400 dark:text-purple-300/50 outline-none">
-              <option>Relevance</option>
-              <option>Newest First</option>
-              <option>Last Active</option>
-              <option>Age: Low to High</option>
+            <select value={sortBy} onChange={handleSortChange} className="text-[11px] bg-transparent border border-teal-100 dark:border-purple-500/10 rounded-lg px-2 py-1 text-slate-400 dark:text-purple-300/50 outline-none">
+              <option value="relevance">Relevance</option>
+              <option value="newest">Newest First</option>
+              <option value="lastActive">Last Active</option>
+              <option value="age-asc">Age: Low to High</option>
             </select>
             <div className="flex items-center gap-1.5 text-[10px] text-teal-600 dark:text-purple-400/40"><Brain className="h-3.5 w-3.5" /> AI-Ranked</div>
           </div>
@@ -440,7 +487,7 @@ export default function SearchPage() {
               const search = profileIdSearch.trim().toLowerCase()
               return p.name.toLowerCase().includes(search) || p.id.toLowerCase().includes(search)
             }).map((profile, i) => (
-              <div key={profile.id} className="animate-fade-in-up" style={{animationDelay: `${i * 0.08}s`, opacity: 0}}>
+              <div key={profile.id}>
                 <ProfileCard profile={profile} interestStatus={interestMap[profile.id] || 'none'} />
               </div>
             ))}

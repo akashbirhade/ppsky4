@@ -14,12 +14,33 @@ export async function GET(req: NextRequest) {
     const religion = searchParams.get('religion') || undefined
     const city = searchParams.get('city') || undefined
     const education = searchParams.get('education') || undefined
+    const occupation = searchParams.get('occupation') || undefined
+    const motherTongue = searchParams.get('motherTongue') || undefined
+    const income = searchParams.get('income') || undefined
+    const community = searchParams.get('community') || undefined
+    const maritalStatus = searchParams.get('maritalStatus') || undefined
+    const manglik = searchParams.get('manglik') || undefined
+    const verifiedOnly = searchParams.get('verifiedOnly') === 'true' || undefined
+    const premiumOnly = searchParams.get('premiumOnly') === 'true' || undefined
+    const withPhoto = searchParams.get('withPhoto') === 'true' || undefined
     const excludeId = searchParams.get('excludeId') || undefined
+    const sort = searchParams.get('sort') || undefined
 
     const profiles = searchProfiles(
-      { gender, ageMin, ageMax, religion, city, education },
+      { gender, ageMin, ageMax, religion, city, education, occupation, motherTongue, income, community, maritalStatus, manglik, verifiedOnly, premiumOnly, withPhoto },
       excludeId
     )
+
+    // Sort results
+    if (sort === 'newest') {
+      profiles.sort((a, b) => new Date((b as any).createdAt || 0).getTime() - new Date((a as any).createdAt || 0).getTime())
+    } else if (sort === 'age-asc') {
+      profiles.sort((a, b) => a.age - b.age)
+    } else if (sort === 'age-desc') {
+      profiles.sort((a, b) => b.age - a.age)
+    } else if (sort === 'lastActive') {
+      profiles.sort((a, b) => new Date((b as any).lastActive || 0).getTime() - new Date((a as any).lastActive || 0).getTime())
+    }
 
     // Remove sensitive data but include photos and new fields
     const safeProfiles = profiles.map(({ password, ...rest }) => rest)

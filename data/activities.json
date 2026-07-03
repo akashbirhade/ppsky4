@@ -40,7 +40,7 @@
       "id": "d4ef0e9e-7d53-4088-8ef6-67f2f1bfa319",
       "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
       "receiverId": "2",
-      "status": "pending",
+      "status": "accepted",
       "timestamp": "2026-05-31T10:08:38.731Z"
     },
     {
@@ -110,7 +110,7 @@
       "id": "0e3380d1-efa9-454d-9ad1-af8a6f3462d1",
       "senderId": "109",
       "receiverId": "2",
-      "status": "pending",
+      "status": "accepted",
       "timestamp": "2026-05-31T12:07:29.307Z"
     },
     {
@@ -147,6 +147,20 @@
       "receiverId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
       "status": "pending",
       "timestamp": "2026-07-01T08:29:10.444Z"
+    },
+    {
+      "id": "df465152-62b7-4642-ba57-b7a82188cdaf",
+      "senderId": "ec3a7724-11a3-4ca2-a21e-c18468fd42fa",
+      "receiverId": "3",
+      "status": "pending",
+      "timestamp": "2026-07-03T08:58:53.760Z"
+    },
+    {
+      "id": "bffc22ba-281e-47ec-ac28-dd43267f3b3c",
+      "senderId": "ec3a7724-11a3-4ca2-a21e-c18468fd42fa",
+      "receiverId": "1",
+      "status": "pending",
+      "timestamp": "2026-07-03T08:59:36.806Z"
     }
   ],
   "shortlists": [

@@ -826,6 +826,15 @@ export function searchProfiles(filters: {
   religion?: string
   city?: string
   education?: string
+  occupation?: string
+  motherTongue?: string
+  income?: string
+  community?: string
+  maritalStatus?: string
+  manglik?: string
+  verifiedOnly?: boolean
+  premiumOnly?: boolean
+  withPhoto?: boolean
 }, excludeId?: string): UserProfile[] {
   const users = getStoredUsers()
   return users.filter(u => {
@@ -836,6 +845,16 @@ export function searchProfiles(filters: {
     if (filters.religion && filters.religion !== 'Any' && u.religion !== filters.religion) return false
     if (filters.city && !u.city.toLowerCase().includes(filters.city.toLowerCase())) return false
     if (filters.education && !u.education.toLowerCase().includes(filters.education.toLowerCase())) return false
+    if (filters.occupation && !(u as any).occupation?.toLowerCase().includes(filters.occupation.toLowerCase())) return false
+    if (filters.motherTongue && (u as any).motherTongue !== filters.motherTongue) return false
+    if (filters.income && (u as any).income !== filters.income) return false
+    if (filters.community && (u as any).community !== filters.community) return false
+    if (filters.maritalStatus && (u as any).maritalStatus !== filters.maritalStatus) return false
+    if (filters.manglik === 'yes' && (u as any).manglik !== true) return false
+    if (filters.manglik === 'no' && (u as any).manglik === true) return false
+    if (filters.verifiedOnly && !(u as any).verified) return false
+    if (filters.premiumOnly && !(u as any).premium) return false
+    if (filters.withPhoto && (!u.photos || u.photos.length === 0)) return false
     return true
   })
 }

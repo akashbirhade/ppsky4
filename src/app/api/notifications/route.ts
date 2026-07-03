@@ -240,12 +240,21 @@ export async function POST(req: NextRequest) {
 
 // GET - Get notification preferences
 export async function GET(req: NextRequest) {
+  // Verify authentication
+  const authResult = authenticateRequest(req)
+  if ('error' in authResult) return authResult.error
+
   const url = new URL(req.url)
   const userId = url.searchParams.get('userId')
   const type = url.searchParams.get('type') // 'feed' | 'preferences'
 
   if (!userId) {
     return NextResponse.json({ error: 'userId required' }, { status: 400 })
+  }
+
+  // Ensure users can only access their own notifications
+  if (userId !== authResult.user.userId) {
+    return NextResponse.json({ error: 'Unauthorized access' }, { status: 403 })
   }
 
   // Return real notification feed
@@ -284,6 +293,7 @@ export async function GET(req: NextRequest) {
           profileId: i.profile.id,
           profilePhoto: i.profile.photos?.[0] || null,
           actionRequired: i.interest.status === 'pending',
+          interestId: i.interest.id,
         })
       })
     } catch {}
