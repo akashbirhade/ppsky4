@@ -181,9 +181,9 @@ export default function ProfileDetailPage() {
     const maskedName = nameParts.map(p => p[0] + '...').join(' ')
 
     return (
-      <div className="min-h-screen bg-mesh pt-[104px] pb-12 px-4">
+      <div className="min-h-screen bg-mesh pt-4 sm:pt-[104px] pb-12 px-4">
         <div className="max-w-2xl mx-auto">
-          <button onClick={() => router.back()} className="flex items-center gap-2 text-purple-300/50 hover:text-purple-200 mb-6 transition-colors text-sm">
+          <button onClick={() => router.back()} className="flex items-center gap-2 text-purple-300/50 hover:text-purple-200 mb-3 sm:mb-6 transition-colors text-sm">
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
 
@@ -346,9 +346,9 @@ export default function ProfileDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mesh pt-[104px] pb-12 px-4">
+    <div className="min-h-screen bg-mesh pt-4 sm:pt-[104px] pb-12 px-4">
       <div className="max-w-5xl mx-auto">
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-purple-300/50 hover:text-purple-200 mb-6 transition-colors text-sm">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-purple-300/50 hover:text-purple-200 mb-3 sm:mb-6 transition-colors text-sm">
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
 

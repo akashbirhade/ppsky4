@@ -192,7 +192,7 @@ export default function ProfilePage() {
 
   if (profileLoading) {
     return (
-      <div className="min-h-screen bg-mesh pt-[104px] pb-12 px-4 flex items-center justify-center">
+      <div className="min-h-screen bg-mesh pt-4 sm:pt-[104px] pb-12 px-4 flex items-center justify-center">
         <div className="text-center">
           <div className="w-10 h-10 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
           <p className="text-sm text-slate-400 dark:text-purple-300/50">Loading profile...</p>
@@ -219,7 +219,7 @@ export default function ProfilePage() {
   const completionScore = Math.round((completionFields.filter(Boolean).length / completionFields.length) * 100)
 
   return (
-    <div className="min-h-screen bg-mesh pt-[104px] pb-12 px-4">
+    <div className="min-h-screen bg-mesh pt-4 sm:pt-[104px] pb-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Profile Header */}
         <div className="glass-card mb-6 p-8 relative overflow-hidden animate-fade-in-up">
