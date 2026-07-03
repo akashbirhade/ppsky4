@@ -401,7 +401,7 @@ export default function ProfileDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mesh pt-4 sm:pt-[104px] pb-24 md:pb-12 px-4">
+    <div className="min-h-screen bg-mesh pt-4 sm:pt-[104px] pb-32 md:pb-12 px-4">
       <div className="max-w-5xl mx-auto">
         <button onClick={() => router.back()} className="flex items-center gap-2 text-purple-300/50 hover:text-purple-200 mb-3 sm:mb-6 transition-colors text-sm">
           <ArrowLeft className="h-4 w-4" /> Back
@@ -1046,7 +1046,9 @@ export default function ProfileDetailPage() {
 
       {/* Mobile Floating Action Dock */}
       {user && user.id !== profile.id && (
-        <div className="fixed bottom-0 inset-x-0 z-[80] md:hidden px-4 pb-[env(safe-area-inset-bottom,8px)] pt-2">
+        <div className="fixed bottom-0 inset-x-0 z-[80] md:hidden">
+          <div className="h-4 bg-gradient-to-t from-[#0f0a1e] to-transparent pointer-events-none"></div>
+          <div className="px-4 pb-[env(safe-area-inset-bottom,8px)] pt-1 bg-[#0f0a1e]/90">
           <div className="flex items-center justify-center gap-2 p-2 rounded-2xl bg-dark-900/95 backdrop-blur-xl border border-purple-500/20 shadow-xl shadow-purple-500/10">
             {/* State: My interest was DECLINED by this profile */}
             {interestSent && interestSentStatus === 'declined' ? (
@@ -1131,6 +1133,7 @@ export default function ProfileDetailPage() {
                 </button>
               </>
             )}
+          </div>
           </div>
         </div>
       )}
