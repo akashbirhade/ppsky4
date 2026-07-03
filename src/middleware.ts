@@ -63,7 +63,7 @@ const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
 function checkEdgeRateLimit(ip: string): { allowed: boolean; remaining: number } {
   const now = Date.now()
   const windowMs = 15 * 60 * 1000 // 15 min
-  const maxRequests = 200
+  const maxRequests = process.env.NODE_ENV === 'production' ? 200 : 5000
 
   const entry = rateLimitMap.get(ip)
   
