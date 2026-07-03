@@ -1045,11 +1045,9 @@ export default function ProfileDetailPage() {
       )}
 
       {/* Mobile Floating Action Dock */}
-      {user && user.id !== profile.id && (
-        <div className="fixed bottom-0 inset-x-0 z-[80] md:hidden">
-          <div className="h-4 bg-gradient-to-t from-[#0f0a1e] to-transparent pointer-events-none"></div>
-          <div className="px-4 pb-[env(safe-area-inset-bottom,8px)] pt-1 bg-[#0f0a1e]/90">
-          <div className="flex items-center justify-center gap-2 p-2 rounded-2xl bg-dark-900/95 backdrop-blur-xl border border-purple-500/20 shadow-xl shadow-purple-500/10">
+      {user && String(user.id) !== String(profile.id) && (
+        <div className="fixed bottom-0 left-0 right-0 z-[100] md:hidden px-3 pb-3 pt-2" style={{ background: 'linear-gradient(to top, #0f0a1e 70%, transparent)' }}>
+          <div className="flex items-center justify-center gap-2 p-2.5 rounded-2xl border border-purple-500/20 shadow-xl" style={{ background: 'rgba(15,10,30,0.98)' }}>
             {/* State: My interest was DECLINED by this profile */}
             {interestSent && interestSentStatus === 'declined' ? (
               <div className="flex-1 flex flex-col items-center py-3 px-4">
@@ -1133,7 +1131,6 @@ export default function ProfileDetailPage() {
                 </button>
               </>
             )}
-          </div>
           </div>
         </div>
       )}
