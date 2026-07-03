@@ -55,10 +55,16 @@ export default function DashboardPage() {
     setLoading(false)
   }, [user, filters, authFetch])
 
+  // Main data fetch - runs once when user is available or filters change
   useEffect(() => {
     if (authLoading) return
     if (!user) { router.push('/login'); return }
     fetchProfiles()
+  }, [user?.id, authLoading, router, filters]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Load sidebar data (interests, shortlist, stats) - runs once on mount
+  useEffect(() => {
+    if (!user) return
     // Load already-sent interests
     authFetch(`/api/activity/interests?userId=${user.id}&type=sent`)
       .then(r => r.json())
@@ -92,7 +98,7 @@ export default function DashboardPage() {
         setStats(prev => ({ ...prev, conversations: data.conversations?.length || 0 }))
       })
       .catch(() => {})
-    // Refresh user profile data from server to ensure profile strength is up to date
+    // Refresh user profile data from server (one-time)
     authFetch(`/api/profiles/${user.id}`)
       .then(r => r.json())
       .then(data => {
@@ -111,7 +117,7 @@ export default function DashboardPage() {
         }
       })
       .catch(() => {})
-  }, [user, authLoading, router, fetchProfiles, authFetch, updateUserData])
+  }, [user?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSendInterest = async (e: React.MouseEvent, profileId: string) => {
     e.preventDefault()
