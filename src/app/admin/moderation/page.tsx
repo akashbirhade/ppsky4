@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Eye, Image, MessageCircle, Flag, Check, X, AlertTriangle } from 'lucide-react'
+import { Eye, ImageIcon, MessageCircle, Flag, Check, X, AlertTriangle } from 'lucide-react'
 
 interface FlaggedItem {
   id: string
@@ -55,7 +55,7 @@ export default function ModerationPage() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  {item.type === 'photo' && <Image className="h-4 w-4 text-blue-400" />}
+                  {item.type === 'photo' && <ImageIcon aria-hidden className="h-4 w-4 text-blue-400" />}
                   {item.type === 'message' && <MessageCircle className="h-4 w-4 text-green-400" />}
                   {item.type === 'profile' && <Flag className="h-4 w-4 text-red-400" />}
                   <span className="text-sm font-medium text-white capitalize">{item.type}</span>
@@ -71,7 +71,7 @@ export default function ModerationPage() {
                   <p className="text-xs text-purple-200/40 mb-1"><AlertTriangle className="h-3 w-3 inline mr-1" />Reason: {item.reason}</p>
                   {item.type === 'photo' ? (
                     <div className="w-20 h-20 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
-                      <Image className="h-8 w-8 text-purple-300/30" />
+                      <ImageIcon aria-hidden className="h-8 w-8 text-purple-300/30" />
                     </div>
                   ) : (
                     <p className="text-sm text-purple-200/70 bg-white/5 px-3 py-2 rounded-lg border border-purple-500/10 italic">&quot;{item.content}&quot;</p>

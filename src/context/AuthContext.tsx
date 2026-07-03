@@ -15,6 +15,13 @@ interface User {
   profileComplete: boolean
   photos: string[]
   verified: boolean
+  religion?: string
+  education?: string
+  occupation?: string
+  city?: string
+  about?: string
+  height?: string
+  partnerPreferences?: Record<string, any>
 }
 
 interface AuthContextType {

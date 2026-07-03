@@ -95,7 +95,7 @@ export default function PremiumPage() {
           <h1 className="text-4xl sm:text-5xl font-bold text-slate-800 dark:text-white mb-3">
             Find Love <span className="gradient-text">Faster</span>
           </h1>
-          <p className="text-purple-200/40 max-w-lg mx-auto text-sm">
+          <p className="text-slate-500 dark:text-purple-200/40 max-w-lg mx-auto text-sm">
             Unlock premium features to connect with verified profiles and find your soulmate with AI-powered matchmaking.
           </p>
         </div>

@@ -36,7 +36,7 @@ interface NotificationSettings {
 }
 
 export default function SettingsPage() {
-  const { user, authFetch } = useAuth()
+  const { user, authFetch, logout } = useAuth()
   const { language, setLanguage, languages } = useLanguage()
   const router = useRouter()
   const [activeSection, setActiveSection] = useState<'privacy' | 'notifications' | 'security' | 'account'>('privacy')
@@ -54,6 +54,10 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [blockedUsers, setBlockedUsers] = useState<string[]>([])
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deletePassword, setDeletePassword] = useState('')
+  const [deleteError, setDeleteError] = useState('')
+  const [deleting, setDeleting] = useState(false)
   const [devices, setDevices] = useState([
     { id: '1', name: 'iPhone 15 Pro', lastActive: '2 mins ago', current: true },
     { id: '2', name: 'MacBook Air', lastActive: '1 hour ago', current: false },
@@ -101,6 +105,28 @@ export default function SettingsPage() {
 
   const toggleNotif = (key: keyof NotificationSettings) => {
     setNotifications(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const handleDeleteAccount = async () => {
+    if (!deletePassword) { setDeleteError('Password is required'); return }
+    setDeleting(true)
+    setDeleteError('')
+    try {
+      const res = await authFetch('/api/account', {
+        method: 'DELETE',
+        body: JSON.stringify({ password: deletePassword, reason: 'User requested deletion' })
+      })
+      if (res.ok) {
+        logout()
+        router.push('/')
+      } else {
+        const data = await res.json()
+        setDeleteError(data.error || 'Failed to delete account')
+      }
+    } catch {
+      setDeleteError('Network error. Please try again.')
+    }
+    setDeleting(false)
   }
 
   if (!user) return null
@@ -399,11 +425,11 @@ export default function SettingsPage() {
                 <AlertTriangle className="h-5 w-5 text-red-400" /> Danger Zone
               </h2>
               <div className="space-y-3">
-                <button className="w-full p-4 rounded-xl border border-red-500/20 bg-red-500/5 text-left hover:bg-red-500/10 transition-all">
+                <button onClick={() => setShowDeleteModal(true)} className="w-full p-4 rounded-xl border border-red-500/20 bg-red-500/5 text-left hover:bg-red-500/10 transition-all">
                   <span className="text-sm text-red-300 font-medium">Deactivate Account</span>
                   <p className="text-xs text-red-300/50 mt-0.5">Temporarily hide your profile. Reactivate anytime.</p>
                 </button>
-                <button className="w-full p-4 rounded-xl border border-red-500/20 bg-red-500/5 text-left hover:bg-red-500/10 transition-all">
+                <button onClick={() => setShowDeleteModal(true)} className="w-full p-4 rounded-xl border border-red-500/20 bg-red-500/5 text-left hover:bg-red-500/10 transition-all">
                   <span className="text-sm text-red-300 font-medium">Delete Account</span>
                   <p className="text-xs text-red-300/50 mt-0.5">Permanently delete all data. Cannot be undone.</p>
                 </button>
@@ -420,6 +446,38 @@ export default function SettingsPage() {
           </button>
         </div>
       </div>
+
+      {/* Delete Account Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+          <div className="glass-card p-6 w-full max-w-md">
+            <h3 className="text-lg font-bold text-red-400 flex items-center gap-2 mb-2">
+              <AlertTriangle className="h-5 w-5" /> Delete Account
+            </h3>
+            <p className="text-sm text-slate-400 dark:text-purple-200/60 mb-4">
+              This will permanently delete your account and all data. This cannot be undone.
+            </p>
+            <input
+              type="password"
+              placeholder="Enter your password to confirm"
+              value={deletePassword}
+              onChange={e => setDeletePassword(e.target.value)}
+              className="w-full px-4 py-3 bg-white/5 border border-red-500/30 rounded-xl text-white placeholder-red-300/40 text-sm mb-3 focus:outline-none focus:border-red-500/60"
+            />
+            {deleteError && <p className="text-xs text-red-400 mb-3">{deleteError}</p>}
+            <div className="flex gap-3">
+              <button onClick={() => { setShowDeleteModal(false); setDeletePassword(''); setDeleteError('') }}
+                className="flex-1 py-2.5 rounded-xl border border-purple-500/20 text-sm text-slate-300 hover:bg-white/5 transition-all">
+                Cancel
+              </button>
+              <button onClick={handleDeleteAccount} disabled={deleting}
+                className="flex-1 py-2.5 rounded-xl bg-red-500/20 border border-red-500/40 text-sm text-red-300 hover:bg-red-500/30 transition-all disabled:opacity-50">
+                {deleting ? 'Deleting...' : 'Delete Account'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

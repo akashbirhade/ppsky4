@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
@@ -13,7 +13,7 @@ import { useSlideIn, useStaggerCards } from '@/hooks/useGsap'
 import { useChatSidebar } from '@/context/ChatSidebarContext'
 
 export default function DashboardPage() {
-  const { user, authFetch, loading: authLoading } = useAuth()
+  const { user, authFetch, updateUserData, loading: authLoading } = useAuth()
   const router = useRouter()
   const { isOpen: chatOpen } = useChatSidebar()
   const [profiles, setProfiles] = useState<UserProfile[]>([])
@@ -24,7 +24,15 @@ export default function DashboardPage() {
 
   const [sentInterests, setSentInterests] = useState<Set<string>>(new Set())
   const [shortlisted, setShortlisted] = useState<Set<string>>(new Set())
-  const [stats, setStats] = useState({ profileViews: 0, interestsReceived: 0, conversations: 0, profileScore: 0 })
+  const [stats, setStats] = useState({ profileViews: 0, interestsReceived: 0, conversations: 0 })
+
+  // Dynamically compute profile score from current user data
+  const profileScore = useMemo(() => {
+    if (!user) return 0
+    const fields = [user.name, user.email, user.gender, user.age, user.religion, user.city, user.education, user.occupation, user.about]
+    const filled = fields.filter(Boolean).length
+    return Math.round((filled / fields.length) * 100)
+  }, [user])
 
   const lookingFor = user?.gender === 'Male' ? 'Bride' : 'Groom'
 
@@ -84,11 +92,26 @@ export default function DashboardPage() {
         setStats(prev => ({ ...prev, conversations: data.conversations?.length || 0 }))
       })
       .catch(() => {})
-    // Profile completeness score
-    const fields = [user.name, user.email, user.gender, user.age, (user as any).religion, (user as any).city, (user as any).education, (user as any).occupation, (user as any).about]
-    const filled = fields.filter(Boolean).length
-    setStats(prev => ({ ...prev, profileScore: Math.round((filled / fields.length) * 100) }))
-  }, [user, authLoading, router, fetchProfiles, authFetch])
+    // Refresh user profile data from server to ensure profile strength is up to date
+    authFetch(`/api/profiles/${user.id}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.profile) {
+          updateUserData({
+            religion: data.profile.religion,
+            education: data.profile.education,
+            occupation: data.profile.occupation,
+            city: data.profile.city,
+            about: data.profile.about,
+            height: data.profile.height,
+            photos: data.profile.photos,
+            partnerPreferences: data.profile.partnerPreferences,
+            verified: data.profile.verified,
+          })
+        }
+      })
+      .catch(() => {})
+  }, [user, authLoading, router, fetchProfiles, authFetch, updateUserData])
 
   const handleSendInterest = async (e: React.MouseEvent, profileId: string) => {
     e.preventDefault()
@@ -172,7 +195,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-green-500/10 border border-green-500/20 whitespace-nowrap">
             <TrendingUp className="h-3.5 w-3.5 text-green-400" />
-            <span className="text-sm font-bold text-slate-800 dark:text-white">{stats.profileScore}%</span>
+            <span className="text-sm font-bold text-slate-800 dark:text-white">{profileScore}%</span>
             <span className="text-[10px] text-slate-500 dark:text-purple-300/40">Score</span>
           </div>
         </div>
@@ -203,7 +226,7 @@ export default function DashboardPage() {
             <div className="w-9 h-9 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center mx-auto mb-2">
               <TrendingUp className="h-4 w-4 text-green-400" />
             </div>
-            <p className="text-xl font-bold text-slate-800 dark:text-white">{stats.profileScore}%</p>
+            <p className="text-xl font-bold text-slate-800 dark:text-white">{profileScore}%</p>
             <p className="text-[10px] text-slate-500 dark:text-purple-300/40">Profile Score</p>
           </div>
         </div>
@@ -352,7 +375,7 @@ export default function DashboardPage() {
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                 activeTab === tab 
                   ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30' 
-                  : 'bg-white/5 text-purple-300/60 hover:bg-white/10 hover:text-purple-200'
+                  : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-purple-300/60 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-purple-700 dark:hover:text-purple-200'
               }`}>
               {tab === 'all' && `All ${lookingFor}s`}
               {tab === 'new' && 'Newly Joined'}
@@ -379,8 +402,8 @@ export default function DashboardPage() {
         ) : profiles.length === 0 ? (
           <div className="text-center py-20">
             <Users className="h-16 w-16 text-purple-400/30 mx-auto mb-4" />
-            <h3 className="text-lg font-bold text-white mb-2">No profiles found</h3>
-            <p className="text-sm text-purple-300/50">Try adjusting your filters to see more matches</p>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">No profiles found</h3>
+            <p className="text-sm text-slate-500 dark:text-purple-300/50">Try adjusting your filters to see more matches</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" ref={gridRef}>
@@ -395,7 +418,7 @@ export default function DashboardPage() {
               <Link key={profile.id} href={`/profile/${profile.id}`} 
                 className="glass-card !p-0 overflow-hidden group hover:border-purple-400/40 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/10">
                 {/* Photo */}
-                <div className="relative h-52 bg-gradient-to-br from-purple-900/40 to-dark-900">
+                <div className="relative h-52 bg-gradient-to-br from-purple-100 to-slate-100 dark:from-purple-900/40 dark:to-dark-900">
                   {profile.photos && profile.photos.length > 0 ? (
                     <ProfileImage src={profile.photos[0]} name={profile.name} gender={profile.gender} />
                   ) : (
@@ -428,23 +451,23 @@ export default function DashboardPage() {
 
                 {/* Profile Details */}
                 <div className="p-4 space-y-2">
-                  <div className="flex items-center gap-2 text-xs text-purple-300/60">
+                  <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-purple-300/60">
                     {profile.city && (
                       <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{profile.city}{profile.state ? `, ${profile.state}` : ''}</span>
                     )}
                   </div>
                   {profile.occupation && (
-                    <p className="flex items-center gap-1.5 text-xs text-purple-300/60">
+                    <p className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-purple-300/60">
                       <Briefcase className="h-3 w-3 shrink-0" /> {profile.occupation}
                     </p>
                   )}
                   {profile.education && (
-                    <p className="flex items-center gap-1.5 text-xs text-purple-300/60">
+                    <p className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-purple-300/60">
                       <GraduationCap className="h-3 w-3 shrink-0" /> {profile.education}
                     </p>
                   )}
                   {profile.religion && (
-                    <p className="text-xs text-purple-300/40">{profile.religion}{profile.caste ? ` - ${profile.caste}` : ''}</p>
+                    <p className="text-xs text-slate-400 dark:text-purple-300/40">{profile.religion}{profile.caste ? ` - ${profile.caste}` : ''}</p>
                   )}
 
                   {/* Action Buttons */}
@@ -460,15 +483,15 @@ export default function DashboardPage() {
                           WhatsApp
                         </a>
                         <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push(`/call?type=audio&target=${profile.id}&name=${encodeURIComponent(profile.name)}`) }}
-                          className="py-2 px-3 text-xs bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-colors border border-blue-500/20" title="Call">
+                          className="py-2 px-3 text-xs bg-blue-500/20 text-blue-600 dark:text-blue-300 rounded-lg hover:bg-blue-500/30 transition-colors border border-blue-500/20" title="Call">
                           <Phone className="h-3.5 w-3.5" />
                         </button>
                         <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push(`/messages?chat=${profile.id}`) }}
-                          className="py-2 px-3 text-xs bg-purple-500/20 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-colors border border-purple-500/20" title="Chat">
+                          className="py-2 px-3 text-xs bg-purple-500/20 text-purple-600 dark:text-purple-300 rounded-lg hover:bg-purple-500/30 transition-colors border border-purple-500/20" title="Chat">
                           <MessageCircle className="h-3.5 w-3.5" />
                         </button>
                         <button onClick={(e) => handleShortlist(e, profile.id)}
-                          className={`py-2 px-3 text-xs rounded-lg transition-colors border ${shortlisted.has(profile.id) ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-white/5 text-purple-300 border-purple-500/20 hover:bg-white/10'}`} title="Shortlist">
+                          className={`py-2 px-3 text-xs rounded-lg transition-colors border ${shortlisted.has(profile.id) ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-purple-300 border-slate-200 dark:border-purple-500/20 hover:bg-slate-200 dark:hover:bg-white/10'}`} title="Shortlist">
                           <Star className={`h-3.5 w-3.5 ${shortlisted.has(profile.id) ? 'fill-amber-400' : ''}`} />
                         </button>
                       </>
@@ -479,7 +502,7 @@ export default function DashboardPage() {
                           <HalfHeart className="h-3.5 w-3.5" /> Send Interest
                         </button>
                         <button onClick={(e) => handleShortlist(e, profile.id)}
-                          className={`py-2 px-3 text-xs rounded-lg transition-colors border ${shortlisted.has(profile.id) ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-white/5 text-purple-300 border-purple-500/20 hover:bg-white/10'}`}>
+                          className={`py-2 px-3 text-xs rounded-lg transition-colors border ${shortlisted.has(profile.id) ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-purple-300 border-slate-200 dark:border-purple-500/20 hover:bg-slate-200 dark:hover:bg-white/10'}`}>
                           <Star className={`h-3.5 w-3.5 ${shortlisted.has(profile.id) ? 'fill-amber-400' : ''}`} />
                         </button>
                       </>

@@ -971,6 +971,7 @@ export function getConversations(userId: string): { user: UserProfile, lastMessa
       unreadCount
     }
   }).filter(c => c.user)
+    .sort((a, b) => new Date(b.lastMessage?.timestamp || 0).getTime() - new Date(a.lastMessage?.timestamp || 0).getTime())
 }
 
 // ============ ACTIVITY TRACKING ============

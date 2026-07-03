@@ -8,6 +8,9 @@ import { ToastProvider } from '@/components/Toast'
 import { ChatSidebarProvider } from '@/context/ChatSidebarContext'
 import PageTransition from '@/components/PageTransition'
 import AIChatBot from '@/components/AIChatBot'
+
+// Force all pages to be dynamically rendered (no static prerendering)
+export const dynamic = 'force-dynamic'
 import VoiceAssistant from '@/components/VoiceAssistant'
 import ServiceWorkerRegistration from '@/components/ServiceWorker'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'

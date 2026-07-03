@@ -156,6 +156,13 @@ export default function ProfilePage() {
           profileComplete: data.profile.profileComplete,
           verified: data.profile.verified,
           premium: data.profile.premium,
+          religion: data.profile.religion || profile.religion,
+          education: data.profile.education || profile.education,
+          occupation: data.profile.occupation || profile.occupation,
+          city: data.profile.city || profile.city,
+          about: data.profile.about || profile.about,
+          height: data.profile.height || profile.height,
+          partnerPreferences: data.profile.partnerPreferences,
         })
       }
 

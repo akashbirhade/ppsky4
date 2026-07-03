@@ -159,19 +159,19 @@ export default function Navbar() {
 
                 {/* Help Dropdown */}
                 <div ref={helpRef} className="relative ml-3">
-                  <button onClick={() => setHelpOpen(!helpOpen)} aria-expanded={helpOpen} aria-haspopup="menu" aria-label="Open help menu" className="flex items-center gap-1 text-purple-200/70 hover:text-white text-sm font-medium transition-colors">
+                  <button onClick={() => setHelpOpen(!helpOpen)} aria-expanded={helpOpen} aria-haspopup="menu" aria-label="Open help menu" className="flex items-center gap-1 text-slate-600 dark:text-purple-200/70 hover:text-slate-900 dark:hover:text-white text-sm font-medium transition-colors">
                     Help <ChevronDown className="h-3.5 w-3.5" />
                   </button>
                   {helpOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-dark-800 rounded-lg shadow-xl border border-purple-500/20 py-2 z-50 animate-fade-in-down">
-                      <Link href="/legal" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Help Center</Link>
-                      <Link href="/legal" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Contact Us</Link>
-                      <Link href="/legal" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>FAQs</Link>
-                      <Link href="/legal" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Safety Tips</Link>
-                      <div className="border-t border-purple-500/10 my-1"></div>
-                      <Link href="/legal" className="block px-4 py-2 text-sm text-purple-300 hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Legal Center</Link>
-                      <Link href="/legal/terms-and-conditions" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Terms & Conditions</Link>
-                      <Link href="/legal/privacy-policy" className="block px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Privacy Policy</Link>
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-dark-800 rounded-lg shadow-xl border border-slate-200 dark:border-purple-500/20 py-2 z-50 animate-fade-in-down">
+                      <Link href="/legal" className="block px-4 py-2 text-sm text-slate-700 dark:text-purple-200 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Help Center</Link>
+                      <Link href="/legal" className="block px-4 py-2 text-sm text-slate-700 dark:text-purple-200 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Contact Us</Link>
+                      <Link href="/legal" className="block px-4 py-2 text-sm text-slate-700 dark:text-purple-200 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>FAQs</Link>
+                      <Link href="/legal" className="block px-4 py-2 text-sm text-slate-700 dark:text-purple-200 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Safety Tips</Link>
+                      <div className="border-t border-slate-200 dark:border-purple-500/10 my-1"></div>
+                      <Link href="/legal" className="block px-4 py-2 text-sm text-slate-600 dark:text-purple-300 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Legal Center</Link>
+                      <Link href="/legal/terms-and-conditions" className="block px-4 py-2 text-sm text-slate-700 dark:text-purple-200 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Terms & Conditions</Link>
+                      <Link href="/legal/privacy-policy" className="block px-4 py-2 text-sm text-slate-700 dark:text-purple-200 hover:bg-slate-100 dark:hover:bg-purple-500/10" onClick={() => setHelpOpen(false)}>Privacy Policy</Link>
                     </div>
                   )}
                 </div>
@@ -202,29 +202,29 @@ export default function Navbar() {
                     )}
                   </button>
                   {userInfoOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-80 bg-dark-800/95 backdrop-blur-md rounded-xl shadow-2xl border border-purple-500/20 z-50 animate-fade-in-down overflow-hidden">
-                      <div className="flex items-center justify-between px-4 py-3 border-b border-purple-500/10">
-                        <h3 className="text-sm font-semibold text-white">Notifications</h3>
-                        {notifCount > 0 && <span className="text-[10px] bg-pink-500/20 text-pink-300 px-2 py-0.5 rounded-full">{notifCount} new</span>}
+                    <div className="absolute right-0 top-full mt-2 w-80 bg-white/95 dark:bg-dark-800/95 backdrop-blur-md rounded-xl shadow-2xl border border-slate-200 dark:border-purple-500/20 z-50 animate-fade-in-down overflow-hidden">
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-purple-500/10">
+                        <h3 className="text-sm font-semibold text-slate-800 dark:text-white">Notifications</h3>
+                        {notifCount > 0 && <span className="text-[10px] bg-pink-500/20 text-pink-600 dark:text-pink-300 px-2 py-0.5 rounded-full">{notifCount} new</span>}
                       </div>
                       <div className="max-h-72 overflow-y-auto">
                         {notifications.length > 0 ? notifications.map(n => (
                           <Link key={n.id} href={n.link || '/notifications'} onClick={() => setUserInfoOpen(false)}
-                            className={`flex items-start gap-3 px-4 py-3 hover:bg-purple-500/5 transition-colors border-b border-purple-500/5 ${!n.read ? 'bg-purple-500/[0.03]' : ''}`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${!n.read ? 'bg-pink-500/20' : 'bg-white/5'}`}>
-                              <Bell className={`h-3.5 w-3.5 ${!n.read ? 'text-pink-400' : 'text-purple-300/50'}`} />
+                            className={`flex items-start gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-purple-500/5 transition-colors border-b border-slate-100 dark:border-purple-500/5 ${!n.read ? 'bg-purple-50 dark:bg-purple-500/[0.03]' : ''}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${!n.read ? 'bg-pink-500/20' : 'bg-slate-100 dark:bg-white/5'}`}>
+                              <Bell className={`h-3.5 w-3.5 ${!n.read ? 'text-pink-400' : 'text-slate-400 dark:text-purple-300/50'}`} />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className={`text-xs font-medium truncate ${!n.read ? 'text-white' : 'text-purple-200/70'}`}>{n.title}</p>
-                              <p className="text-[11px] text-purple-300/50 truncate">{n.message}</p>
-                              <p className="text-[9px] text-purple-300/30 mt-0.5">{n.time}</p>
+                              <p className={`text-xs font-medium truncate ${!n.read ? 'text-slate-800 dark:text-white' : 'text-slate-600 dark:text-purple-200/70'}`}>{n.title}</p>
+                              <p className="text-[11px] text-slate-500 dark:text-purple-300/50 truncate">{n.message}</p>
+                              <p className="text-[9px] text-slate-400 dark:text-purple-300/30 mt-0.5">{n.time}</p>
                             </div>
                             {!n.read && <span className="w-2 h-2 bg-pink-500 rounded-full mt-1.5 shrink-0"></span>}
                           </Link>
                         )) : (
                           <div className="px-4 py-8 text-center">
-                            <Bell className="h-6 w-6 text-purple-300/20 mx-auto mb-2" />
-                            <p className="text-xs text-purple-300/40">No notifications yet</p>
+                            <Bell className="h-6 w-6 text-slate-300 dark:text-purple-300/20 mx-auto mb-2" />
+                            <p className="text-xs text-slate-400 dark:text-purple-300/40">No notifications yet</p>
                           </div>
                         )}
                       </div>
@@ -251,37 +251,37 @@ export default function Navbar() {
                     <ChevronDown className="h-3.5 w-3.5 text-purple-300/60" />
                   </button>
                   {profileOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-72 bg-dark-800 rounded-xl shadow-2xl border border-purple-500/20 z-50 animate-fade-in-down overflow-hidden">
+                    <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-dark-800 rounded-xl shadow-2xl border border-slate-200 dark:border-purple-500/20 z-50 animate-fade-in-down overflow-hidden">
                       {/* Dropdown Menu Items */}
-                      <div className="grid grid-cols-2 gap-0 p-4 border-b border-purple-500/10">
-                        <Link href="/profile" className="flex items-center gap-2 p-2 rounded-lg hover:bg-purple-500/10 text-sm text-purple-200" onClick={() => setProfileOpen(false)}>
-                          <User className="h-4 w-4 text-purple-400" /> My Profile
+                      <div className="grid grid-cols-2 gap-0 p-4 border-b border-slate-200 dark:border-purple-500/10">
+                        <Link href="/profile" className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-purple-500/10 text-sm text-slate-700 dark:text-purple-200" onClick={() => setProfileOpen(false)}>
+                          <User className="h-4 w-4 text-purple-500 dark:text-purple-400" /> My Profile
                         </Link>
-                        <Link href="/notifications" className="flex items-center gap-2 p-2 rounded-lg hover:bg-purple-500/10 text-sm text-purple-200" onClick={() => setProfileOpen(false)}>
-                          <Mail className="h-4 w-4 text-purple-400" /> Alerts
+                        <Link href="/notifications" className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-purple-500/10 text-sm text-slate-700 dark:text-purple-200" onClick={() => setProfileOpen(false)}>
+                          <Mail className="h-4 w-4 text-purple-500 dark:text-purple-400" /> Alerts
                         </Link>
-                        <Link href="/settings" className="flex items-center gap-2 p-2 rounded-lg hover:bg-purple-500/10 text-sm text-purple-200" onClick={() => setProfileOpen(false)}>
-                          <Settings className="h-4 w-4 text-purple-400" /> Settings
+                        <Link href="/settings" className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-purple-500/10 text-sm text-slate-700 dark:text-purple-200" onClick={() => setProfileOpen(false)}>
+                          <Settings className="h-4 w-4 text-purple-500 dark:text-purple-400" /> Settings
                         </Link>
-                        <Link href="/settings" className="flex items-center gap-2 p-2 rounded-lg hover:bg-purple-500/10 text-sm text-purple-200" onClick={() => setProfileOpen(false)}>
-                          <Shield className="h-4 w-4 text-purple-400" /> Privacy
+                        <Link href="/settings" className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-purple-500/10 text-sm text-slate-700 dark:text-purple-200" onClick={() => setProfileOpen(false)}>
+                          <Shield className="h-4 w-4 text-purple-500 dark:text-purple-400" /> Privacy
                         </Link>
-                        <Link href="/search" className="flex items-center gap-2 p-2 rounded-lg hover:bg-purple-500/10 text-sm text-purple-200" onClick={() => setProfileOpen(false)}>
-                          <SlidersHorizontal className="h-4 w-4 text-purple-400" /> Filters
+                        <Link href="/search" className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-purple-500/10 text-sm text-slate-700 dark:text-purple-200" onClick={() => setProfileOpen(false)}>
+                          <SlidersHorizontal className="h-4 w-4 text-purple-500 dark:text-purple-400" /> Filters
                         </Link>
-                        <button onClick={() => { logout(); setProfileOpen(false) }} className="flex items-center gap-2 p-2 rounded-lg hover:bg-red-500/10 text-sm text-red-300">
-                          <LogOut className="h-4 w-4 text-red-400" /> Logout
+                        <button onClick={() => { logout(); setProfileOpen(false) }} className="flex items-center gap-2 p-2 rounded-lg hover:bg-red-500/10 text-sm text-red-500 dark:text-red-300">
+                          <LogOut className="h-4 w-4 text-red-500 dark:text-red-400" /> Logout
                         </button>
                       </div>
                       {/* Account Type */}
                       <div className="p-4 text-center">
-                        <p className="text-sm text-purple-300/60 mb-2">Account Type: <span className="font-semibold text-purple-200">{user.premium ? user.premiumPlan || 'Premium' : 'Free'}</span></p>
+                        <p className="text-sm text-slate-500 dark:text-purple-300/60 mb-2">Account Type: <span className="font-semibold text-slate-800 dark:text-purple-200">{user.premium ? user.premiumPlan || 'Premium' : 'Free'}</span></p>
                         {!user.premium && (
                           <>
                             <Link href="/premium" className="block w-full btn-gold py-2.5 px-4 text-sm" onClick={() => setProfileOpen(false)}>
                               Upgrade Now
                             </Link>
-                            <Link href="/premium" className="block mt-2 text-purple-400 text-sm hover:underline" onClick={() => setProfileOpen(false)}>
+                            <Link href="/premium" className="block mt-2 text-purple-600 dark:text-purple-400 text-sm hover:underline" onClick={() => setProfileOpen(false)}>
                               Compare memberships
                             </Link>
                           </>
@@ -357,7 +357,7 @@ function NavLink({ href, label, badge }: { href: string; label: string; badge?: 
 
 function SubNavLink({ href, label }: { href: string; label: string }) {
   return (
-    <Link href={href} className="text-purple-300/50 hover:text-purple-200 text-xs font-medium transition-colors">
+    <Link href={href} className="text-slate-500 dark:text-purple-300/50 hover:text-slate-700 dark:hover:text-purple-200 text-xs font-medium transition-colors">
       {label}
     </Link>
   )

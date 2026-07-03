@@ -93,6 +93,13 @@ export async function POST(req: NextRequest) {
         profileComplete: newUser.profileComplete,
         photos: newUser.photos,
         verified: newUser.verified,
+        religion: newUser.religion,
+        education: newUser.education,
+        occupation: newUser.occupation,
+        city: newUser.city,
+        about: newUser.about,
+        height: newUser.height,
+        partnerPreferences: newUser.partnerPreferences,
       },
       token
     }, { status: 201 })

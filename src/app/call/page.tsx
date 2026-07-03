@@ -124,6 +124,7 @@ function CallPageInner() {
       socket.disconnect()
       socketRef.current = null
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [callState, user])
 
   // Auto-start call if navigated from a profile

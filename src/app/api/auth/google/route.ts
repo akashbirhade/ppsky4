@@ -98,6 +98,13 @@ export async function POST(req: NextRequest) {
         profileComplete: user.profileComplete || false,
         photos: user.photos || [],
         verified: true,
+        religion: user.religion,
+        education: user.education,
+        occupation: user.occupation,
+        city: user.city,
+        about: user.about,
+        height: user.height,
+        partnerPreferences: user.partnerPreferences,
       },
       token,
     })

@@ -236,7 +236,7 @@ export default function MatchesPage() {
                 <button 
                   onClick={handlePrev}
                   disabled={currentIndex === 0}
-                  className="text-purple-300/60 hover:text-purple-200 disabled:opacity-30 text-sm"
+                  className="text-slate-500 dark:text-purple-300/60 hover:text-purple-200 disabled:opacity-30 text-sm"
                 >
                   ← Prev
                 </button>

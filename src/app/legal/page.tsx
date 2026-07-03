@@ -92,7 +92,7 @@ export default function LegalHub() {
           <div className="grid md:grid-cols-3 gap-6">
             <div>
               <h3 className="text-pink-400 font-semibold mb-2">Business Name</h3>
-              <p className="text-slate-300">8459210421</p>
+              <p className="text-slate-300">Soulmate Sync</p>
             </div>
             <div>
               <h3 className="text-pink-400 font-semibold mb-2">Registered Address</h3>
