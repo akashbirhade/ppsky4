@@ -11,9 +11,10 @@ export default function MobileDock() {
 
   if (!user) return null
 
-  // Hide on pages that don't need it (login, register, onboarding, chat, messages)
+  // Hide on pages that don't need it (login, register, onboarding, chat, messages, profile detail)
   const hiddenPaths = ['/login', '/register', '/onboarding', '/call', '/messages']
   if (hiddenPaths.some(p => pathname.startsWith(p))) return null
+  if (pathname.match(/^\/profile\/[^/]+$/)) return null
 
   const isActive = (path: string) => pathname === path
 
