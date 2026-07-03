@@ -936,13 +936,13 @@ export function sendMessage(senderId: string, receiverId: string, content: strin
   }
   messages.push(msg)
   saveMessages(messages)
-  // Sync message to Supabase
+  // Sync message to Supabase (fire-and-forget)
   const sb = getSupabase()
   if (sb) {
-    sb.from('app_messages').insert({
+    void sb.from('app_messages').insert({
       id: msg.id, sender_id: msg.senderId, receiver_id: msg.receiverId,
       content: msg.content, timestamp: msg.timestamp, read: msg.read, type: msg.type
-    }).catch(() => {})
+    }).select()
   }
   return msg
 }
