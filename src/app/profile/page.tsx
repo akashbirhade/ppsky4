@@ -481,9 +481,9 @@ export default function ProfilePage() {
                 </div>
               )}
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <div className="flex gap-3 overflow-x-auto pb-3" style={{ scrollbarWidth: 'none' }}>
                 {photos.map((photo, i) => (
-                  <div key={i} className="relative aspect-square rounded-2xl overflow-hidden border border-teal-200/50 dark:border-purple-500/20 group">
+                  <div key={i} className="relative shrink-0 w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden border border-teal-200/50 dark:border-purple-500/20 group">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={photo} alt={`Photo ${i+1}`} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -498,7 +498,7 @@ export default function ProfilePage() {
                 ))}
                 
                 {/* Upload Button */}
-                <label className="aspect-square rounded-2xl border-2 border-dashed border-teal-200/50 dark:border-purple-500/20 flex flex-col items-center justify-center cursor-pointer hover:border-purple-400/40 hover:bg-teal-50/50 dark:bg-purple-500/5 transition-all group">
+                <label className="shrink-0 w-32 h-32 sm:w-40 sm:h-40 rounded-2xl border-2 border-dashed border-teal-200/50 dark:border-purple-500/20 flex flex-col items-center justify-center cursor-pointer hover:border-purple-400/40 hover:bg-teal-50/50 dark:bg-purple-500/5 transition-all group">
                   <Upload className="h-8 w-8 text-teal-600 dark:text-purple-400/40 group-hover:text-slate-600 dark:text-purple-300 transition-colors mb-2" />
                   <span className="text-xs text-slate-300 dark:text-purple-300/40 group-hover:text-slate-700 dark:text-purple-200">Upload Photo</span>
                   <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" multiple />

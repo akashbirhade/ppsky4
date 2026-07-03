@@ -266,6 +266,17 @@ export default function MatchesPage() {
                     <span className="absolute top-3 left-3 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded">VIP</span>
                   )}
                 </div>
+                {/* Horizontal scroll thumbnails */}
+                {currentProfile.photos && currentProfile.photos.length > 1 && (
+                  <div className="flex gap-2 mt-3 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+                    {currentProfile.photos.map((photo: string, i: number) => (
+                      <div key={i} className={`shrink-0 w-12 h-12 rounded-lg overflow-hidden border-2 ${i === 0 ? 'border-purple-500' : 'border-transparent opacity-60'}`}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={photo} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {/* Verification Badge */}
                 {currentProfile.verified && (
                   <div className="mt-4 flex items-center gap-2 p-3 bg-green-500/10 rounded-lg border border-green-500/20">

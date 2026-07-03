@@ -40,6 +40,7 @@ export default function ProfileDetailPage() {
   const [showPremiumModal, setShowPremiumModal] = useState(false)
   const [premiumAction, setPremiumAction] = useState('')
   const [detailTab, setDetailTab] = useState<'about' | 'preferences'>('about')
+  const [activePhotoIdx, setActivePhotoIdx] = useState(0)
   const [similarProfiles, setSimilarProfiles] = useState<any[]>([])
 
   const fetchSimilarProfiles = useCallback(async () => {
@@ -413,31 +414,51 @@ export default function ProfileDetailPage() {
             {/* Left: Photo Gallery */}
             <div className="relative lg:w-[380px] xl:w-[420px] shrink-0 bg-gradient-to-br from-purple-900/30 to-dark-900">
               {profile.photos && profile.photos.length > 0 ? (
-                <div className="relative w-full aspect-[3/4] lg:h-full">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img 
-                    src={profile.photos[0]} 
-                    alt={profile.name} 
-                    className="w-full h-full object-cover"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden') }}
-                  />
-                  <div className="hidden w-full h-full bg-gradient-to-br from-purple-900/60 to-dark-900 flex items-center justify-center">
-                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="w-24 h-24">
-                      <circle cx="50" cy="50" r="50" fill="#2d1b69" />
-                      <circle cx="50" cy="38" r="16" fill="rgba(124,58,237,0.6)" />
-                      <ellipse cx="50" cy="80" rx="26" ry="22" fill="rgba(124,58,237,0.6)" />
-                    </svg>
+                <div className="relative w-full aspect-[3/4] lg:h-full flex flex-col">
+                  {/* Main Photo */}
+                  <div className="relative flex-1 min-h-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img 
+                      src={profile.photos[activePhotoIdx]} 
+                      alt={`${profile.name} photo ${activePhotoIdx + 1}`} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden') }}
+                    />
+                    <div className="hidden w-full h-full bg-gradient-to-br from-purple-900/60 to-dark-900 flex items-center justify-center">
+                      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="w-24 h-24">
+                        <circle cx="50" cy="50" r="50" fill="#2d1b69" />
+                        <circle cx="50" cy="38" r="16" fill="rgba(124,58,237,0.6)" />
+                        <ellipse cx="50" cy="80" rx="26" ry="22" fill="rgba(124,58,237,0.6)" />
+                      </svg>
+                    </div>
+                    {/* Photo counter */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-dark-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple-500/20">
+                      <button onClick={() => setActivePhotoIdx(i => i > 0 ? i - 1 : profile.photos.length - 1)} className="text-white/60 hover:text-white text-xs">‹</button>
+                      <span className="text-[10px] text-white/80 font-medium">{activePhotoIdx + 1} of {profile.photos.length}</span>
+                      <button onClick={() => setActivePhotoIdx(i => i < profile.photos.length - 1 ? i + 1 : 0)} className="text-white/60 hover:text-white text-xs">›</button>
+                    </div>
+                    {/* Premium Badge */}
+                    {profile.premium && (
+                      <div className="absolute top-4 left-4 flex items-center gap-1 bg-amber-500/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-lg">
+                        <Crown className="h-3 w-3" /> Premium
+                      </div>
+                    )}
                   </div>
-                  {/* Photo counter */}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-dark-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple-500/20">
-                    <button className="text-white/60 hover:text-white text-xs">‹</button>
-                    <span className="text-[10px] text-white/80 font-medium">1 of {profile.photos.length}</span>
-                    <button className="text-white/60 hover:text-white text-xs">›</button>
-                  </div>
-                  {/* Premium Badge */}
-                  {profile.premium && (
-                    <div className="absolute top-4 left-4 flex items-center gap-1 bg-amber-500/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-lg">
-                      <Crown className="h-3 w-3" /> Premium
+                  {/* Horizontal Scroll Thumbnails */}
+                  {profile.photos.length > 1 && (
+                    <div className="flex gap-2 p-2 overflow-x-auto bg-dark-900/60 backdrop-blur-sm" style={{ scrollbarWidth: 'none' }}>
+                      {profile.photos.map((photo, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setActivePhotoIdx(i)}
+                          className={`shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${
+                            i === activePhotoIdx ? 'border-purple-500 shadow-[0_0_8px_rgba(147,51,234,0.4)]' : 'border-transparent opacity-60 hover:opacity-100'
+                          }`}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={photo} alt={`Thumb ${i + 1}`} className="w-full h-full object-cover" />
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
