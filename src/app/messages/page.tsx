@@ -29,7 +29,8 @@ interface Message {
 function Avatar({ user, size = 12 }: { user?: { name?: string; photos?: string[]; gender?: string }, size?: number }) {
   const [imgErr, setImgErr] = useState(false)
   const photo = user?.photos?.[0]
-  const cls = `w-${size} h-${size} rounded-full overflow-hidden border border-purple-400/20 shrink-0`
+  const sizeClass = size === 8 ? 'w-8 h-8' : size === 10 ? 'w-10 h-10' : size === 14 ? 'w-14 h-14' : 'w-12 h-12'
+  const cls = `${sizeClass} rounded-full overflow-hidden border border-purple-400/20 shrink-0`
   if (photo && !imgErr) {
     return (
       <div className={cls}>
