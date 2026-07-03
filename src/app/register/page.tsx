@@ -27,10 +27,12 @@ export default function RegisterPage() {
   const googleBtnRef = useRef<HTMLDivElement>(null)
   const [googleLoaded, setGoogleLoaded] = useState(false)
 
-  // Redirect if already logged in
+  const [justRegistered, setJustRegistered] = useState(false)
+
+  // Redirect if already logged in (only on initial load, not after registration)
   useEffect(() => {
-    if (!authLoading && user) router.replace('/dashboard')
-  }, [user, authLoading, router])
+    if (!authLoading && user && !justRegistered) router.replace('/dashboard')
+  }, [user, authLoading, router, justRegistered])
 
   // Load Google Identity Services
   useEffect(() => {
@@ -158,7 +160,10 @@ export default function RegisterPage() {
       password: formData.password, gender: formData.gender, dateOfBirth: formData.dateOfBirth,
       phone: formData.phone.replace(/\D/g, '')
     })
-    if (result.success) router.push('/onboarding')
+    if (result.success) {
+      setJustRegistered(true)
+      router.push('/onboarding')
+    }
     else setError(result.error || 'Registration failed. Please try again.')
     setLoading(false)
   }
@@ -178,7 +183,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Progress */}
-        <div className="flex items-center justify-center gap-2 mb-8 animate-fade-in-up delay-100" style={{opacity:0}}>
+        <div className="flex items-center justify-center gap-2 mb-8">
           {[1, 2, 3, 4].map(i => (
             <div key={i} className="flex items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 ${
@@ -194,7 +199,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Form Card */}
-        <div className="glass-card animate-fade-in-up delay-200" style={{opacity:0}}>
+        <div className="glass-card">
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 text-red-300 px-4 py-3 rounded-xl text-sm animate-fade-in-up">

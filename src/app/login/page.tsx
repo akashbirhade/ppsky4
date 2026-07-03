@@ -236,7 +236,7 @@ export default function LoginPage() {
           <p className="text-slate-400 dark:text-purple-300/50 mt-1">Continue your search for love</p>
         </div>
 
-        <div className="glass-card animate-fade-in-up delay-200" style={{opacity:0}}>
+        <div className="glass-card">
           {/* Mode Toggle */}
           <div className="flex mb-6 bg-slate-100 dark:bg-white/5 rounded-xl p-1">
             <button

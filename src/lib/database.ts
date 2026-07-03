@@ -653,7 +653,11 @@ export function getUserByEmail(email: string): UserProfile | undefined {
 }
 
 export function getUserByPhone(phone: string): UserProfile | undefined {
-  return getStoredUsers().find(u => u.phone === phone)
+  const cleanInput = phone.replace(/\D/g, '').slice(-10)
+  return getStoredUsers().find(u => {
+    const cleanStored = u.phone.replace(/\D/g, '').slice(-10)
+    return cleanStored === cleanInput
+  })
 }
 
 // ============ ASYNC SUPABASE-AWARE LOOKUPS (for auth on deployed) ============
@@ -726,7 +730,11 @@ export async function getUserByIdAsync(id: string): Promise<UserProfile | undefi
 
 export async function getUserByPhoneAsync(phone: string): Promise<UserProfile | undefined> {
   // Check local/memory first
-  const local = getStoredUsers().find(u => u.phone === phone)
+  const cleanInput = phone.replace(/\D/g, '').slice(-10)
+  const local = getStoredUsers().find(u => {
+    const cleanStored = u.phone.replace(/\D/g, '').slice(-10)
+    return cleanStored === cleanInput
+  })
   if (local) return local
 
   // Fallback: query Supabase directly

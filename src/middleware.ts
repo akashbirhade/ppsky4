@@ -103,12 +103,12 @@ export function middleware(request: NextRequest) {
   // CSP header
   response.headers.set('Content-Security-Policy', [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com https://www.google.com https://www.gstatic.com",
     "style-src 'self' 'unsafe-inline' https://accounts.google.com",
     "img-src 'self' data: blob: https:",
     "font-src 'self' data: https://fonts.gstatic.com",
-    "connect-src 'self' ws: wss: https://accounts.google.com https://oauth2.googleapis.com",
-    "frame-src https://accounts.google.com",
+    "connect-src 'self' ws: wss: https://accounts.google.com https://oauth2.googleapis.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com",
+    "frame-src https://accounts.google.com https://www.google.com https://*.firebaseapp.com",
     "media-src 'self'",
     "frame-ancestors 'none'",
   ].join('; '))
@@ -148,7 +148,7 @@ export function middleware(request: NextRequest) {
         rateLimitMap.set(authKey, { count: 1, resetAt: now + 15 * 60 * 1000 })
       } else {
         authEntry.count++
-        if (authEntry.count > 10) { // 10 auth attempts per 15 min
+        if (authEntry.count > (process.env.NODE_ENV === 'production' ? 10 : 100)) { // auth attempts per 15 min
           return new NextResponse(
             JSON.stringify({ error: 'Too many authentication attempts. Try again later.' }),
             { 

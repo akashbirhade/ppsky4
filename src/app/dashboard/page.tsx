@@ -415,8 +415,8 @@ export default function DashboardPage() {
                 return true
               })
               .map((profile) => (
-              <Link key={profile.id} href={`/profile/${profile.id}`} 
-                className="glass-card !p-0 overflow-hidden group hover:border-purple-400/40 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/10">
+              <div key={profile.id} onClick={() => router.push(`/profile/${profile.id}`)} 
+                className="glass-card !p-0 overflow-hidden group hover:border-purple-400/40 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/10 cursor-pointer">
                 {/* Photo */}
                 <div className="relative h-52 bg-gradient-to-br from-purple-100 to-slate-100 dark:from-purple-900/40 dark:to-dark-900">
                   {profile.photos && profile.photos.length > 0 ? (
@@ -509,7 +509,7 @@ export default function DashboardPage() {
                     )}
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}
