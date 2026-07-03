@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { sendInterest, getInterestsSent, getInterestsReceived, respondToInterest, getMutualMatches, getUserById } from '@/lib/database'
 import { authenticateRequest } from '@/lib/auth'
 import { notifyInterestReceived, notifyNewMatch } from '@/lib/push-notifications'
+import { sendInterestReceivedEmail } from '@/lib/email-service'
 
 export const dynamic = 'force-dynamic'
 
@@ -60,6 +61,19 @@ export async function POST(req: NextRequest) {
     // Send push notification to receiver
     if (senderProfile) {
       notifyInterestReceived(receiverId, senderProfile.name).catch(e => console.error('notifyInterestReceived failed:', e.message))
+    }
+
+    // Send email notification to receiver
+    if (receiverProfile?.email && senderProfile) {
+      sendInterestReceivedEmail(receiverProfile.email, {
+        userName: receiverProfile.name,
+        senderName: senderProfile.name,
+        senderAge: senderProfile.age,
+        senderCity: senderProfile.city,
+        senderOccupation: senderProfile.occupation,
+        senderPhoto: senderProfile.photos?.[0],
+        senderId: senderProfile.id,
+      }).catch(err => console.error('[Interests] Email notification failed:', err))
     }
     
     return NextResponse.json({ 

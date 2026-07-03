@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getRecentlyViewed, getWhoViewedMe, addProfileView } from '@/lib/database'
+import { getRecentlyViewed, getWhoViewedMe, addProfileView, getUserById } from '@/lib/database'
+import { sendProfileViewedEmail } from '@/lib/email-service'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,6 +29,22 @@ export async function POST(req: NextRequest) {
     const { viewerId, viewedId } = await req.json()
     if (!viewerId || !viewedId) return NextResponse.json({ error: 'viewerId and viewedId required' }, { status: 400 })
     const view = addProfileView(viewerId, viewedId)
+
+    // Send email notification to the viewed user (async, non-blocking)
+    const viewedUser = getUserById(viewedId)
+    const viewer = getUserById(viewerId)
+    if (viewedUser?.email && viewer) {
+      sendProfileViewedEmail(viewedUser.email, {
+        userName: viewedUser.name,
+        viewerName: viewer.name,
+        viewerAge: viewer.age,
+        viewerCity: viewer.city,
+        viewerOccupation: viewer.occupation,
+        viewerPhoto: viewer.photos?.[0],
+        viewerId: viewer.id,
+      }).catch(err => console.error('[Views] Email notification failed:', err))
+    }
+
     return NextResponse.json({ view })
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

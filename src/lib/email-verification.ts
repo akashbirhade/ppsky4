@@ -89,56 +89,16 @@ export function verifyOTP(identifier: string, userOtp: string): { success: boole
 }
 
 /**
- * Send verification email (in production, use Nodemailer/SendGrid/Resend)
- * For now, logs to console in development
+ * Send verification email using the email service
  */
-export async function sendVerificationEmail(email: string, token: string): Promise<boolean> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+export async function sendVerificationEmail(email: string, token: string, userName?: string): Promise<boolean> {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002'
   const verifyUrl = `${baseUrl}/verify?token=${token}`
 
-  // In production, replace with actual email sending (Resend, SendGrid, etc.)
-  if (process.env.NODE_ENV === 'development' || !process.env.SMTP_HOST) {
-    console.log(`\n📧 VERIFICATION EMAIL (Dev Mode)`)
-    console.log(`To: ${email}`)
-    console.log(`Link: ${verifyUrl}`)
-    console.log(`---`)
-    return true
-  }
-
-  // Production email sending with Nodemailer
-  try {
-    const nodemailer = require('nodemailer')
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: process.env.SMTP_SECURE === 'true',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    })
-
-    await transporter.sendMail({
-      from: `"Soulmate Sync" <${process.env.SMTP_FROM || 'noreply@soulmatesync.com'}>`,
-      to: email,
-      subject: 'Verify your email - Soulmate Sync',
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #7c3aed; text-align: center;">💜 Soulmate Sync</h1>
-          <h2 style="text-align: center;">Verify Your Email</h2>
-          <p style="text-align: center; color: #666;">Click the button below to verify your email address.</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${verifyUrl}" style="background: linear-gradient(135deg, #7c3aed, #ec4899); color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">
-              Verify Email
-            </a>
-          </div>
-          <p style="text-align: center; color: #999; font-size: 12px;">This link expires in 24 hours.</p>
-        </div>
-      `,
-    })
-    return true
-  } catch (error) {
-    console.error('Failed to send verification email:', error)
-    return false
-  }
+  const { sendVerificationMail } = await import('./email-service')
+  const result = await sendVerificationMail(email, {
+    userName: userName || 'there',
+    verifyUrl,
+  })
+  return result.success
 }
