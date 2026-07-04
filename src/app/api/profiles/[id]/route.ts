@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserById } from '@/lib/database'
+import { getUserById, getUserByIdAsync } from '@/lib/database'
 import { extractTokenFromRequest, verifyToken } from '@/lib/auth'
 
 export async function GET(
@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = getUserById(params.id)
+    const user = getUserById(params.id) || await getUserByIdAsync(params.id)
     
     if (!user) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })

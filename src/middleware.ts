@@ -30,6 +30,7 @@ const PUBLIC_API_PATHS = [
   '/api/hosts/auth/register',
   '/api/payment/phonepe/callback',
   '/api/profiles',
+  '/api/locations',
 ]
 
 // Page paths that don't require authentication

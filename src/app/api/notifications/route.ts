@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserById, getWhoViewedMe, getInterestsReceived, getMutualMatches } from '@/lib/database'
+import { getUserById, getUserByIdAsync, getWhoViewedMe, getInterestsReceived, getMutualMatches } from '@/lib/database'
 import { authenticateRequest } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
@@ -259,7 +259,7 @@ export async function GET(req: NextRequest) {
 
   // Return real notification feed
   if (type === 'feed') {
-    const user = getUserById(userId)
+    const user = getUserById(userId) || await getUserByIdAsync(userId)
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     const notifications: any[] = []

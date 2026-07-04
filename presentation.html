@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soulmate Sync - Project Presentation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --purple: #7c3aed;
+      --purple-dark: #5b21b6;
+      --fuchsia: #d946ef;
+      --dark: #0f0a1e;
+      --card-bg: #1a1035;
+      --text: #e2d9f3;
+      --text-muted: #a78bfa;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .page {
+      width: 100%;
+      min-height: 100vh;
+      padding: 60px 80px;
+      page-break-after: always;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -30%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .page::after {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      left: -20%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(217,70,239,0.1) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .page > * { position: relative; z-index: 1; }
+
+    /* Cover Page */
+    .cover { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+    .cover h1 { font-size: 4.5rem; font-weight: 900; background: linear-gradient(135deg, #a78bfa, #d946ef, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px; }
+    .cover .subtitle { font-size: 1.5rem; color: var(--text-muted); font-weight: 300; margin-bottom: 40px; }
+    .cover .tagline { font-size: 1.1rem; color: #64748b; max-width: 600px; line-height: 1.8; }
+    .cover .meta { margin-top: 60px; font-size: 0.85rem; color: #6b7280; }
+    .cover .logo { width: 120px; height: 120px; background: linear-gradient(135deg, var(--purple), var(--fuchsia)); border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 30px; box-shadow: 0 20px 60px rgba(124,58,237,0.3); }
+
+    /* Section Headers */
+    .section-title { font-size: 2.2rem; font-weight: 800; margin-bottom: 8px; color: #fff; }
+    .section-subtitle { font-size: 1rem; color: var(--text-muted); margin-bottom: 40px; font-weight: 400; }
+    .section-num { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; color: var(--fuchsia); font-weight: 600; margin-bottom: 8px; }
+
+    /* Cards */
+    .card { background: rgba(26,16,53,0.8); border: 1px solid rgba(124,58,237,0.2); border-radius: 16px; padding: 24px; margin-bottom: 16px; backdrop-filter: blur(10px); }
+    .card h3 { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+    .card p { font-size: 0.85rem; color: #a78bfa; line-height: 1.7; }
+    .card .icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+
+    /* Grid */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+
+    /* Feature List */
+    .feature-list { list-style: none; }
+    .feature-list li { padding: 6px 0; font-size: 0.85rem; color: var(--text); display: flex; align-items: flex-start; gap: 8px; }
+    .feature-list li::before { content: '✓'; color: #10b981; font-weight: 700; flex-shrink: 0; }
+
+    /* Tech Stack Table */
+    .tech-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    .tech-table th { text-align: left; padding: 10px 16px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--fuchsia); border-bottom: 1px solid rgba(124,58,237,0.2); }
+    .tech-table td { padding: 10px 16px; font-size: 0.85rem; border-bottom: 1px solid rgba(124,58,237,0.08); }
+    .tech-table tr:hover { background: rgba(124,58,237,0.05); }
+
+    /* Stats */
+    .stat-box { text-align: center; padding: 20px; background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.15); border-radius: 16px; }
+    .stat-box .num { font-size: 2.5rem; font-weight: 900; background: linear-gradient(135deg, #a78bfa, #d946ef); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-box .label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Badge */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+    .badge-purple { background: rgba(124,58,237,0.2); color: #c4b5fd; border: 1px solid rgba(124,58,237,0.3); }
+    .badge-green { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+    .badge-amber { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+
+    /* Module Card */
+    .module-card { background: linear-gradient(135deg, rgba(26,16,53,0.9), rgba(15,10,30,0.9)); border: 1px solid rgba(124,58,237,0.15); border-radius: 12px; padding: 16px 20px; }
+    .module-card h4 { font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .module-card p { font-size: 0.75rem; color: #94a3b8; line-height: 1.5; }
+
+    /* Footer */
+    .page-footer { position: absolute; bottom: 30px; left: 80px; right: 80px; display: flex; justify-content: space-between; font-size: 0.7rem; color: #4b5563; z-index: 2; }
+
+    /* Highlight box */
+    .highlight { background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(217,70,239,0.05)); border-left: 3px solid var(--purple); padding: 16px 20px; border-radius: 0 12px 12px 0; margin: 16px 0; }
+    .highlight p { font-size: 0.9rem; color: var(--text); font-style: italic; }
+
+    /* Flow diagram */
+    .flow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
+    .flow-step { padding: 10px 16px; border-radius: 10px; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.25); font-size: 0.8rem; font-weight: 500; }
+    .flow-arrow { color: var(--fuchsia); font-weight: bold; }
+
+    @media print {
+      .page { padding: 40px 50px; }
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SLIDE 1: COVER -->
+<div class="page cover">
+  <div class="logo">💜</div>
+  <h1>Soulmate Sync</h1>
+  <p class="subtitle">AI-Powered Matrimonial Platform</p>
+  <p class="tagline">Helping individuals and families discover meaningful life partners through intelligent matchmaking, verified profiles, and cultural compatibility — powered by AI.</p>
+  <div class="meta">
+    <p style="margin-bottom:8px"><strong style="color:#a78bfa">Project Presentation</strong></p>
+    <p>Full-Stack Web Application • Next.js 14 • TypeScript • AI/NLP Engine</p>
+    <p style="margin-top:4px">July 2026</p>
+  </div>
+</div>
+
+<!-- SLIDE 2: PROJECT OVERVIEW -->
+<div class="page">
+  <p class="section-num">01 — Overview</p>
+  <h2 class="section-title">Project Overview</h2>
+  <p class="section-subtitle">A modern, secure, and intelligent matrimonial platform for the Indian audience</p>
+
+  <div class="highlight">
+    <p>"Soulmate Sync bridges traditional family values with modern AI technology — making the journey of finding a life partner safe, efficient, and meaningful."</p>
+  </div>
+
+  <div class="grid-4" style="margin-top:30px">
+    <div class="stat-box">
+      <div class="num">38</div>
+      <div class="label">App Routes</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">15+</div>
+      <div class="label">Core Modules</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">214</div>
+      <div class="label">Users Seeded</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">201</div>
+      <div class="label">QA Test Cases</div>
+    </div>
+  </div>
+
+  <div style="margin-top:30px">
+    <h3 style="font-size:1rem; font-weight:700; color:#fff; margin-bottom:12px">Target Audience</h3>
+    <div class="grid-3">
+      <div class="module-card">
+        <h4>👤 Working Professionals</h4>
+        <p>Age 24-38, seeking meaningful connections with verified profiles</p>
+      </div>
+      <div class="module-card">
+        <h4>👨‍👩‍👧 Family Members</h4>
+        <p>Parents managing profiles for adult children with family account system</p>
+      </div>
+      <div class="module-card">
+        <h4>🌏 Urban & Semi-Urban India</h4>
+        <p>Multilingual support (English, Hindi, Marathi) with 40K+ locations</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Soulmate Sync — Project Presentation</span>
+    <span>Page 2</span>
+  </div>
+</div>
+
+<!-- SLIDE 3: ARCHITECTURE & TECH STACK -->
+<div class="page">
+  <p class="section-num">02 — Technology</p>
+  <h2 class="section-title">Architecture & Tech Stack</h2>
+  <p class="section-subtitle">Enterprise-grade full-stack architecture with AI capabilities</p>
+
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <h3><span class="icon" style="background:rgba(59,130,246,0.2)">⚛️</span> Frontend</h3>
+        <table class="tech-table">
+          <tr><td>Framework</td><td><strong>Next.js 14</strong> (App Router)</td></tr>
+          <tr><td>Language</td><td>TypeScript 5+</td></tr>
+          <tr><td>UI Library</td><td>React 18</td></tr>
+          <tr><td>Styling</td><td>Tailwind CSS 3</td></tr>
+          <tr><td>Animations</td><td>GSAP 3</td></tr>
+          <tr><td>Real-time</td><td>Socket.io Client</td></tr>
+          <tr><td>State</td><td>React Context API</td></tr>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h3><span class="icon" style="background:rgba(16,185,129,0.2)">🖥️</span> Backend</h3>
+        <table class="tech-table">
+          <tr><td>Runtime</td><td><strong>Node.js 20</strong> LTS</td></tr>
+          <tr><td>Framework</td><td>Express.js 4</td></tr>
+          <tr><td>ORM</td><td>Prisma 5</td></tr>
+          <tr><td>Database</td><td>PostgreSQL 15+</td></tr>
+          <tr><td>Cache</td><td>Redis 7+</td></tr>
+          <tr><td>Auth</td><td>JWT (Access + Refresh)</td></tr>
+          <tr><td>Testing</td><td>Jest 30 + Playwright</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="margin-top:16px">
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(245,158,11,0.2)">☁️</span> Cloud</h3>
+      <p>AWS ECS Fargate • Cloudinary CDN • CloudWatch • Docker</p>
+    </div>
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(239,68,68,0.2)">🤖</span> AI/ML</h3>
+      <p>Custom NLP Engine • Intent Classification • RAG • TF-IDF Scoring</p>
+    </div>
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(168,85,247,0.2)">💳</span> Integrations</h3>
+      <p>Razorpay • Firebase OTP • Twilio SMS • Web Push API</p>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Soulmate Sync — Project Presentation</span>
+    <span>Page 3</span>
+  </div>
+</div>
+
+<!-- SLIDE 4: CORE MODULES PART 1 -->
+<div class="page">
+  <p class="section-num">03 — Modules</p>
+  <h2 class="section-title">Core Modules</h2>
+  <p class="section-subtitle">Complete feature breakdown of the application</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(59,130,246,0.2)">🔐</span> Authentication & Onboarding</h3>
+      <ul class="feature-list">
+        <li>Mobile OTP + Email signup + Google login</li>
+        <li>JWT-based auth with token rotation</li>
+        <li>Multi-step profile creation wizard</li>
+        <li>Photo upload with Cloudinary CDN</li>
+        <li>Biodata PDF extraction with AI</li>
+        <li>40K+ India locations database</li>
+        <li>Age verification (18+ enforcement)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(236,72,153,0.2)">💜</span> Profile & Matchmaking</h3>
+      <ul class="feature-list">
+        <li>Comprehensive profile with 20+ fields</li>
+        <li>AI compatibility scoring (0-100%)</li>
+        <li>Multi-factor matching algorithm</li>
+        <li>Advanced search with 15+ filters</li>
+        <li>Geospatial "Near Me" (Haversine)</li>
+        <li>Profile views & interest tracking</li>
+        <li>Photo gallery with horizontal scroll</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(16,185,129,0.2)">💬</span> Messaging & Communication</h3>
+      <ul class="feature-list">
+        <li>Real-time chat via Socket.io</li>
+        <li>Text, image & voice messages</li>
+        <li>Typing indicators & read receipts</li>
+        <li>Online/offline status</li>
+        <li>Send/receive interest system</li>
+        <li>Block & report functionality</li>
+        <li>WhatsApp integration</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(59,130,246,0.2)">📹</span> Video & Voice Calling</h3>
+      <ul class="feature-list">
+        <li>WebRTC-based audio/video calls</li>
+        <li>Call duration timer</li>
+        <li>Mute/unmute & volume controls</li>
+        <li>Number masking for privacy</li>
+        <li>Call history & missed calls</li>
+        <li>Call scheduling interface</li>
+        <li>Voice assistant (speech-to-text)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Soulmate Sync — Project Presentation</span>
+    <span>Page 4</span>
+  </div>
+</div>
+
+<!-- SLIDE 5: CORE MODULES PART 2 -->
+<div class="page">
+  <p class="section-num">03 — Modules (continued)</p>
+  <h2 class="section-title">AI & Premium Features</h2>
+  <p class="section-subtitle">Intelligent features that set the platform apart</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(245,158,11,0.2)">🤖</span> AI Chatbot Engine</h3>
+      <ul class="feature-list">
+        <li>Multilingual NLP (English, Hindi, Marathi)</li>
+        <li>15+ intent categories classified</li>
+        <li>RAG with TF-IDF document scoring</li>
+        <li>Entity extraction (names, dates, prefs)</li>
+        <li>Sentiment analysis</li>
+        <li>Context-aware conversation memory</li>
+        <li>Confidence scoring per response</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(234,179,8,0.2)">🔮</span> Kundali (Astrology) Matching</h3>
+      <ul class="feature-list">
+        <li>Astrological compatibility (0-100%)</li>
+        <li>Guna matching (score out of 36)</li>
+        <li>Manglik status detection</li>
+        <li>Nakshatra compatibility assessment</li>
+        <li>Detailed recommendation output</li>
+        <li>Profile-specific results</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(168,85,247,0.2)">👑</span> Premium & Subscription</h3>
+      <ul class="feature-list">
+        <li>3-tier plan: Free / Premium / Elite</li>
+        <li>Payment gateway (Razorpay/UPI)</li>
+        <li>Unlimited messaging & video calls</li>
+        <li>See who viewed you</li>
+        <li>Profile boost & priority matching</li>
+        <li>Coupon/discount code system</li>
+        <li>Plan upgrade/downgrade flow</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(16,185,129,0.2)">✅</span> Verification System</h3>
+      <ul class="feature-list">
+        <li>Mobile & email OTP verification</li>
+        <li>Photo verification (selfie match)</li>
+        <li>ID document upload & verification</li>
+        <li>LinkedIn profile check</li>
+        <li>Verified badge display</li>
+        <li>Admin moderation queue</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3><span class="icon" style="background:rgba(236,72,153,0.2)">💡</span> Relationship Coach</h3>
+    <p>6 interactive coaching modules: First Impressions • Starting Conversations • First Meeting Tips • Family Dynamics • Building Compatibility • Safety & Red Flags — with 5-6 detailed tips per topic and daily affirmations.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>Soulmate Sync — Project Presentation</span>
+    <span>Page 5</span>
+  </div>
+</div>
+
+<!-- SLIDE 6: SOCIAL & COMMUNITY -->
+<div class="page">
+  <p class="section-num">04 — Social Features</p>
+  <h2 class="section-title">Community & Events</h2>
+  <p class="section-subtitle">Social engagement beyond traditional matchmaking</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(59,130,246,0.2)">👥</span> Community Groups</h3>
+      <ul class="feature-list">
+        <li>12+ community groups across 8 categories</li>
+        <li>Regional groups (Tamil, Punjabi, Marathi...)</li>
+        <li>Professional networks (IT, Doctors, MBA)</li>
+        <li>NRI communities</li>
+        <li>Parents-focused groups</li>
+        <li>Support groups (second marriage)</li>
+        <li>Join/leave with member count tracking</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(245,158,11,0.2)">🎉</span> Event Matchmaking</h3>
+      <ul class="feature-list">
+        <li>7+ featured events</li>
+        <li>Speed dating events</li>
+        <li>Social mixers & coffee meetups</li>
+        <li>Online webinars</li>
+        <li>Festival celebrations</li>
+        <li>Professional meetups</li>
+        <li>Event registration & capacity tracking</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(168,85,247,0.2)">👨‍👩‍👧</span> Family Account System</h3>
+      <ul class="feature-list">
+        <li>Role-based permissions (Admin/Manager/Viewer)</li>
+        <li>Add family members (parent, sibling, friend)</li>
+        <li>Profile management delegation</li>
+        <li>Activity tracking per member</li>
+        <li>Safety controls & permission model</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(236,72,153,0.2)">💒</span> Wedding Vendor Marketplace</h3>
+      <ul class="feature-list">
+        <li>9 vendor categories</li>
+        <li>Venues, Photography, Catering</li>
+        <li>Decoration, Music, Makeup</li>
+        <li>Jewelry, Invitations, Misc</li>
+        <li>Ratings, reviews & price range</li>
+        <li>Search & category filtering</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3><span class="icon" style="background:rgba(16,185,129,0.2)">🏠</span> Host System</h3>
+    <p>Dedicated host portal for matchmakers and community leaders to manage introductions, host meetup events, and facilitate connections between compatible profiles with a separate login and dashboard.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>Soulmate Sync — Project Presentation</span>
+    <span>Page 6</span>
+  </div>
+</div>
+
+<!-- SLIDE 7: ADMIN & SECURITY -->
+<div class="page">
+  <p class="section-num">05 — Operations</p>
+  <h2 class="section-title">Admin Panel & Security</h2>
+  <p class="section-subtitle">Enterprise-grade management and protection</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(239,68,68,0.2)">🛡️</span> Admin Dashboard</h3>
+      <ul class="feature-list">
+        <li>Analytics: DAU, MAU, revenue, match rate</li>
+        <li>User management (ban/suspend/activate)</li>
+        <li>Moderation queue for reports</li>
+        <li>Verification queue (photo/ID review)</li>
+        <li>Audit logs for admin actions</li>
+        <li>Event & coupon management</li>
+        <li>Feature toggles</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(59,130,246,0.2)">🔒</span> Security & Privacy</h3>
+      <ul class="feature-list">
+        <li>JWT with access + refresh token rotation</li>
+        <li>Rate limiting (5000 req/15min dev, 500 prod)</li>
+        <li>CORS policy enforcement</li>
+        <li>Helmet security headers</li>
+        <li>Input validation (express-validator, Zod)</li>
+        <li>Photo masking (visible only on accept)</li>
+        <li>Number masking for calls</li>
+        <li>GDPR data export support</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:16px">
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(168,85,247,0.2)">📱</span> Mobile & PWA</h3>
+      <ul class="feature-list">
+        <li>Progressive Web App support</li>
+        <li>Install to home screen</li>
+        <li>Offline capability (Service Worker)</li>
+        <li>Mobile-first responsive design</li>
+        <li>Bottom dock navigation</li>
+        <li>Web push notifications</li>
+        <li>Touch-optimized interactions</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="icon" style="background:rgba(16,185,129,0.2)">⚙️</span> Settings & Preferences</h3>
+      <ul class="feature-list">
+        <li>Profile visibility controls</li>
+        <li>Privacy settings (who can message/view)</li>
+        <li>Notification preferences</li>
+        <li>Dark/light mode toggle</li>
+        <li>Language switching (EN/HI/MR)</li>
+        <li>Account deactivation option</li>
+        <li>Data download/export</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Soulmate Sync — Project Presentation</span>
+    <span>Page 7</span>
+  </div>
+</div>
+
+<!-- SLIDE 8: USER FLOW -->
+<div class="page">
+  <p class="section-num">06 — User Journey</p>
+  <h2 class="section-title">User Flow & Experience</h2>
+  <p class="section-subtitle">End-to-end journey from registration to match</p>
+
+  <div style="margin-bottom:30px">
+    <h3 style="font-size:1rem; color:#fff; margin-bottom:16px; font-weight:700;">Registration → Match Flow</h3>
+    <div class="flow">
+      <div class="flow-step">📱 Sign Up (OTP/Google)</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">📝 Onboarding Wizard</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">📷 Photo Upload</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">✅ Verification</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">🔍 Browse & Search</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">💜 Send Interest</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">✨ Match!</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">💬 Chat / Call</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">🤝 Meet & Connect</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>📊 Dashboard Experience</h3>
+      <ul class="feature-list">
+        <li>Profile completion score & prompts</li>
+        <li>Today's Top Picks (AI-curated)</li>
+        <li>Near You (geospatial)</li>
+        <li>Premium & Verified sections</li>
+        <li>Same profession matches</li>
+        <li>Activity stats strip</li>
+        <li>Real-time notification badges</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🎨 UI/UX Highlights</h3>
+      <ul class="feature-list">
+        <li>Glass morphism design system</li>
+        <li>Purple/fuchsia gradient theme</li>
+        <li>GSAP slide-in animations</li>
+        <li>Skeleton loading states</li>
+        <li>Toast notifications</li>
+        <li>Dark mode (default) + Light mode</li>
+        <li>Horizontal scroll photo galleries</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight" style="margin-top:20px">
+    <p><strong style="color:#d946ef">Key Differentiator:</strong> Unlike traditional matrimonial sites, Soulmate Sync combines AI compatibility scoring, real-time communication, cultural matching (Kundali), family involvement features, and a modern mobile-first experience — all in one platform.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>Soulmate Sync — Project Presentation</span>
+    <span>Page 8</span>
+  </div>
+</div>
+
+<!-- SLIDE 9: MODULE MAP -->
+<div class="page">
+  <p class="section-num">07 — Module Map</p>
+  <h2 class="section-title">Complete Module Architecture</h2>
+  <p class="section-subtitle">All 15+ modules and their interconnections</p>
+
+  <div class="grid-3">
+    <div class="module-card"><h4>🔐 Auth Module</h4><p>/login, /register, /api/auth</p></div>
+    <div class="module-card"><h4>📝 Onboarding</h4><p>/onboarding (5-step wizard)</p></div>
+    <div class="module-card"><h4>👤 Profile</h4><p>/profile, /profile/[id]</p></div>
+    <div class="module-card"><h4>📊 Dashboard</h4><p>/dashboard (home feed)</p></div>
+    <div class="module-card"><h4>🔍 Search</h4><p>/search (filters + AI rank)</p></div>
+    <div class="module-card"><h4>💜 Matches</h4><p>/matches (swipe cards)</p></div>
+    <div class="module-card"><h4>💬 Messages</h4><p>/messages (real-time chat)</p></div>
+    <div class="module-card"><h4>📹 Calls</h4><p>/call (WebRTC audio/video)</p></div>
+    <div class="module-card"><h4>🤖 AI Chatbot</h4><p>/api/chat (NLP engine)</p></div>
+    <div class="module-card"><h4>🔮 Kundali</h4><p>/kundali (astro matching)</p></div>
+    <div class="module-card"><h4>👑 Premium</h4><p>/premium, /checkout</p></div>
+    <div class="module-card"><h4>👨‍👩‍👧 Family</h4><p>/family (role-based)</p></div>
+    <div class="module-card"><h4>👥 Community</h4><p>/community (groups)</p></div>
+    <div class="module-card"><h4>🎉 Events</h4><p>/events (meetups)</p></div>
+    <div class="module-card"><h4>💒 Vendors</h4><p>Wedding marketplace</p></div>
+    <div class="module-card"><h4>🏠 Hosts</h4><p>/hosts (matchmaker portal)</p></div>
+    <div class="module-card"><h4>💡 Coach</h4><p>/coach (relationship tips)</p></div>
+    <div class="module-card"><h4>🛡️ Admin</h4><p>/admin (full CMS)</p></div>
+    <div class="module-card"><h4>⚙️ Settings</h4><p>/settings (privacy/notifs)</p></div>
+    <div class="module-card"><h4>🔔 Notifications</h4><p>/notifications (push)</p></div>
+    <div class="module-card"><h4>📋 Legal</h4><p>/legal (ToS, privacy)</p></div>
+  </div>
+
+  <div class="page-footer">
+    <span>Soulmate Sync — Project Presentation</span>
+    <span>Page 9</span>
+  </div>
+</div>
+
+<!-- SLIDE 10: API & BACKEND -->
+<div class="page">
+  <p class="section-num">08 — Backend</p>
+  <h2 class="section-title">API Architecture</h2>
+  <p class="section-subtitle">RESTful API design with real-time capabilities</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>🌐 API Endpoints</h3>
+      <table class="tech-table">
+        <tr><th>Group</th><th>Endpoints</th></tr>
+        <tr><td>/api/auth/*</td><td>Login, Register, Verify, Refresh</td></tr>
+        <tr><td>/api/profiles/*</td><td>CRUD, Search, Upload</td></tr>
+        <tr><td>/api/activity/*</td><td>Matches, Interests, Views</td></tr>
+        <tr><td>/api/messages/*</td><td>Conversations, Send, History</td></tr>
+        <tr><td>/api/chat</td><td>AI Chatbot (NLP)</td></tr>
+        <tr><td>/api/community/*</td><td>Groups, Join, Leave</td></tr>
+        <tr><td>/api/events/*</td><td>List, Register, Details</td></tr>
+        <tr><td>/api/payment/*</td><td>Plans, Checkout, Verify</td></tr>
+        <tr><td>/api/admin/*</td><td>Users, Reports, Analytics</td></tr>
+        <tr><td>/api/upload</td><td>Photo upload (Cloudinary)</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>⚡ Real-time (Socket.io)</h3>
+      <ul class="feature-list">
+        <li>Chat message delivery</li>
+        <li>Typing indicators</li>
+        <li>Online status updates</li>
+        <li>Call signaling (WebRTC)</li>
+        <li>Push notifications</li>
+        <li>Activity feed updates</li>
+      </ul>
+      <h3 style="margin-top:16px">🔧 Middleware Stack</h3>
+      <ul class="feature-list">
+        <li>JWT Authentication</li>
+        <li>Rate Limiting (per-IP)</li>
+        <li>CORS (configurable origins)</li>
+        <li>Request logging (Winston)</li>
+        <li>Input sanitization</li>
+        <li>Error handling (structured)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3><span class="icon" style="background:rgba(59,130,246,0.2)">🧠</span> AI/NLP Pipeline</h3>
+    <div class="flow" style="margin-top:12px">
+      <div class="flow-step">User Input</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">Language Detection</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">Tokenization</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">Entity Extraction</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">Intent Classification</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">RAG Retrieval</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">Response Generation</div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Soulmate Sync — Project Presentation</span>
+    <span>Page 10</span>
+  </div>
+</div>
+
+<!-- SLIDE 11: TESTING & QUALITY -->
+<div class="page">
+  <p class="section-num">09 — Quality</p>
+  <h2 class="section-title">Testing & Quality Assurance</h2>
+  <p class="section-subtitle">Comprehensive testing strategy across all layers</p>
+
+  <div class="grid-4" style="margin-bottom:30px">
+    <div class="stat-box">
+      <div class="num">201</div>
+      <div class="label">QA Test Cases</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">8</div>
+      <div class="label">E2E Spec Files</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">17</div>
+      <div class="label">QA Modules</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">38</div>
+      <div class="label">Routes Passing</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>🧪 Testing Layers</h3>
+      <ul class="feature-list">
+        <li><strong>Unit Tests:</strong> Jest 30 for backend services</li>
+        <li><strong>Integration:</strong> API endpoint testing</li>
+        <li><strong>E2E:</strong> Playwright browser automation</li>
+        <li><strong>Manual QA:</strong> 17 detailed test plan documents</li>
+        <li><strong>Security:</strong> OWASP Top 10 coverage</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>📋 QA Coverage Areas</h3>
+      <ul class="feature-list">
+        <li>Authentication & session management</li>
+        <li>Dashboard & profile operations</li>
+        <li>Search & matchmaking accuracy</li>
+        <li>Messaging & real-time features</li>
+        <li>AI chatbot responses</li>
+        <li>Video calling stability</li>
+        <li>Payment & premium flows</li>
+        <li>Navigation & accessibility</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3><span class="icon" style="background:rgba(16,185,129,0.2)">✅</span> E2E Test Scenarios (Playwright)</h3>
+    <div class="grid-4" style="margin-top:12px">
+      <div class="module-card"><h4>01</h4><p>Authentication flows</p></div>
+      <div class="module-card"><h4>02</h4><p>Dashboard operations</p></div>
+      <div class="module-card"><h4>03</h4><p>Search functionality</p></div>
+      <div class="module-card"><h4>04</h4><p>Messaging system</p></div>
+      <div class="module-card"><h4>05</h4><p>Premium features</p></div>
+      <div class="module-card"><h4>06</h4><p>Kundali matching</p></div>
+      <div class="module-card"><h4>07</h4><p>API integration</p></div>
+      <div class="module-card"><h4>08</h4><p>Navigation & UI</p></div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Soulmate Sync — Project Presentation</span>
+    <span>Page 11</span>
+  </div>
+</div>
+
+<!-- SLIDE 12: CONCLUSION -->
+<div class="page" style="display:flex; flex-direction:column; justify-content:center;">
+  <p class="section-num">10 — Summary</p>
+  <h2 class="section-title">Project Summary</h2>
+  <p class="section-subtitle">A production-ready, AI-powered matrimonial platform</p>
+
+  <div class="grid-3" style="margin-top:20px">
+    <div class="stat-box">
+      <div class="num">15+</div>
+      <div class="label">Feature Modules</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">38</div>
+      <div class="label">Application Routes</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">3</div>
+      <div class="label">Languages Supported</div>
+    </div>
+  </div>
+
+  <div class="highlight" style="margin-top:30px">
+    <p><strong style="color:#a78bfa">Key Highlights:</strong></p>
+    <ul class="feature-list" style="margin-top:12px">
+      <li>Full-stack application with Next.js 14, TypeScript, Node.js, and PostgreSQL</li>
+      <li>Custom AI/NLP engine with multilingual intent classification and RAG</li>
+      <li>Real-time communication via Socket.io (chat, calls, notifications)</li>
+      <li>Cultural features: Kundali matching, community groups, family accounts</li>
+      <li>Complete premium monetization with payment gateway integration</li>
+      <li>Enterprise security: JWT rotation, rate limiting, input validation, CORS</li>
+      <li>PWA-ready with offline support and web push notifications</li>
+      <li>Comprehensive testing: 201 QA cases, E2E automation, CI/CD pipeline</li>
+    </ul>
+  </div>
+
+  <div style="text-align:center; margin-top:50px">
+    <p style="font-size:1.5rem; font-weight:800; background:linear-gradient(135deg, #a78bfa, #d946ef); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Thank You</p>
+    <p style="color:#6b7280; font-size:0.85rem; margin-top:8px">Soulmate Sync — AI-Powered Matrimonial Platform</p>
+  </div>
+
+  <div class="page-footer">
+    <span>Soulmate Sync — Project Presentation</span>
+    <span>Page 12</span>
+  </div>
+</div>
+
+</body>
+</html>
