@@ -34,7 +34,19 @@
       "id": "57d2a08f-fbcf-457e-8f8f-550e7cc8ed8f",
       "viewerId": "2",
       "viewedId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
-      "timestamp": "2026-07-04T19:09:46.276Z"
+      "timestamp": "2026-07-04T19:14:23.687Z"
+    },
+    {
+      "id": "478bf7b7-0e82-41e0-95e9-a02f2c6a16b6",
+      "viewerId": "2",
+      "viewedId": "109",
+      "timestamp": "2026-07-04T19:11:54.297Z"
+    },
+    {
+      "id": "5a9b8a27-4a65-4547-a296-94a67ccf46fd",
+      "viewerId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+      "viewedId": "2",
+      "timestamp": "2026-07-04T19:14:56.058Z"
     }
   ],
   "interests": [
@@ -198,6 +210,20 @@
       "receiverId": "ea7c48db-55ab-4753-9e33-0a845f49d15b",
       "status": "pending",
       "timestamp": "2026-07-03T20:38:05.459Z"
+    },
+    {
+      "id": "bb48812f-a434-4ce7-a02f-f4a556e36994",
+      "senderId": "2",
+      "receiverId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+      "status": "accepted",
+      "timestamp": "2026-07-04T19:10:17.499Z"
+    },
+    {
+      "id": "0066c4ae-4c6a-46e5-b7c0-16afe1c8d6e5",
+      "senderId": "2",
+      "receiverId": "175",
+      "status": "pending",
+      "timestamp": "2026-07-04T19:12:08.417Z"
     }
   ],
   "shortlists": [

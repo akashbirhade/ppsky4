@@ -518,7 +518,7 @@
     "receiverId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
     "content": "hi",
     "timestamp": "2026-07-04T19:09:01.478Z",
-    "read": false,
+    "read": true,
     "type": "text"
   },
   {
@@ -527,7 +527,34 @@
     "receiverId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
     "content": "hoe",
     "timestamp": "2026-07-04T19:09:04.394Z",
-    "read": false,
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "b707f8ed-3d9f-4546-8cc9-d8948816ec0b",
+    "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "receiverId": "2",
+    "content": "kaise hi",
+    "timestamp": "2026-07-04T19:11:04.660Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "f05946fd-d9a4-4abc-b494-d2a4785cc6ac",
+    "senderId": "2",
+    "receiverId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "content": "good",
+    "timestamp": "2026-07-04T19:11:11.136Z",
+    "read": true,
+    "type": "text"
+  },
+  {
+    "id": "1bbeac4d-8465-400d-85f6-17dcd88062cc",
+    "senderId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "receiverId": "2",
+    "content": "njn]",
+    "timestamp": "2026-07-04T19:14:18.026Z",
+    "read": true,
     "type": "text"
   }
 ]

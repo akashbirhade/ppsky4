@@ -1,0 +1,11 @@
+[
+  {
+    "id": "1d388a85-33ec-43f6-a67b-99facae17cf0",
+    "callerId": "2",
+    "receiverId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "type": "audio",
+    "status": "initiated",
+    "duration": 0,
+    "timestamp": "2026-07-04T19:13:53.113Z"
+  }
+]

@@ -12,5 +12,19 @@
     "startDate": "2026-07-04T19:04:58.674Z",
     "endDate": "2026-12-31T19:04:58.673Z",
     "createdAt": "2026-07-04T19:04:58.674Z"
+  },
+  {
+    "id": "130db556-6b26-43a7-bd5a-9dbaff4b9ef9",
+    "userId": "2",
+    "plan": "gold",
+    "amount": 3539,
+    "couponUsed": null,
+    "discount": 0,
+    "paymentMethod": "upi",
+    "paymentId": "PAY_MR6QPMSK_34FF10",
+    "status": "active",
+    "startDate": "2026-07-04T19:13:16.196Z",
+    "endDate": "2026-12-31T19:13:16.196Z",
+    "createdAt": "2026-07-04T19:13:16.196Z"
   }
 ]
