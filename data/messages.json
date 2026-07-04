@@ -455,7 +455,7 @@
     "receiverId": "2",
     "content": "hi",
     "timestamp": "2026-06-04T19:35:08.411Z",
-    "read": false,
+    "read": true,
     "type": "text"
   },
   {
@@ -464,7 +464,7 @@
     "receiverId": "2",
     "content": "fn",
     "timestamp": "2026-06-04T19:35:12.368Z",
-    "read": false,
+    "read": true,
     "type": "text"
   },
   {
@@ -509,6 +509,24 @@
     "receiverId": "3",
     "content": "Hi Ananya! How are you?",
     "timestamp": "2026-07-03T08:59:20.799Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "9aef46d1-9e66-4d9e-b981-10bc7ec4d643",
+    "senderId": "2",
+    "receiverId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "content": "hi",
+    "timestamp": "2026-07-04T19:09:01.478Z",
+    "read": false,
+    "type": "text"
+  },
+  {
+    "id": "23ec5629-773d-4cbd-aca6-ed1e55e0c084",
+    "senderId": "2",
+    "receiverId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "content": "hoe",
+    "timestamp": "2026-07-04T19:09:04.394Z",
     "read": false,
     "type": "text"
   }

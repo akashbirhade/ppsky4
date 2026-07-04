@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "f5f9be8c-de32-4bdf-b041-2a4e8fb6bc7e",
+    "userId": "0cdfb99e-3f6f-464d-8434-562c392a5d9a",
+    "plan": "gold",
+    "amount": 3539,
+    "couponUsed": null,
+    "discount": 0,
+    "paymentMethod": "upi",
+    "paymentId": "PAY_MR6QEYWI_V0C6TV",
+    "status": "active",
+    "startDate": "2026-07-04T19:04:58.674Z",
+    "endDate": "2026-12-31T19:04:58.673Z",
+    "createdAt": "2026-07-04T19:04:58.674Z"
+  }
+]

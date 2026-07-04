@@ -152,10 +152,16 @@ export default function Navbar() {
                 <NavLink href="/search" label="Search" />
                 <NavLink href="/messages" label="Inbox" badge={inboxCount} />
 
-                {/* Upgrade Button */}
-                <Link href="/premium" className="ml-3 flex items-center gap-1.5 btn-gold text-sm py-2 px-4">
-                  <Crown className="h-4 w-4" /> Upgrade Now
-                </Link>
+                {/* Upgrade / Premium Badge */}
+                {user.premium ? (
+                  <span className="ml-3 flex items-center gap-1.5 text-sm py-2 px-4 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 rounded-xl text-amber-700 dark:text-amber-300 font-semibold">
+                    <Crown className="h-4 w-4 text-amber-500" /> {user.premiumPlan || 'Premium'}
+                  </span>
+                ) : (
+                  <Link href="/premium" className="ml-3 flex items-center gap-1.5 btn-gold text-sm py-2 px-4">
+                    <Crown className="h-4 w-4" /> Upgrade Now
+                  </Link>
+                )}
 
                 {/* Help Dropdown */}
                 <div ref={helpRef} className="relative ml-3">
@@ -276,7 +282,14 @@ export default function Navbar() {
                       {/* Account Type */}
                       <div className="p-4 text-center">
                         <p className="text-sm text-slate-500 dark:text-purple-300/60 mb-2">Account Type: <span className="font-semibold text-slate-800 dark:text-purple-200">{user.premium ? user.premiumPlan || 'Premium' : 'Free'}</span></p>
-                        {!user.premium && (
+                        {user.premium ? (
+                          <div className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 rounded-xl p-3">
+                            <p className="text-xs text-amber-700 dark:text-amber-300 font-semibold flex items-center justify-center gap-1 mb-1"><Crown className="h-3.5 w-3.5" /> Premium Member</p>
+                            <p className="text-[10px] text-slate-500 dark:text-purple-300/50">Want to upgrade to higher tier?</p>
+                            <p className="text-xs font-bold text-purple-700 dark:text-purple-300 mt-1">Contact: +91 98765 43210</p>
+                            <p className="text-[9px] text-slate-400 dark:text-purple-300/40 mt-0.5">₹150 extra for Elite features</p>
+                          </div>
+                        ) : (
                           <>
                             <Link href="/premium" className="block w-full btn-gold py-2.5 px-4 text-sm" onClick={() => setProfileOpen(false)}>
                               Upgrade Now

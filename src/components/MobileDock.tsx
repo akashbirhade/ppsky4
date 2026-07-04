@@ -61,17 +61,24 @@ export default function MobileDock() {
               <span className="text-[10px] font-medium">Chat</span>
             </Link>
 
-            {/* Upgrade */}
-            <Link
-              href="/checkout?plan=gold"
-              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all relative"
-            >
-              <div className="relative">
+            {/* Upgrade / Premium Badge */}
+            {user.premium ? (
+              <div className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl bg-amber-500/10">
                 <Crown className="h-5 w-5 text-amber-500" />
-                <span className="absolute -top-1.5 -right-3 text-[8px] font-bold bg-red-500 text-white px-1 rounded-full">70%</span>
+                <span className="text-[10px] font-medium text-amber-600 dark:text-amber-400">Premium</span>
               </div>
-              <span className="text-[10px] font-medium text-amber-600 dark:text-amber-400">Upgrade</span>
-            </Link>
+            ) : (
+              <Link
+                href="/checkout?plan=gold"
+                className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all relative"
+              >
+                <div className="relative">
+                  <Crown className="h-5 w-5 text-amber-500" />
+                  <span className="absolute -top-1.5 -right-3 text-[8px] font-bold bg-red-500 text-white px-1 rounded-full">70%</span>
+                </div>
+                <span className="text-[10px] font-medium text-amber-600 dark:text-amber-400">Upgrade</span>
+              </Link>
+            )}
           </div>
         </div>
       </nav>
