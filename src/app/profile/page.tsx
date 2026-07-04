@@ -347,11 +347,12 @@ export default function ProfilePage() {
             <button
               onClick={() => {
                 const profileUrl = `${window.location.origin}/profile/${user?.id}`
+                const shareText = `Check out ${user?.name}'s profile on Soulmate Sync!\n\nVisit: ${profileUrl}`
                 if (navigator.share) {
-                  navigator.share({ title: `${user?.name} - Soulmate Sync`, text: 'Check out my profile on Soulmate Sync!', url: profileUrl })
+                  navigator.share({ title: `${user?.name} - Soulmate Sync`, text: `Check out ${user?.name}'s profile on Soulmate Sync!`, url: profileUrl })
                 } else {
-                  navigator.clipboard.writeText(profileUrl)
-                  alert('Profile link copied to clipboard!')
+                  navigator.clipboard.writeText(shareText)
+                  alert('Profile link copied! Anyone with this link can visit your profile directly.')
                 }
               }}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-50 dark:bg-purple-500/10 border border-teal-200/50 dark:border-purple-500/20 text-sm text-teal-700 dark:text-purple-200 hover:bg-teal-100 dark:hover:bg-purple-500/20 transition-all"

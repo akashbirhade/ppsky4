@@ -168,10 +168,13 @@ export default function ProfileDetailPage() {
   }
 
   const handleShare = () => {
+    const profileUrl = `${window.location.origin}/profile/${profile?.id}`
+    const shareText = `Check out ${profile?.name}'s profile on Soulmate Sync!\n\n${profileUrl}`
     if (navigator.share) {
-      navigator.share({ title: `${profile?.name} - Soulmate Sync`, url: window.location.href })
+      navigator.share({ title: `${profile?.name} - Soulmate Sync`, text: `Check out ${profile?.name}'s profile on Soulmate Sync!`, url: profileUrl })
     } else {
-      navigator.clipboard.writeText(window.location.href)
+      navigator.clipboard.writeText(shareText)
+      alert('Profile link copied! Share it with anyone to visit this profile directly.')
     }
   }
 

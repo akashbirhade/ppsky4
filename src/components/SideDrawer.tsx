@@ -68,7 +68,7 @@ export default function SideDrawer() {
         <div className="p-3 border-b border-teal-100 dark:border-purple-500/10">
           <DrawerLink href="/profile" icon={<User className="h-4 w-4" />} label="View & Edit Profile" onClick={() => setIsOpen(false)} />
           <DrawerButton icon={<Download className="h-4 w-4" />} label="Download Profile" onClick={() => { window.print(); setIsOpen(false) }} />
-          <DrawerButton icon={<Share2 className="h-4 w-4" />} label="Share Profile" onClick={() => { navigator.share?.({ title: 'My Soulmate Sync Profile', url: '/profile' }); setIsOpen(false) }} />
+          <DrawerButton icon={<Share2 className="h-4 w-4" />} label="Share Profile" onClick={() => { const url = `${window.location.origin}/profile/${user?.id}`; if (navigator.share) { navigator.share({ title: `${user?.name} - Soulmate Sync`, text: `Check out ${user?.name}'s profile on Soulmate Sync!`, url }) } else { navigator.clipboard.writeText(url); alert('Profile link copied!') }; setIsOpen(false) }} />
           <DrawerLink href="/premium" icon={<Crown className="h-4 w-4 text-amber-400" />} label="VIP Soulmate - Premium" badge="VIP" onClick={() => setIsOpen(false)} />
           <DrawerLink href="/kundali" icon={<Moon className="h-4 w-4 text-amber-300" />} label="AstroChat" onClick={() => setIsOpen(false)} />
         </div>
