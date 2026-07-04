@@ -16,6 +16,7 @@ interface ProfileMiniCardProps {
 
 export default function ProfileMiniCard({ profile, onClick, onSendInterest, interestSent, variant = 'default', viewedTime }: ProfileMiniCardProps) {
   const [imgErr, setImgErr] = useState(false)
+  const [activePhoto, setActivePhoto] = useState(0)
   const hasPhoto = profile.photos && profile.photos.length > 0 && !imgErr
 
   return (
@@ -28,7 +29,7 @@ export default function ProfileMiniCard({ profile, onClick, onSendInterest, inte
         {hasPhoto ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={profile.photos![0]}
+            src={profile.photos![activePhoto] || profile.photos![0]}
             alt={profile.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             onError={() => setImgErr(true)}
@@ -41,6 +42,19 @@ export default function ProfileMiniCard({ profile, onClick, onSendInterest, inte
               alt="Avatar"
               className="w-16 h-16 opacity-60"
             />
+          </div>
+        )}
+
+        {/* Photo dots indicator for multiple photos */}
+        {hasPhoto && profile.photos!.length > 1 && (
+          <div className="absolute top-2 right-2 flex gap-0.5">
+            {profile.photos!.slice(0, 5).map((_, i) => (
+              <button
+                key={i}
+                onClick={(e) => { e.stopPropagation(); setActivePhoto(i) }}
+                className={`w-1.5 h-1.5 rounded-full transition-all ${i === activePhoto ? 'bg-white shadow-sm scale-125' : 'bg-white/50'}`}
+              />
+            ))}
           </div>
         )}
 
@@ -63,6 +77,24 @@ export default function ProfileMiniCard({ profile, onClick, onSendInterest, inte
           </div>
         )}
       </div>
+
+      {/* Horizontal scroll photo thumbnails */}
+      {hasPhoto && profile.photos!.length > 1 && (
+        <div className="flex gap-1 px-1.5 py-1 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+          {profile.photos!.slice(0, 6).map((photo, i) => (
+            <button
+              key={i}
+              onClick={(e) => { e.stopPropagation(); setActivePhoto(i) }}
+              className={`shrink-0 w-7 h-7 rounded-md overflow-hidden border transition-all ${
+                i === activePhoto ? 'border-purple-500 ring-1 ring-purple-500/30' : 'border-slate-200/30 dark:border-purple-500/10 opacity-60 hover:opacity-100'
+              }`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={photo} alt={`${i + 1}`} className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Info */}
       <div className="p-2 space-y-0.5">
