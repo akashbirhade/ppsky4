@@ -143,13 +143,13 @@ export default function DashboardPage() {
 
             <Section title="Newly Joined" icon={<Sparkles className="h-4 w-4 text-pink-400" />} count={profiles.length} href="/search">{profiles.slice(0, 10).map(p => (<ProfileMiniCard key={p.id} profile={p} onClick={() => router.push(`/profile/${p.id}`)} onSendInterest={(e) => handleSendInterest(e, p.id)} interestSent={sentInterests.has(p.id)} />))}</Section>
 
-            {/* All Profiles Grid */}
+            {/* All Profiles */}
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white flex items-center gap-2"><Users className="h-4 w-4 text-purple-400" /> All Profiles <span className="text-[10px] text-slate-400 dark:text-purple-300/40 font-normal ml-1">{profiles.length}</span></h2>
                 <Link href="/search" className="text-[11px] text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-0.5">Advanced Search <ChevronRight className="h-3 w-3" /></Link>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+              <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
                 {profiles.slice(0, 20).map(p => (<ProfileMiniCard key={p.id} profile={p} onClick={() => router.push(`/profile/${p.id}`)} onSendInterest={(e) => handleSendInterest(e, p.id)} interestSent={sentInterests.has(p.id)} />))}
               </div>
               {profiles.length > 20 && (<div className="text-center mt-4"><Link href="/search" className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-purple-600/10 border border-purple-500/20 text-sm text-purple-700 dark:text-purple-300 hover:bg-purple-600/20 transition-all">View All {profiles.length} Profiles <ChevronRight className="h-4 w-4" /></Link></div>)}
