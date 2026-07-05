@@ -37,7 +37,7 @@ export const config = {
   },
 
   cors: {
-    allowedOrigins: (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').split(','),
+    allowedOrigins: (process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:8081,exp://localhost:8081').split(','),
   },
 
   cloudinary: {
