@@ -114,9 +114,13 @@ export class AuthService {
 
   // ─── LOGIN ──────────────────────────────────────────────────────────────────
 
-  async login(email: string, password: string, ipAddress?: string, userAgent?: string) {
-    const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
+  async login(identifier: string, password: string, ipAddress?: string, userAgent?: string) {
+    // Support login by email OR mobile number
+    const isEmail = identifier.includes('@');
+    const user = await prisma.user.findFirst({
+      where: isEmail
+        ? { email: identifier.toLowerCase() }
+        : { mobileNumber: identifier.replace(/\s+/g, '') },
       select: {
         id: true,
         email: true,
@@ -129,12 +133,12 @@ export class AuthService {
       },
     });
 
-    if (!user || user.deletedAt) throw new AppError('Invalid email or password', 401);
+    if (!user || user.deletedAt) throw new AppError('Invalid email/mobile or password', 401);
     if (user.accountStatus === 'BANNED') throw new AppError('Your account has been banned', 403);
     if (user.accountStatus === 'SUSPENDED') throw new AppError('Your account is suspended. Contact support.', 403);
 
     const isValid = await comparePassword(password, user.password);
-    if (!isValid) throw new AppError('Invalid email or password', 401);
+    if (!isValid) throw new AppError('Invalid email/mobile or password', 401);
 
     const role = user.adminUser?.role;
     const { accessToken, refreshToken } = await this.issueTokens(

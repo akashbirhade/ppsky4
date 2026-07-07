@@ -28,8 +28,7 @@ export const LoginScreen = () => {
 
   const validate = () => {
     const newErrors: typeof errors = {};
-    if (!email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'Invalid email format';
+    if (!email.trim()) newErrors.email = 'Email or mobile number is required';
     if (!password) newErrors.password = 'Password is required';
     else if (password.length < 6) newErrors.password = 'Minimum 6 characters';
     setErrors(newErrors);
@@ -42,10 +41,14 @@ export const LoginScreen = () => {
     try {
       await login(email.trim(), password);
     } catch (err: any) {
-      Alert.alert(
-        'Login Failed',
-        err.response?.data?.message || 'Invalid credentials. Please try again.'
-      );
+      const message = err.response?.data?.message;
+      if (message) {
+        Alert.alert('Login Failed', message);
+      } else if (err.message?.includes('Network') || err.code === 'ERR_NETWORK') {
+        Alert.alert('Connection Error', 'Unable to reach server. Please check your internet connection.');
+      } else {
+        Alert.alert('Login Failed', 'Something went wrong. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -76,8 +79,8 @@ export const LoginScreen = () => {
           {/* Form */}
           <View style={styles.form}>
             <Input
-              label="Email"
-              placeholder="Enter your email"
+              label="Email or Mobile"
+              placeholder="Enter email or mobile number"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"

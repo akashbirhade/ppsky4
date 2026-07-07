@@ -71,6 +71,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     await SecureStore.setItemAsync('refreshToken', data.data.refreshToken);
     set({ user: data.data.user, isAuthenticated: true, isOnboarded: true });
     socketService.connect();
+    // Load full profile after login
+    try {
+      await get().loadUser();
+    } catch {}
   },
 
   register: async (registerData) => {
