@@ -26,6 +26,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       data: {
         user: result.user,
         accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
       },
     });
   } catch (err) {
@@ -45,6 +46,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       data: {
         user: result.user,
         accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
       },
     });
   } catch (err) {
@@ -87,7 +89,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
     res.cookie('refreshToken', result.refreshToken, COOKIE_OPTIONS);
     res.json({
       success: true,
-      data: { accessToken: result.accessToken },
+      data: { accessToken: result.accessToken, refreshToken: result.refreshToken },
     });
   } catch (err) {
     next(err);

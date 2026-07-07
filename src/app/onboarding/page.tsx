@@ -68,6 +68,43 @@ function OnboardingContent() {
     if (!authLoading && !user) router.push('/login')
   }, [user, authLoading, router])
 
+  // Pre-populate form with existing profile data (from registration)
+  useEffect(() => {
+    if (!user) return
+    const loadExistingProfile = async () => {
+      try {
+        const res = await authFetch(`/api/profiles/${user.id}`)
+        if (res.ok) {
+          const data = await res.json()
+          const p = data.profile
+          setFormData(prev => ({
+            ...prev,
+            photoUrl: (p.photos && p.photos.length > 0) ? p.photos[0] : prev.photoUrl,
+            about: p.about || prev.about,
+            religion: p.religion || prev.religion,
+            caste: p.caste || prev.caste,
+            motherTongue: p.motherTongue || prev.motherTongue,
+            height: p.height || prev.height,
+            education: p.education || prev.education,
+            occupation: p.occupation || prev.occupation,
+            income: p.income || prev.income,
+            familyType: p.familyDetails?.familyType || prev.familyType,
+            city: p.city || prev.city,
+            state: p.state || prev.state,
+            diet: p.diet || prev.diet,
+            prefAgeMin: String(p.partnerPreferences?.ageMin || prev.prefAgeMin),
+            prefAgeMax: String(p.partnerPreferences?.ageMax || prev.prefAgeMax),
+            prefReligion: p.partnerPreferences?.religion || prev.prefReligion,
+            prefEducation: p.partnerPreferences?.education || prev.prefEducation,
+            prefCity: p.partnerPreferences?.city || prev.prefCity,
+          }))
+        }
+      } catch {}
+    }
+    loadExistingProfile()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id])
+
   useEffect(() => {
     // Update step when section parameter changes
     const newStep = SECTION_TO_STEP[section] || 0

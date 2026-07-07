@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { searchProfiles, updateUser, getUserById } from '@/lib/database'
+import { searchProfiles, updateUser, getUserById, getUserByIdAsync } from '@/lib/database'
 import { authenticateRequest } from '@/lib/auth'
 import { sanitizeProfileData } from '@/lib/security'
 
@@ -70,7 +70,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized: cannot update another user\'s profile' }, { status: 403 })
     }
 
-    const existing = getUserById(userId)
+    const existing = getUserById(userId) || await getUserByIdAsync(userId)
     if (!existing) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
@@ -78,8 +78,16 @@ export async function PUT(req: NextRequest) {
     // Sanitize all input data
     const sanitizedData = sanitizeProfileData(profileData)
 
+    // Remove empty string values to prevent overwriting existing data with blanks
+    const cleanedData: any = {}
+    for (const [key, value] of Object.entries(sanitizedData)) {
+      if (value !== '' && value !== undefined && value !== null) {
+        cleanedData[key] = value
+      }
+    }
+
     // Build update data
-    const updateData: any = { ...sanitizedData }
+    const updateData: any = { ...cleanedData }
     const existingPartnerPreferences = existing.partnerPreferences || {
       ageMin: 22,
       ageMax: 35,
@@ -91,8 +99,12 @@ export async function PUT(req: NextRequest) {
       city: 'Any',
     }
     
-    // If core fields are provided, mark profile as complete
-    if (profileData.religion && profileData.city && profileData.education && profileData.occupation) {
+    // If core fields are provided (in request or already existing), mark profile as complete
+    const finalReligion = profileData.religion || existing.religion
+    const finalCity = profileData.city || existing.city
+    const finalEducation = profileData.education || existing.education
+    const finalOccupation = profileData.occupation || existing.occupation
+    if (finalReligion && finalCity && finalEducation && finalOccupation) {
       updateData.profileComplete = true
     }
 
