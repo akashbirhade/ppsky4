@@ -127,9 +127,13 @@ export class AuthService {
         username: true,
         password: true,
         gender: true,
+        mobileNumber: true,
         accountStatus: true,
         deletedAt: true,
         adminUser: { select: { role: true } },
+        profile: { select: { firstName: true, lastName: true, age: true, city: true, religion: true, education: true, profession: true, isVerified: true, height: true, bio: true } },
+        subscription: { select: { plan: true, isActive: true } },
+        photos: { select: { url: true }, take: 5, orderBy: { order: 'asc' } },
       },
     });
 
@@ -152,7 +156,13 @@ export class AuthService {
     });
 
     return {
-      user: { id: user.id, email: user.email, username: user.username, gender: user.gender, role },
+      user: {
+        id: user.id, email: user.email, username: user.username, gender: user.gender, role,
+        mobileNumber: user.mobileNumber,
+        profile: user.profile,
+        subscription: user.subscription,
+        photos: user.photos || [],
+      },
       accessToken,
       refreshToken,
     };
