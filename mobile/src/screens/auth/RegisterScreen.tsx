@@ -91,7 +91,14 @@ export const RegisterScreen = () => {
         dateOfBirth: formData.dateOfBirth,
       });
     } catch (err: any) {
-      Alert.alert('Registration Failed', err.response?.data?.message || 'Please try again.');
+      const message = err.response?.data?.message;
+      if (message) {
+        Alert.alert('Registration Failed', message);
+      } else if (err.message?.includes('Network') || err.code === 'ERR_NETWORK') {
+        Alert.alert('Connection Error', 'Unable to reach server. Please check your internet connection.');
+      } else {
+        Alert.alert('Registration Failed', 'Something went wrong. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

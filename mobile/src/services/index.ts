@@ -203,3 +203,13 @@ export const verificationService = {
     api.post('/verification/submit', data),
   getStatus: () => api.get('/verification/status'),
 };
+
+// ─── HOST SERVICE ─────────────────────────────────────────────────────────────
+
+export const hostService = {
+  getAll: (params?: { region?: string; city?: string; page?: number }) =>
+    api.get('/hosts', params),
+  getById: (hostId: string) => api.get(`/hosts/${hostId}`),
+  getEvents: (hostId: string) => api.get(`/hosts/${hostId}/events`),
+  getMembers: (hostId: string) => api.get(`/hosts/${hostId}/members`),
+};

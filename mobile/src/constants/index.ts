@@ -1,6 +1,6 @@
 // ─── API CONFIGURATION ────────────────────────────────────────────────────────
 // Use machine's local network IP so physical devices can connect
-const LOCAL_IP = '192.168.51.32';
+const LOCAL_IP = '10.141.31.42';
 
 export const API_BASE_URL = __DEV__
   ? `http://${LOCAL_IP}:5001/api/v1`

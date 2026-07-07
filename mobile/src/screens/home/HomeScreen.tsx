@@ -108,6 +108,24 @@ export const HomeScreen = () => {
           ))}
         </View>
 
+        {/* Community Hosts Banner */}
+        <TouchableOpacity
+          style={styles.hostBanner}
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate('Hosts')}
+        >
+          <View style={styles.hostBannerLeft}>
+            <View style={styles.hostBannerIcon}>
+              <Ionicons name="people" size={22} color={Colors.white} />
+            </View>
+            <View>
+              <Text style={styles.hostBannerTitle}>Community Hosts</Text>
+              <Text style={styles.hostBannerSub}>Browse local matchmakers & events</Text>
+            </View>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
+        </TouchableOpacity>
+
         {/* New Profiles */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -228,6 +246,20 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', marginBottom: Spacing.sm,
   },
   quickActionLabel: { ...Typography.caption1, color: Colors.textSecondary, fontWeight: '500' },
+  hostBanner: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    marginHorizontal: Spacing.xl, marginBottom: Spacing.lg, padding: Spacing.md,
+    backgroundColor: Colors.white, borderRadius: BorderRadius.lg,
+    borderWidth: 1, borderColor: Colors.primaryLight + '40',
+    ...Shadows.small,
+  },
+  hostBannerLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  hostBannerIcon: {
+    width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.primary,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  hostBannerTitle: { ...Typography.subhead, fontWeight: '700', color: Colors.textPrimary },
+  hostBannerSub: { ...Typography.caption2, color: Colors.textTertiary },
   section: { marginBottom: Spacing.xxl },
   sectionHeader: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',

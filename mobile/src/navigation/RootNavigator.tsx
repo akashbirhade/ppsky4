@@ -12,6 +12,8 @@ import { KundaliScreen } from '@/screens/features/KundaliScreen';
 import { AIChatbotScreen } from '@/screens/features/AIChatbotScreen';
 import VerificationScreen from '@/screens/features/VerificationScreen';
 import NotificationsScreen from '@/screens/notifications/NotificationsScreen';
+import HostsScreen from '@/screens/hosts/HostsScreen';
+import HostDetailScreen from '@/screens/hosts/HostDetailScreen';
 import { SettingsScreen } from '@/screens/settings/SettingsScreen';
 import { EditProfileScreen } from '@/screens/profile/EditProfileScreen';
 
@@ -27,6 +29,8 @@ export type RootStackParamList = {
   AICoach: undefined;
   Verification: undefined;
   Notifications: undefined;
+  Hosts: undefined;
+  HostDetail: { hostId: string };
   Settings: undefined;
   EditProfile: undefined;
 };
@@ -69,6 +73,8 @@ export const RootNavigator = () => {
           <Stack.Screen name="AICoach" component={AIChatbotScreen} />
           <Stack.Screen name="Verification" component={VerificationScreen} />
           <Stack.Screen name="Notifications" component={NotificationsScreen} />
+          <Stack.Screen name="Hosts" component={HostsScreen} />
+          <Stack.Screen name="HostDetail" component={HostDetailScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
         </>
