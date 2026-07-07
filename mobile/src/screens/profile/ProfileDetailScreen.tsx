@@ -14,11 +14,20 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { profileService, chatService, matchService } from '@/services';
+import { formatDistanceToNow } from 'date-fns';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '@/constants/theme';
 import * as Haptics from '@/utils/haptics';
 import { ActionSheetIOS, Platform } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
+
+const isOnline = (lastActive: string) => {
+  return Date.now() - new Date(lastActive).getTime() < 5 * 60 * 1000; // 5 min
+};
+
+const formatLastActive = (lastActive: string) => {
+  return formatDistanceToNow(new Date(lastActive), { addSuffix: true });
+};
 
 export const ProfileDetailScreen = () => {
   const navigation = useNavigation<any>();
@@ -205,6 +214,17 @@ export const ProfileDetailScreen = () => {
             {profile.profession && (
               <Text style={styles.professionText}>{profile.profession}</Text>
             )}
+            {profile.user?.lastActive && (
+              <View style={styles.lastActiveRow}>
+                <View style={[
+                  styles.onlineDot,
+                  isOnline(profile.user.lastActive) && styles.onlineDotActive,
+                ]} />
+                <Text style={styles.lastActiveText}>
+                  {isOnline(profile.user.lastActive) ? 'Online now' : `Active ${formatLastActive(profile.user.lastActive)}`}
+                </Text>
+              </View>
+            )}
           </View>
 
           {/* Bio */}
@@ -348,6 +368,10 @@ const styles = StyleSheet.create({
   },
   ageLocation: { ...Typography.callout, color: Colors.textSecondary, marginTop: 4 },
   professionText: { ...Typography.subhead, color: Colors.textSecondary, marginTop: 2 },
+  lastActiveRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 6 },
+  onlineDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.textTertiary },
+  onlineDotActive: { backgroundColor: Colors.success },
+  lastActiveText: { ...Typography.caption1, color: Colors.textTertiary },
   section: { marginBottom: Spacing.xxl },
   sectionTitle: { ...Typography.headline, color: Colors.textPrimary, marginBottom: Spacing.md },
   bioText: { ...Typography.body, color: Colors.textSecondary, lineHeight: 24 },
