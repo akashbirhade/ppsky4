@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,14 +7,17 @@ import {
   Dimensions,
   TouchableOpacity,
   Animated,
+  PanResponder,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, BorderRadius, Spacing, Typography, Shadows } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
+import * as Haptics from '@/utils/haptics';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = SCREEN_WIDTH - 32;
-const CARD_HEIGHT = CARD_WIDTH * 1.35;
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const CARD_WIDTH = SCREEN_WIDTH - 28;
+const CARD_HEIGHT = SCREEN_HEIGHT * 0.56;
+const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.22;
 
 interface ProfileCardProps {
   profile: {
@@ -25,6 +28,8 @@ interface ProfileCardProps {
     profession?: string;
     isVerified?: boolean;
     bio?: string;
+    religion?: string;
+    education?: string;
     user: {
       id: string;
       photos: Array<{ url: string; isMain: boolean }>;
@@ -43,95 +48,170 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
   onSkip,
   onPress,
 }) => {
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  const mainPhoto = profile.user.photos.find((p) => p.isMain) || profile.user.photos[0];
+  const position = useRef(new Animated.ValueXY()).current;
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const photos = profile.user?.photos || [];
+  const currentPhoto = photos[photoIndex] || photos[0];
 
-  const animatePress = (callback: () => void) => {
-    Animated.sequence([
-      Animated.spring(scaleAnim, { toValue: 0.95, useNativeDriver: true }),
-      Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true }),
-    ]).start();
-    callback();
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_, gesture) =>
+        Math.abs(gesture.dx) > 10 && Math.abs(gesture.dx) > Math.abs(gesture.dy),
+      onPanResponderMove: (_, gesture) => {
+        position.setValue({ x: gesture.dx, y: gesture.dy * 0.2 });
+      },
+      onPanResponderRelease: (_, gesture) => {
+        if (gesture.dx > SWIPE_THRESHOLD) {
+          swipeOut('right');
+        } else if (gesture.dx < -SWIPE_THRESHOLD) {
+          swipeOut('left');
+        } else {
+          Animated.spring(position, {
+            toValue: { x: 0, y: 0 },
+            friction: 6,
+            tension: 100,
+            useNativeDriver: false,
+          }).start();
+        }
+      },
+    })
+  ).current;
+
+  const swipeOut = (direction: 'left' | 'right') => {
+    Haptics.mediumTap();
+    const x = direction === 'right' ? SCREEN_WIDTH * 1.2 : -SCREEN_WIDTH * 1.2;
+    Animated.timing(position, {
+      toValue: { x, y: 0 },
+      duration: 300,
+      useNativeDriver: false,
+    }).start(() => {
+      direction === 'right' ? onLike() : onSkip();
+      position.setValue({ x: 0, y: 0 });
+      setPhotoIndex(0);
+    });
+  };
+
+  const rotate = position.x.interpolate({
+    inputRange: [-SCREEN_WIDTH * 0.5, 0, SCREEN_WIDTH * 0.5],
+    outputRange: ['-8deg', '0deg', '8deg'],
+    extrapolate: 'clamp',
+  });
+
+  const likeOpacity = position.x.interpolate({
+    inputRange: [0, SWIPE_THRESHOLD * 0.7],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
+
+  const nopeOpacity = position.x.interpolate({
+    inputRange: [-SWIPE_THRESHOLD * 0.7, 0],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  const nextPhoto = () => {
+    if (photoIndex < photos.length - 1) { Haptics.softTap(); setPhotoIndex(photoIndex + 1); }
+  };
+  const prevPhoto = () => {
+    if (photoIndex > 0) { Haptics.softTap(); setPhotoIndex(photoIndex - 1); }
   };
 
   return (
-    <TouchableOpacity activeOpacity={0.95} onPress={onPress}>
-      <Animated.View style={[styles.card, { transform: [{ scale: scaleAnim }] }]}>
-        {/* Profile Image */}
+    <Animated.View
+      style={[
+        styles.card,
+        { transform: [{ translateX: position.x }, { translateY: position.y }, { rotate }] },
+      ]}
+      {...panResponder.panHandlers}
+    >
+      <TouchableOpacity activeOpacity={1} onPress={onPress} style={styles.imageWrap}>
+        {/* Photo */}
         <Image
-          source={{ uri: mainPhoto?.url || 'https://via.placeholder.com/400x600' }}
+          source={{ uri: currentPhoto?.url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop' }}
           style={styles.image}
         />
 
-        {/* Gradient Overlay */}
+        {/* Photo navigation */}
+        {photos.length > 1 && (
+          <>
+            <TouchableOpacity style={styles.tapLeft} onPress={prevPhoto} activeOpacity={1} />
+            <TouchableOpacity style={styles.tapRight} onPress={nextPhoto} activeOpacity={1} />
+          </>
+        )}
+
+        {/* Photo dots */}
+        {photos.length > 1 && (
+          <View style={styles.dots}>
+            {photos.map((_, i) => (
+              <View key={i} style={[styles.dotBar, i === photoIndex && styles.dotBarActive]} />
+            ))}
+          </View>
+        )}
+
+        {/* LIKE overlay */}
+        <Animated.View style={[styles.overlay, styles.overlayLike, { opacity: likeOpacity }]}>
+          <View style={styles.overlayBadge}>
+            <Text style={styles.overlayLikeText}>LIKE</Text>
+          </View>
+        </Animated.View>
+
+        {/* NOPE overlay */}
+        <Animated.View style={[styles.overlay, styles.overlayNope, { opacity: nopeOpacity }]}>
+          <View style={[styles.overlayBadge, styles.overlayBadgeNope]}>
+            <Text style={styles.overlayNopeText}>NOPE</Text>
+          </View>
+        </Animated.View>
+
+        {/* Bottom gradient */}
         <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)']}
+          colors={['transparent', 'rgba(0,0,0,0.03)', 'rgba(0,0,0,0.65)', 'rgba(0,0,0,0.88)']}
+          locations={[0, 0.4, 0.72, 1]}
           style={styles.gradient}
+          pointerEvents="none"
         />
 
-        {/* Verified Badge */}
+        {/* Verified badge */}
         {profile.isVerified && (
           <View style={styles.verifiedBadge}>
-            <Ionicons name="shield-checkmark" size={14} color={Colors.white} />
+            <Ionicons name="shield-checkmark" size={12} color="#fff" />
             <Text style={styles.verifiedText}>Verified</Text>
           </View>
         )}
 
-        {/* Profile Info */}
-        <View style={styles.infoContainer}>
+        {/* Info section */}
+        <View style={styles.infoSection}>
+          {/* Name & Age */}
           <View style={styles.nameRow}>
-            <Text style={styles.name}>
+            <Text style={styles.name} numberOfLines={1}>
               {profile.firstName}{profile.lastName ? ` ${profile.lastName[0]}.` : ''}
             </Text>
-            {profile.age && <Text style={styles.age}>, {profile.age}</Text>}
+            {profile.age ? <Text style={styles.age}> {profile.age}</Text> : null}
           </View>
 
-          {profile.profession && (
-            <View style={styles.detailRow}>
-              <Ionicons name="briefcase-outline" size={14} color={Colors.white} />
-              <Text style={styles.detailText}>{profile.profession}</Text>
-            </View>
-          )}
+          {/* Details */}
+          <View style={styles.detailsRow}>
+            {profile.profession && (
+              <View style={styles.detail}>
+                <Ionicons name="briefcase" size={12} color="rgba(255,255,255,0.7)" />
+                <Text style={styles.detailText}>{profile.profession}</Text>
+              </View>
+            )}
+            {profile.city && (
+              <View style={styles.detail}>
+                <Ionicons name="location" size={12} color="rgba(255,255,255,0.7)" />
+                <Text style={styles.detailText}>{profile.city}</Text>
+              </View>
+            )}
+          </View>
 
-          {profile.city && (
-            <View style={styles.detailRow}>
-              <Ionicons name="location-outline" size={14} color={Colors.white} />
-              <Text style={styles.detailText}>{profile.city}</Text>
-            </View>
-          )}
-
+          {/* Bio */}
           {profile.bio && (
-            <Text style={styles.bio} numberOfLines={2}>
-              {profile.bio}
-            </Text>
+            <Text style={styles.bio} numberOfLines={2}>{profile.bio}</Text>
           )}
         </View>
-
-        {/* Action Buttons */}
-        <View style={styles.actions}>
-          <TouchableOpacity
-            style={[styles.actionBtn, styles.skipBtn]}
-            onPress={() => animatePress(onSkip)}
-          >
-            <Ionicons name="close" size={28} color={Colors.error} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionBtn, styles.superLikeBtn]}
-            onPress={() => animatePress(onSuperLike)}
-          >
-            <Ionicons name="star" size={24} color={Colors.gold} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionBtn, styles.likeBtn]}
-            onPress={() => animatePress(onLike)}
-          >
-            <Ionicons name="heart" size={28} color={Colors.white} />
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
@@ -139,103 +219,96 @@ const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
-    borderRadius: BorderRadius.xxl,
+    borderRadius: 20,
     overflow: 'hidden',
-    ...Shadows.large,
+    backgroundColor: '#1a1a2e',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
   },
+  imageWrap: { flex: 1 },
   image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    width: '100%', height: '100%', resizeMode: 'cover',
   },
+  tapLeft: { position: 'absolute', left: 0, top: 0, bottom: 100, width: '30%' },
+  tapRight: { position: 'absolute', right: 0, top: 0, bottom: 100, width: '30%' },
+
+  // Photo dots
+  dots: {
+    position: 'absolute', top: 12, left: 16, right: 16,
+    flexDirection: 'row', gap: 3,
+  },
+  dotBar: {
+    flex: 1, height: 3, borderRadius: 1.5,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+  },
+  dotBarActive: {
+    backgroundColor: 'rgba(255,255,255,0.95)',
+  },
+
+  // Swipe overlays
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  overlayLike: {},
+  overlayNope: {},
+  overlayBadge: {
+    paddingHorizontal: 20, paddingVertical: 10,
+    borderWidth: 4, borderColor: '#4CD964', borderRadius: 12,
+    transform: [{ rotate: '-15deg' }],
+    position: 'absolute', top: 60, right: 30,
+  },
+  overlayBadgeNope: {
+    borderColor: '#FF4458', right: undefined, left: 30,
+    transform: [{ rotate: '15deg' }],
+  },
+  overlayLikeText: {
+    fontSize: 36, fontWeight: '900', color: '#4CD964', letterSpacing: 2,
+  },
+  overlayNopeText: {
+    fontSize: 36, fontWeight: '900', color: '#FF4458', letterSpacing: 2,
+  },
+
+  // Gradient
   gradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: '60%',
+    position: 'absolute', bottom: 0, left: 0, right: 0, height: '55%',
   },
+
+  // Verified
   verifiedBadge: {
-    position: 'absolute',
-    top: Spacing.lg,
-    right: Spacing.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(59, 130, 246, 0.9)',
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
-    borderRadius: BorderRadius.full,
+    position: 'absolute', top: 40, right: 14,
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: 'rgba(124,58,237,0.85)',
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 16,
   },
-  verifiedText: {
-    ...Typography.caption1,
-    color: Colors.white,
-    fontWeight: '600',
-    marginLeft: 4,
-  },
-  infoContainer: {
-    position: 'absolute',
-    bottom: 80,
-    left: Spacing.xl,
-    right: Spacing.xl,
+  verifiedText: { color: '#fff', fontSize: 11, fontWeight: '700' },
+
+  // Info
+  infoSection: {
+    position: 'absolute', bottom: 20, left: 16, right: 16,
   },
   nameRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
+    flexDirection: 'row', alignItems: 'baseline',
   },
   name: {
-    ...Typography.title2,
-    color: Colors.white,
-    fontWeight: '700',
+    fontSize: 24, fontWeight: '800', color: '#fff', letterSpacing: -0.3,
   },
   age: {
-    ...Typography.title3,
-    color: Colors.white,
-    fontWeight: '400',
+    fontSize: 20, fontWeight: '400', color: 'rgba(255,255,255,0.85)',
   },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: Spacing.xs,
+  detailsRow: {
+    flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 6,
+  },
+  detail: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
   },
   detailText: {
-    ...Typography.subhead,
-    color: 'rgba(255,255,255,0.9)',
-    marginLeft: Spacing.sm,
+    fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: '500',
   },
   bio: {
-    ...Typography.footnote,
-    color: 'rgba(255,255,255,0.8)',
-    marginTop: Spacing.sm,
-  },
-  actions: {
-    position: 'absolute',
-    bottom: Spacing.xl,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: Spacing.lg,
-  },
-  actionBtn: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...Shadows.medium,
-  },
-  skipBtn: {
-    backgroundColor: Colors.white,
-  },
-  superLikeBtn: {
-    backgroundColor: Colors.white,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-  },
-  likeBtn: {
-    backgroundColor: Colors.primary,
-    ...Shadows.glow,
+    fontSize: 13, color: 'rgba(255,255,255,0.65)', marginTop: 8, lineHeight: 18,
   },
 });

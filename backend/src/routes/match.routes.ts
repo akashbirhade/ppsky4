@@ -4,7 +4,7 @@ import {
   getPremiumProfiles, getVerifiedProfiles, getRecommended,
   likeProfile, unlikeProfile, superLikeProfile,
   favoriteProfile, unfavoriteProfile, blockUser, viewProfile,
-  getLikesReceived, getFavorites, getCompatibilityScore,
+  getLikesReceived, getLikesSent, getViewedByMe, getFavorites, getCompatibilityScore,
 } from '@controllers/match.controller';
 import { authenticate, requirePremium } from '@middleware/auth.middleware';
 
@@ -23,6 +23,8 @@ router.get('/recommended', getRecommended);
 
 // My activity
 router.get('/likes/received', requirePremium, getLikesReceived);
+router.get('/likes/sent', getLikesSent);
+router.get('/views/by-me', getViewedByMe);
 router.get('/favorites', getFavorites);
 
 // Actions

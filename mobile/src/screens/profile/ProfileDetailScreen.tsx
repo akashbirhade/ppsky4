@@ -14,8 +14,9 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { profileService, chatService, matchService } from '@/services';
-import { Button } from '@/components/ui';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '@/constants/theme';
+import * as Haptics from '@/utils/haptics';
+import { ActionSheetIOS, Platform } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -44,9 +45,11 @@ export const ProfileDetailScreen = () => {
   };
 
   const handleLike = async () => {
+    Haptics.heavyTap();
     try {
       const { data } = await matchService.likeProfile(userId);
       if (data.data?.isMatch) {
+        Haptics.success();
         Alert.alert('It\'s a Match! 🎉', 'You both liked each other!');
       } else {
         Alert.alert('Liked! ❤️', 'Interest sent successfully');
@@ -55,6 +58,7 @@ export const ProfileDetailScreen = () => {
   };
 
   const handleChat = async () => {
+    Haptics.mediumTap();
     try {
       const { data } = await chatService.getOrCreateConversation(userId);
       navigation.navigate('Chat', {
@@ -67,6 +71,67 @@ export const ProfileDetailScreen = () => {
 
   const handleCall = (type: 'AUDIO' | 'VIDEO') => {
     navigation.navigate('VideoCall', { receiverId: userId, type, callId: '' });
+  };
+
+  const showMoreOptions = () => {
+    const options = ['Block User', 'Report User', 'Cancel'];
+    const destructiveButtonIndex = 0;
+    const cancelButtonIndex = 2;
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        { options, destructiveButtonIndex, cancelButtonIndex },
+        (index) => handleOptionSelect(index),
+      );
+    } else {
+      Alert.alert('Options', '', [
+        { text: 'Block User', style: 'destructive', onPress: () => handleOptionSelect(0) },
+        { text: 'Report User', onPress: () => handleOptionSelect(1) },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+    }
+  };
+
+  const handleOptionSelect = (index: number) => {
+    if (index === 0) {
+      Alert.alert(
+        'Block User',
+        'They won\'t be able to see your profile or message you. Are you sure?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Block', style: 'destructive',
+            onPress: async () => {
+              try {
+                await matchService.blockUser(userId);
+                Haptics.warning();
+                Alert.alert('Blocked', 'This user has been blocked.');
+                navigation.goBack();
+              } catch {}
+            },
+          },
+        ],
+      );
+    } else if (index === 1) {
+      Alert.alert(
+        'Report User',
+        'Why are you reporting this profile?',
+        [
+          { text: 'Fake Profile', onPress: () => submitReport('fake_profile') },
+          { text: 'Inappropriate Content', onPress: () => submitReport('inappropriate') },
+          { text: 'Harassment', onPress: () => submitReport('harassment') },
+          { text: 'Cancel', style: 'cancel' },
+        ],
+      );
+    }
+  };
+
+  const submitReport = async (reason: string) => {
+    try {
+      await matchService.reportUser(userId, reason);
+      Haptics.success();
+      Alert.alert('Reported', 'Thank you for helping keep our community safe.');
+    } catch {}
   };
 
   if (loading || !profile) {
@@ -113,7 +178,7 @@ export const ProfileDetailScreen = () => {
               <TouchableOpacity style={styles.topActionBtn}>
                 <Ionicons name="share-outline" size={20} color={Colors.white} />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.topActionBtn}>
+              <TouchableOpacity style={styles.topActionBtn} onPress={showMoreOptions}>
                 <Ionicons name="ellipsis-vertical" size={20} color={Colors.white} />
               </TouchableOpacity>
             </View>
@@ -135,30 +200,17 @@ export const ProfileDetailScreen = () => {
               )}
             </View>
             <Text style={styles.ageLocation}>
-              {profile.age} yrs • {profile.city}, {profile.state}
+              {profile.age} yrs • {profile.height ? `${profile.height} cm` : ''} • {profile.city}, {profile.state}
             </Text>
-          </View>
-
-          {/* Action Buttons */}
-          <View style={styles.actionRow}>
-            <TouchableOpacity style={styles.actionCircle} onPress={() => handleCall('AUDIO')}>
-              <Ionicons name="call" size={22} color={Colors.success} />
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.actionCircle, styles.likeCircle]} onPress={handleLike}>
-              <Ionicons name="heart" size={26} color={Colors.white} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionCircle} onPress={handleChat}>
-              <Ionicons name="chatbubble" size={22} color={Colors.secondary} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionCircle} onPress={() => handleCall('VIDEO')}>
-              <Ionicons name="videocam" size={22} color={Colors.info} />
-            </TouchableOpacity>
+            {profile.profession && (
+              <Text style={styles.professionText}>{profile.profession}</Text>
+            )}
           </View>
 
           {/* Bio */}
           {profile.bio && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>About</Text>
+              <Text style={styles.sectionTitle}>About {profile.firstName}</Text>
               <Text style={styles.bioText}>{profile.bio}</Text>
             </View>
           )}
@@ -222,9 +274,33 @@ export const ProfileDetailScreen = () => {
             </LinearGradient>
           </TouchableOpacity>
 
-          <View style={{ height: 100 }} />
+          <View style={{ height: 120 }} />
         </View>
       </ScrollView>
+
+      {/* Sticky Bottom Action Bar */}
+      <View style={styles.bottomBar}>
+        <TouchableOpacity style={styles.bottomAction} onPress={handleLike}>
+          <View style={[styles.bottomIconCircle, { backgroundColor: '#E8F5E9' }]}>
+            <Ionicons name="heart" size={22} color="#1B5E20" />
+          </View>
+          <Text style={styles.bottomActionLabel}>Super Connect</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.bottomAction} onPress={() => handleCall('AUDIO')}>
+          <View style={[styles.bottomIconCircle, { backgroundColor: '#E0F2F1' }]}>
+            <Ionicons name="call" size={22} color="#00695C" />
+          </View>
+          <Text style={styles.bottomActionLabel}>View Contact</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.bottomAction} onPress={handleChat}>
+          <View style={[styles.bottomIconCircle, { backgroundColor: '#E8F5E9' }]}>
+            <Ionicons name="checkmark-circle" size={22} color="#2E7D32" />
+          </View>
+          <Text style={styles.bottomActionLabel}>Connect Now</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -271,16 +347,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.info, alignItems: 'center', justifyContent: 'center',
   },
   ageLocation: { ...Typography.callout, color: Colors.textSecondary, marginTop: 4 },
-  actionRow: {
-    flexDirection: 'row', justifyContent: 'center', gap: Spacing.xl,
-    marginBottom: Spacing.xxl,
-  },
-  actionCircle: {
-    width: 52, height: 52, borderRadius: 26,
-    backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center',
-    ...Shadows.small,
-  },
-  likeCircle: { width: 60, height: 60, borderRadius: 30, backgroundColor: Colors.primary, ...Shadows.glow },
+  professionText: { ...Typography.subhead, color: Colors.textSecondary, marginTop: 2 },
   section: { marginBottom: Spacing.xxl },
   sectionTitle: { ...Typography.headline, color: Colors.textPrimary, marginBottom: Spacing.md },
   bioText: { ...Typography.body, color: Colors.textSecondary, lineHeight: 24 },
@@ -305,4 +372,19 @@ const styles = StyleSheet.create({
   },
   kundaliTitle: { ...Typography.bodyBold, color: Colors.white },
   kundaliSub: { ...Typography.caption1, color: 'rgba(255,255,255,0.8)' },
+  // Bottom Action Bar
+  bottomBar: {
+    position: 'absolute', bottom: 0, left: 0, right: 0,
+    flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center',
+    backgroundColor: Colors.white, paddingTop: 12, paddingBottom: 34,
+    borderTopWidth: 1, borderTopColor: '#F0F0F0',
+    shadowColor: '#000', shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.08, shadowRadius: 12, elevation: 10,
+  },
+  bottomAction: { alignItems: 'center', gap: 6 },
+  bottomIconCircle: {
+    width: 52, height: 52, borderRadius: 26,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  bottomActionLabel: { ...Typography.caption2, color: Colors.textSecondary, fontWeight: '600' },
 });

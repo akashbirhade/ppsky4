@@ -65,7 +65,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   loadConversations: async () => {
     const { data } = await chatService.getConversations();
-    const conversations = data.data || [];
+    const conversations = data.data?.conversations || [];
     const unreadCount = conversations.reduce(
       (acc: number, c: any) => acc + (c.unreadCount || 0), 0
     );
@@ -74,7 +74,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   loadMessages: async (conversationId) => {
     const { data } = await chatService.getMessages(conversationId);
-    set({ currentMessages: data.data || [], activeConversation: conversationId });
+    set({ currentMessages: data.data?.messages || data.data || [], activeConversation: conversationId });
     socketService.joinConversation(conversationId);
   },
 

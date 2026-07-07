@@ -25,7 +25,7 @@ export const SettingsScreen = () => {
         { icon: 'person-outline', label: 'Edit Profile', action: () => navigation.navigate('EditProfile') },
         { icon: 'images-outline', label: 'Manage Photos', action: () => {} },
         { icon: 'heart-outline', label: 'Partner Preferences', action: () => {} },
-        { icon: 'shield-checkmark-outline', label: 'Verification', action: () => {} },
+        { icon: 'shield-checkmark-outline', label: 'Verification', action: () => navigation.navigate('Verification') },
       ],
     },
     {

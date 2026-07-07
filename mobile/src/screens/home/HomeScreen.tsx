@@ -94,12 +94,13 @@ export const HomeScreen = () => {
         <View style={styles.quickActions}>
           {[
             { icon: 'heart', label: 'Likes', color: Colors.love, screen: 'Matches' },
-            { icon: 'star', label: 'Premium', color: Colors.gold, screen: 'Premium' },
-            { icon: 'planet', label: 'Kundali', color: Colors.secondary, screen: 'Kundali' },
-            { icon: 'videocam', label: 'Video Call', color: Colors.success, screen: 'Messages' },
+            { icon: 'diamond', label: 'Premium', color: Colors.gold, screen: 'Premium' },
+            { icon: 'planet', label: 'Kundali', color: Colors.primary, screen: 'Kundali' },
+            { icon: 'sparkles', label: 'AI Coach', color: '#EC4899', screen: 'AICoach' },
+            { icon: 'shield-checkmark', label: 'Verify', color: Colors.success, screen: 'Verification' },
           ].map((item, i) => (
             <TouchableOpacity key={i} style={styles.quickActionItem} onPress={() => navigation.navigate(item.screen)}>
-              <View style={[styles.quickActionIcon, { backgroundColor: item.color + '15' }]}>
+              <View style={[styles.quickActionIcon, { backgroundColor: item.color + '12' }]}>
                 <Ionicons name={item.icon as any} size={22} color={item.color} />
               </View>
               <Text style={styles.quickActionLabel}>{item.label}</Text>

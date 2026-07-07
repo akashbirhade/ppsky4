@@ -1,76 +1,86 @@
-// ─── SOULMATE SYNC THEME ──────────────────────────────────────────────────────
-// Matching the web app's purple/teal brand identity
+// ─── SOULMATE SYNC — PREMIUM THEME ───────────────────────────────────────────
+// Luxurious, modern color system with deep purples, soft golds, and clean whites
 
 export const Colors = {
-  // Primary brand colors (Purple - matches web)
-  primary: '#a855f7',
-  primaryDark: '#9333ea',
-  primaryLight: '#c084fc',
-  primarySoft: '#faf5ff',
+  // Primary brand — Rich Purple (premium feel)
+  primary: '#7C3AED',
+  primaryDark: '#6D28D9',
+  primaryLight: '#A78BFA',
+  primarySoft: '#F5F3FF',
+  primaryMuted: '#EDE9FE',
 
-  // Secondary accent (Teal/Sky - matches web)
-  secondary: '#38bdf8',
-  secondaryDark: '#0ea5e9',
-  secondaryLight: '#7dd3fc',
-  secondarySoft: '#f0f9ff',
+  // Secondary accent — Warm Rose Gold
+  secondary: '#F472B6',
+  secondaryDark: '#EC4899',
+  secondaryLight: '#F9A8D4',
+  secondarySoft: '#FDF2F8',
 
-  // Warm accent (gold/premium)
-  gold: '#FFB347',
-  goldDark: '#E69A30',
-  goldLight: '#FFD194',
-  goldSoft: '#FFF8ED',
+  // Accent — Sky/Teal for trust indicators
+  accent: '#06B6D4',
+  accentDark: '#0891B2',
+  accentLight: '#67E8F9',
+  accentSoft: '#ECFEFF',
 
-  // Success / Match
-  success: '#4ECDC4',
-  successDark: '#3BB5AD',
-  successLight: '#7EDDD7',
+  // Premium Gold — For badges and premium features
+  gold: '#F59E0B',
+  goldDark: '#D97706',
+  goldLight: '#FCD34D',
+  goldSoft: '#FFFBEB',
 
-  // Heart / Love accent
-  love: '#FF4B8C',
-  loveDark: '#E03A78',
-  loveLight: '#FF7DAF',
-  loveSoft: '#FFF0F5',
+  // Success / Match — Emerald
+  success: '#10B981',
+  successDark: '#059669',
+  successLight: '#6EE7B7',
+  successSoft: '#ECFDF5',
 
-  // Neutrals
+  // Heart / Love — Deep Rose
+  love: '#E11D48',
+  loveDark: '#BE123C',
+  loveLight: '#FB7185',
+  loveSoft: '#FFF1F2',
+
+  // Neutrals — Warm gray with slight purple undertone
   white: '#FFFFFF',
-  background: '#FAFBFC',
+  background: '#FAFAFA',
   surface: '#FFFFFF',
   card: '#FFFFFF',
-  border: '#F0F1F3',
-  borderDark: '#E2E4E8',
-  divider: '#F5F5F5',
+  border: '#F3F4F6',
+  borderDark: '#E5E7EB',
+  divider: '#F9FAFB',
 
-  // Text
-  textPrimary: '#1A1D26',
-  textSecondary: '#6B7280',
+  // Text — High contrast, premium look
+  textPrimary: '#111827',
+  textSecondary: '#4B5563',
   textTertiary: '#9CA3AF',
-  textLight: '#B8BCC4',
+  textLight: '#D1D5DB',
   textInverse: '#FFFFFF',
 
   // Status
-  online: '#22C55E',
+  online: '#10B981',
   offline: '#9CA3AF',
   away: '#F59E0B',
   error: '#EF4444',
   warning: '#F59E0B',
-  info: '#3B82F6',
+  info: '#6366F1',
 
-  // Gradients (start, end) — matches web's purple/teal theme
-  gradientPrimary: ['#a855f7', '#38bdf8'],
-  gradientSecondary: ['#38bdf8', '#4ECDC4'],
-  gradientGold: ['#FFB347', '#a855f7'],
-  gradientSunset: ['#FF6B6B', '#FFB347'],
-  gradientPurple: ['#a855f7', '#FF4B8C'],
-  gradientDark: ['#1A1D26', '#2D3142'],
+  // Premium Gradients — Luxurious color transitions
+  gradientPrimary: ['#7C3AED', '#EC4899'] as const,
+  gradientSecondary: ['#EC4899', '#F59E0B'] as const,
+  gradientGold: ['#F59E0B', '#EF4444'] as const,
+  gradientSunset: ['#F472B6', '#7C3AED'] as const,
+  gradientPurple: ['#6D28D9', '#4F46E5'] as const,
+  gradientDark: ['#1F1135', '#0F172A'] as const,
+  gradientCard: ['#FFFFFF', '#F5F3FF'] as const,
+  gradientPremium: ['#FFD700', '#FFA500', '#FF6347'] as const,
 
-  // Dark mode overrides
+  // Dark mode — Deep, luxurious dark
   dark: {
-    background: '#0f0a1e',
-    surface: '#1a0d2e',
-    card: '#251445',
-    border: '#2d1754',
+    background: '#0C0118',
+    surface: '#160525',
+    card: '#1E0A35',
+    border: '#2E1065',
     textPrimary: '#F9FAFB',
-    textSecondary: '#9CA3AF',
+    textSecondary: '#D1D5DB',
   },
 };
 
@@ -93,51 +103,66 @@ export const BorderRadius = {
   lg: 16,
   xl: 20,
   xxl: 24,
+  xxxl: 32,
   full: 999,
 };
 
 export const Typography = {
-  largeTitle: { fontSize: 34, fontWeight: '700' as const, lineHeight: 41 },
-  title1: { fontSize: 28, fontWeight: '700' as const, lineHeight: 34 },
-  title2: { fontSize: 22, fontWeight: '600' as const, lineHeight: 28 },
+  largeTitle: { fontSize: 34, fontWeight: '800' as const, lineHeight: 41, letterSpacing: -0.5 },
+  title1: { fontSize: 28, fontWeight: '700' as const, lineHeight: 34, letterSpacing: -0.3 },
+  title2: { fontSize: 22, fontWeight: '700' as const, lineHeight: 28, letterSpacing: -0.2 },
   title3: { fontSize: 20, fontWeight: '600' as const, lineHeight: 25 },
   headline: { fontSize: 17, fontWeight: '600' as const, lineHeight: 22 },
-  body: { fontSize: 17, fontWeight: '400' as const, lineHeight: 22 },
-  bodyBold: { fontSize: 17, fontWeight: '600' as const, lineHeight: 22 },
-  callout: { fontSize: 16, fontWeight: '400' as const, lineHeight: 21 },
-  subhead: { fontSize: 15, fontWeight: '400' as const, lineHeight: 20 },
-  footnote: { fontSize: 13, fontWeight: '400' as const, lineHeight: 18 },
-  caption1: { fontSize: 12, fontWeight: '400' as const, lineHeight: 16 },
-  caption2: { fontSize: 11, fontWeight: '400' as const, lineHeight: 13 },
+  body: { fontSize: 16, fontWeight: '400' as const, lineHeight: 24 },
+  bodyBold: { fontSize: 16, fontWeight: '600' as const, lineHeight: 24 },
+  callout: { fontSize: 15, fontWeight: '400' as const, lineHeight: 21 },
+  subhead: { fontSize: 14, fontWeight: '400' as const, lineHeight: 20 },
+  footnote: { fontSize: 13, fontWeight: '500' as const, lineHeight: 18 },
+  caption1: { fontSize: 12, fontWeight: '500' as const, lineHeight: 16 },
+  caption2: { fontSize: 11, fontWeight: '500' as const, lineHeight: 13 },
 };
 
 export const Shadows = {
   small: {
-    shadowColor: '#000',
+    shadowColor: '#7C3AED',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
     elevation: 2,
   },
   medium: {
-    shadowColor: '#000',
+    shadowColor: '#7C3AED',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
-    shadowRadius: 12,
+    shadowRadius: 16,
     elevation: 4,
   },
   large: {
-    shadowColor: '#000',
+    shadowColor: '#7C3AED',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.12,
     shadowRadius: 24,
     elevation: 8,
   },
   glow: {
-    shadowColor: '#a855f7',
+    shadowColor: '#7C3AED',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  goldGlow: {
+    shadowColor: '#F59E0B',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 6,
+  },
+  softCard: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
+    elevation: 2,
   },
 };

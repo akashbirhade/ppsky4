@@ -25,28 +25,28 @@ const slides = [
     title: 'Find Your\nSoulmate',
     subtitle: 'Discover meaningful connections with AI-powered matchmaking',
     icon: '💕',
-    gradient: ['#a855f7', '#38bdf8'] as const,
+    gradient: ['#7C3AED', '#EC4899'] as const,
   },
   {
     id: '2',
     title: 'Verified\nProfiles',
     subtitle: 'Every profile is verified with Aadhaar, selfie & govt ID for your safety',
     icon: '🛡️',
-    gradient: ['#38bdf8', '#4ECDC4'] as const,
+    gradient: ['#6366F1', '#06B6D4'] as const,
   },
   {
     id: '3',
     title: 'Kundali\nMatching',
     subtitle: '36-point Ashtakoota compatibility analysis for perfect matches',
     icon: '⭐',
-    gradient: ['#FFB347', '#a855f7'] as const,
+    gradient: ['#F59E0B', '#EF4444'] as const,
   },
   {
     id: '4',
     title: 'Video Calls\n& Chat',
     subtitle: 'Connect safely with voice calls, video calls, and secure messaging',
     icon: '📱',
-    gradient: ['#4ECDC4', '#a855f7'] as const,
+    gradient: ['#10B981', '#6366F1'] as const,
   },
 ];
 

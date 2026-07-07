@@ -69,7 +69,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const { data } = await authService.login({ email, password });
     await SecureStore.setItemAsync('accessToken', data.data.accessToken);
     await SecureStore.setItemAsync('refreshToken', data.data.refreshToken);
-    set({ user: data.data.user, isAuthenticated: true });
+    set({ user: data.data.user, isAuthenticated: true, isOnboarded: true });
     socketService.connect();
   },
 
@@ -77,7 +77,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const { data } = await authService.register(registerData);
     await SecureStore.setItemAsync('accessToken', data.data.accessToken);
     await SecureStore.setItemAsync('refreshToken', data.data.refreshToken);
-    set({ user: data.data.user, isAuthenticated: true });
+    set({ user: data.data.user, isAuthenticated: true, isOnboarded: false });
     socketService.connect();
   },
 
@@ -97,7 +97,35 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return;
       }
       const { data } = await profileService.getMyProfile();
-      set({ user: data.data?.user || data.data, isAuthenticated: true, isLoading: false });
+      const profileData = data.data;
+      const userData = profileData.user;
+      // Merge: user object gets profile fields nested inside
+      const user = {
+        ...userData,
+        profile: {
+          id: profileData.id,
+          firstName: profileData.firstName,
+          lastName: profileData.lastName,
+          dateOfBirth: profileData.dateOfBirth,
+          age: profileData.age,
+          height: profileData.height,
+          religion: profileData.religion,
+          caste: profileData.caste,
+          motherTongue: profileData.motherTongue,
+          education: profileData.education,
+          profession: profileData.profession,
+          annualIncome: profileData.annualIncome,
+          city: profileData.city,
+          state: profileData.state,
+          bio: profileData.bio,
+          hobbies: profileData.hobbies,
+          isVerified: profileData.isVerified,
+          profileCompletionPercentage: profileData.profileCompletionPercentage,
+          whatsappNumber: profileData.whatsappNumber,
+          whatsappVisible: profileData.whatsappVisible,
+        },
+      };
+      set({ user, isAuthenticated: true, isLoading: false, isOnboarded: true });
       socketService.connect();
     } catch {
       set({ isLoading: false, isAuthenticated: false });

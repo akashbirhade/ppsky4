@@ -14,9 +14,9 @@ export const Logo = ({ size = 40, showText = true, textSize = 24 }: LogoProps) =
     <View style={styles.container}>
       <Svg width={size} height={size} viewBox="0 0 24 24">
         <Defs>
-          <LinearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <Stop offset="50%" stopColor="#38bdf8" />
-            <Stop offset="50%" stopColor="#a855f7" />
+          <LinearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <Stop offset="0%" stopColor="#7C3AED" />
+            <Stop offset="100%" stopColor="#EC4899" />
           </LinearGradient>
         </Defs>
         <Path

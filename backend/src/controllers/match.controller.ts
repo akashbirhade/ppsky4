@@ -137,6 +137,22 @@ export const getLikesReceived = async (req: Request, res: Response, next: NextFu
   } catch (err) { next(err); }
 };
 
+export const getLikesSent = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { page, limit } = getPagination(req);
+    const result = await matchService.getLikesSent(req.user!.userId, page, limit);
+    res.json({ success: true, data: result });
+  } catch (err) { next(err); }
+};
+
+export const getViewedByMe = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { page, limit } = getPagination(req);
+    const result = await matchService.getViewedByMe(req.user!.userId, page, limit);
+    res.json({ success: true, data: result });
+  } catch (err) { next(err); }
+};
+
 export const getFavorites = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { page, limit } = getPagination(req);

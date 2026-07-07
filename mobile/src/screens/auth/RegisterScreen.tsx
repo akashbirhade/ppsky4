@@ -193,7 +193,7 @@ export const RegisterScreen = () => {
                 placeholder="YYYY-MM-DD"
                 value={formData.dateOfBirth}
                 onChangeText={(v) => updateField('dateOfBirth', v)}
-                keyboardType="numbers-and-punctuation"
+                keyboardType="default"
                 icon="calendar-outline"
                 error={errors.dateOfBirth}
               />

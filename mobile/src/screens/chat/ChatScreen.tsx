@@ -152,6 +152,24 @@ export const ChatScreen = () => {
               <Text style={styles.emptyChatText}>
                 Say hello to {name?.split(' ')[0]}! 👋
               </Text>
+              <Text style={styles.emptyChatSub}>Use a template to start the conversation</Text>
+              <View style={styles.templateList}>
+                {[
+                  `Hi ${name?.split(' ')[0]}, I found your profile interesting and would like to connect.`,
+                  `Hello! We seem to have a lot in common. Would you like to chat?`,
+                  `Hi, I liked your profile. Tell me more about yourself!`,
+                ].map((tmpl, i) => (
+                  <TouchableOpacity
+                    key={i}
+                    style={styles.templateCard}
+                    onPress={() => { setText(tmpl); }}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="chatbubble-outline" size={14} color={Colors.primary} />
+                    <Text style={styles.templateText} numberOfLines={2}>{tmpl}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
           }
         />
@@ -161,9 +179,9 @@ export const ChatScreen = () => {
           <View style={styles.typingIndicator}>
             <Text style={styles.typingText}>typing</Text>
             <View style={styles.typingDots}>
-              <View style={[styles.dot, { animationDelay: '0ms' }]} />
-              <View style={[styles.dot, { animationDelay: '200ms' }]} />
-              <View style={[styles.dot, { animationDelay: '400ms' }]} />
+              <View style={styles.dot} />
+              <View style={styles.dot} />
+              <View style={styles.dot} />
             </View>
           </View>
         )}
@@ -246,8 +264,16 @@ const styles = StyleSheet.create({
   typingText: { ...Typography.caption1, color: Colors.textTertiary },
   typingDots: { flexDirection: 'row', marginLeft: 4, gap: 2 },
   dot: { width: 4, height: 4, borderRadius: 2, backgroundColor: Colors.textTertiary },
-  emptyChat: { alignItems: 'center', paddingTop: Spacing.huge },
+  emptyChat: { alignItems: 'center', paddingTop: Spacing.huge, paddingHorizontal: Spacing.xl },
   emptyChatText: { ...Typography.callout, color: Colors.textSecondary },
+  emptyChatSub: { ...Typography.caption1, color: Colors.textTertiary, marginTop: 4, marginBottom: Spacing.lg },
+  templateList: { width: '100%', gap: Spacing.sm },
+  templateCard: {
+    flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.sm,
+    backgroundColor: Colors.white, borderRadius: BorderRadius.lg,
+    padding: Spacing.md, borderWidth: 1, borderColor: Colors.primarySoft,
+  },
+  templateText: { ...Typography.caption1, color: Colors.textPrimary, flex: 1, lineHeight: 18 },
   inputBar: {
     flexDirection: 'row', alignItems: 'flex-end',
     paddingHorizontal: Spacing.md, paddingVertical: Spacing.md,

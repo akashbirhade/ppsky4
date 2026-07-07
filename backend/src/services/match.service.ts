@@ -400,6 +400,54 @@ export class MatchService {
     return { likes, total, page, pages: Math.ceil(total / limit) };
   }
 
+  async getLikesSent(userId: string, page: number, limit: number) {
+    const [likes, total] = await Promise.all([
+      prisma.like.findMany({
+        where: { fromUserId: userId },
+        include: {
+          toUser: {
+            select: {
+              id: true,
+              gender: true,
+              lastActive: true,
+              profile: { select: { firstName: true, lastName: true, age: true, city: true, profession: true, isVerified: true } },
+              photos: { where: { isMain: true }, select: { url: true }, take: 1 },
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.like.count({ where: { fromUserId: userId } }),
+    ]);
+    return { likes, total, page, pages: Math.ceil(total / limit) };
+  }
+
+  async getViewedByMe(userId: string, page: number, limit: number) {
+    const [views, total] = await Promise.all([
+      prisma.profileView.findMany({
+        where: { viewerId: userId },
+        include: {
+          viewed: {
+            select: {
+              id: true,
+              gender: true,
+              lastActive: true,
+              profile: { select: { firstName: true, lastName: true, age: true, city: true, profession: true, isVerified: true } },
+              photos: { where: { isMain: true }, select: { url: true }, take: 1 },
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.profileView.count({ where: { viewerId: userId } }),
+    ]);
+    return { views, total, page, pages: Math.ceil(total / limit) };
+  }
+
   async getFavorites(userId: string, page: number, limit: number) {
     const [favorites, total] = await Promise.all([
       prisma.favorite.findMany({

@@ -5,14 +5,17 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button, Input } from '@/components/ui';
+import { kundaliService } from '@/services';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '@/constants/theme';
 import { RASHIS, NAKSHATRAS } from '@/constants';
+import * as Haptics from '@/utils/haptics';
 
 const gunaCategories = [
   { name: 'Varna', max: 1, desc: 'Spiritual compatibility' },
@@ -30,15 +33,16 @@ export const KundaliScreen = () => {
   const route = useRoute<any>();
   const { userId } = route.params || {};
   const [showResult, setShowResult] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [myRashi, setMyRashi] = useState('');
   const [myNakshatra, setMyNakshatra] = useState('');
   const [partnerRashi, setPartnerRashi] = useState('');
   const [partnerNakshatra, setPartnerNakshatra] = useState('');
+  const [result, setResult] = useState<any>(null);
 
-  // Simulated result
-  const totalScore = 28;
-  const maxScore = 36;
-  const percentage = Math.round((totalScore / maxScore) * 100);
+  const totalScore = result?.totalScore || 0;
+  const maxScore = result?.maxScore || 36;
+  const percentage = result?.percentage || 0;
 
   const getCompatibilityColor = () => {
     if (percentage >= 75) return Colors.success;
@@ -46,8 +50,28 @@ export const KundaliScreen = () => {
     return Colors.error;
   };
 
-  const handleCalculate = () => {
-    setShowResult(true);
+  const handleCalculate = async () => {
+    if (!myRashi || !myNakshatra || !partnerRashi || !partnerNakshatra) {
+      Alert.alert('Missing Info', 'Please fill in all fields');
+      return;
+    }
+    Haptics.mediumTap();
+    setIsLoading(true);
+    try {
+      const { data } = await kundaliService.calculate({
+        boyRashi: myRashi,
+        boyNakshatra: myNakshatra,
+        girlRashi: partnerRashi,
+        girlNakshatra: partnerNakshatra,
+      });
+      setResult(data.data);
+      setShowResult(true);
+      Haptics.success();
+    } catch {
+      Alert.alert('Error', 'Could not calculate compatibility. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -142,21 +166,22 @@ export const KundaliScreen = () => {
             {/* Guna Breakdown */}
             <View style={styles.gunaSection}>
               <Text style={styles.sectionTitle}>Guna Breakdown</Text>
-              {gunaCategories.map((guna, i) => {
-                const score = Math.min(guna.max, Math.round(Math.random() * guna.max) + 1);
+              {(result?.gunas || gunaCategories).map((guna: any, i: number) => {
+                const score = guna.obtained ?? Math.min(guna.max || guna.maxPoints, Math.round(Math.random() * (guna.max || guna.maxPoints)) + 1);
+                const max = guna.max || guna.maxPoints;
                 return (
                   <View key={i} style={styles.gunaRow}>
                     <View style={styles.gunaInfo}>
                       <Text style={styles.gunaName}>{guna.name}</Text>
-                      <Text style={styles.gunaDesc}>{guna.desc}</Text>
+                      <Text style={styles.gunaDesc}>{guna.desc || guna.description}</Text>
                     </View>
                     <View style={styles.gunaScore}>
                       <View style={styles.gunaBar}>
                         <View
-                          style={[styles.gunaFill, { width: `${(score / guna.max) * 100}%` }]}
+                          style={[styles.gunaFill, { width: `${(score / max) * 100}%` }]}
                         />
                       </View>
-                      <Text style={styles.gunaValue}>{score}/{guna.max}</Text>
+                      <Text style={styles.gunaValue}>{score}/{max}</Text>
                     </View>
                   </View>
                 );

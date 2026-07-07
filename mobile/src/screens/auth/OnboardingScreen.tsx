@@ -3,197 +3,162 @@ import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
-  Image,
   ScrollView,
   TouchableOpacity,
+  Alert,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as ImagePicker from 'expo-image-picker';
 import { Button, Input } from '@/components/ui';
 import { useAuthStore } from '@/store/authStore';
+import { profileService } from '@/services';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
-import { RELIGIONS, EDUCATION_LEVELS } from '@/constants';
 
 const { width } = Dimensions.get('window');
 
-const steps = [
-  { title: 'Basic Info', subtitle: 'Tell us about yourself' },
-  { title: 'Background', subtitle: 'Your cultural & educational background' },
-  { title: 'Lifestyle', subtitle: 'Help us find your perfect match' },
-  { title: 'Photos', subtitle: 'Add your best photos' },
-];
-
 export const OnboardingScreen = () => {
   const { updateProfile, setOnboarded } = useAuthStore();
-  const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [photo, setPhoto] = useState<string | null>(null);
   const [profile, setProfile] = useState({
-    firstName: '',
-    lastName: '',
-    dateOfBirth: '',
-    height: '',
-    bio: '',
     religion: '',
-    caste: '',
-    motherTongue: '',
-    education: '',
-    profession: '',
-    annualIncome: '',
     city: '',
-    state: '',
-    hobbies: '',
+    profession: '',
+    bio: '',
   });
 
   const updateField = (key: string, value: string) => {
     setProfile((p) => ({ ...p, [key]: value }));
   };
 
-  const handleNext = () => {
-    if (step < steps.length - 1) setStep(step + 1);
-    else handleComplete();
+  const pickPhoto = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Required', 'We need photo library access to set your profile picture.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setPhoto(result.assets[0].uri);
+    }
   };
 
   const handleComplete = async () => {
     setLoading(true);
     try {
-      await updateProfile(profile);
+      const profileData: any = {};
+      if (profile.religion) profileData.religion = profile.religion;
+      if (profile.city) profileData.city = profile.city;
+      if (profile.profession) profileData.profession = profile.profession;
+      if (profile.bio) profileData.bio = profile.bio;
+
+      if (Object.keys(profileData).length > 0) {
+        await updateProfile(profileData);
+      }
+
+      if (photo) {
+        try {
+          const formData = new FormData();
+          formData.append('photo', {
+            uri: photo,
+            type: 'image/jpeg',
+            name: 'profile.jpg',
+          } as any);
+          await profileService.uploadPhoto(formData);
+        } catch {}
+      }
+
       setOnboarded(true);
     } catch {
-      setOnboarded(true); // Allow skip
+      setOnboarded(true);
     } finally {
       setLoading(false);
     }
   };
 
-  const progress = ((step + 1) / steps.length) * 100;
-
   return (
     <SafeAreaView style={styles.container}>
-      {/* Progress Bar */}
-      <View style={styles.progressContainer}>
-        <View style={styles.progressBg}>
-          <LinearGradient
-            colors={Colors.gradientPrimary as any}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={[styles.progressFill, { width: `${progress}%` }]}
-          />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.header}>
+          <Text style={styles.emoji}>✨</Text>
+          <Text style={styles.title}>Quick Profile Setup</Text>
+          <Text style={styles.subtitle}>
+            Takes less than 2 minutes. You can always edit later.
+          </Text>
         </View>
-        <Text style={styles.stepText}>{step + 1}/{steps.length}</Text>
-      </View>
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>{steps[step].title}</Text>
-        <Text style={styles.subtitle}>{steps[step].subtitle}</Text>
-      </View>
-
-      <ScrollView style={styles.form} showsVerticalScrollIndicator={false}>
-        {/* Step 0: Basic */}
-        {step === 0 && (
-          <>
-            <Input label="First Name" placeholder="Your first name" value={profile.firstName} onChangeText={(v) => updateField('firstName', v)} icon="person-outline" autoCapitalize="words" />
-            <Input label="Last Name" placeholder="Your last name" value={profile.lastName} onChangeText={(v) => updateField('lastName', v)} icon="person-outline" autoCapitalize="words" />
-            <Input label="Date of Birth" placeholder="DD/MM/YYYY" value={profile.dateOfBirth} onChangeText={(v) => updateField('dateOfBirth', v)} icon="calendar-outline" />
-            <Input label="Height (cm)" placeholder="e.g. 170" value={profile.height} onChangeText={(v) => updateField('height', v)} keyboardType="numeric" icon="resize-outline" />
-            <Input label="About Me" placeholder="Write a short bio..." value={profile.bio} onChangeText={(v) => updateField('bio', v)} multiline maxLength={500} icon="document-text-outline" />
-          </>
-        )}
-
-        {/* Step 1: Background */}
-        {step === 1 && (
-          <>
-            <Input label="Religion" placeholder="Select religion" value={profile.religion} onChangeText={(v) => updateField('religion', v)} icon="globe-outline" />
-            <Input label="Caste" placeholder="Your caste (optional)" value={profile.caste} onChangeText={(v) => updateField('caste', v)} icon="people-outline" />
-            <Input label="Mother Tongue" placeholder="e.g. Hindi, Marathi" value={profile.motherTongue} onChangeText={(v) => updateField('motherTongue', v)} icon="chatbubble-outline" />
-            <Input label="Education" placeholder="Highest qualification" value={profile.education} onChangeText={(v) => updateField('education', v)} icon="school-outline" />
-          </>
-        )}
-
-        {/* Step 2: Lifestyle */}
-        {step === 2 && (
-          <>
-            <Input label="Profession" placeholder="e.g. Software Engineer" value={profile.profession} onChangeText={(v) => updateField('profession', v)} icon="briefcase-outline" />
-            <Input label="Annual Income" placeholder="e.g. 10-15 Lakhs" value={profile.annualIncome} onChangeText={(v) => updateField('annualIncome', v)} icon="cash-outline" />
-            <Input label="City" placeholder="Where do you live?" value={profile.city} onChangeText={(v) => updateField('city', v)} icon="location-outline" />
-            <Input label="State" placeholder="Your state" value={profile.state} onChangeText={(v) => updateField('state', v)} icon="map-outline" />
-            <Input label="Hobbies" placeholder="e.g. Travel, Reading, Music" value={profile.hobbies} onChangeText={(v) => updateField('hobbies', v)} icon="heart-outline" />
-          </>
-        )}
-
-        {/* Step 3: Photos */}
-        {step === 3 && (
-          <View style={styles.photoSection}>
-            <View style={styles.photoGrid}>
-              {[0, 1, 2, 3, 4, 5].map((i) => (
-                <TouchableOpacity key={i} style={styles.photoSlot}>
-                  <Ionicons name="camera-outline" size={24} color={Colors.textTertiary} />
-                  <Text style={styles.photoText}>{i === 0 ? 'Main Photo' : `Photo ${i + 1}`}</Text>
-                </TouchableOpacity>
-              ))}
+        <TouchableOpacity style={styles.photoContainer} onPress={pickPhoto} activeOpacity={0.7}>
+          {photo ? (
+            <View style={styles.photoPreview}>
+              <Ionicons name="checkmark-circle" size={44} color={Colors.primary} />
+              <Text style={styles.photoSelectedText}>Photo Selected ✓</Text>
             </View>
-            <Text style={styles.photoHint}>
-              Upload at least 1 photo. Clear face photos get 3x more responses!
-            </Text>
-          </View>
-        )}
+          ) : (
+            <LinearGradient colors={['#faf5ff', '#f0f9ff']} style={styles.photoUpload}>
+              <View style={styles.cameraCircle}>
+                <Ionicons name="camera" size={28} color={Colors.primary} />
+              </View>
+              <Text style={styles.photoTitle}>Add a Profile Photo</Text>
+              <Text style={styles.photoHint}>Profiles with photos get 10x more matches</Text>
+            </LinearGradient>
+          )}
+        </TouchableOpacity>
 
-        <View style={{ height: 100 }} />
+        <View style={styles.form}>
+          <Input label="Religion" placeholder="e.g. Hindu, Muslim, Christian" value={profile.religion} onChangeText={(v) => updateField('religion', v)} icon="globe-outline" />
+          <Input label="City" placeholder="Where do you live?" value={profile.city} onChangeText={(v) => updateField('city', v)} icon="location-outline" />
+          <Input label="Profession" placeholder="e.g. Software Engineer" value={profile.profession} onChangeText={(v) => updateField('profession', v)} icon="briefcase-outline" />
+          <Input label="About Me (optional)" placeholder="A few words about yourself..." value={profile.bio} onChangeText={(v) => updateField('bio', v)} icon="document-text-outline" multiline maxLength={200} />
+        </View>
       </ScrollView>
 
-      {/* Actions */}
       <View style={styles.actions}>
-        {step > 0 && (
-          <Button title="Back" onPress={() => setStep(step - 1)} variant="outline" size="md" style={{ flex: 0.4 }} />
-        )}
-        <Button
-          title={step === steps.length - 1 ? 'Complete' : 'Continue'}
-          onPress={handleNext}
-          variant="gradient"
-          size="lg"
-          loading={loading}
-          style={{ flex: 1 }}
-        />
+        <Button title="Start Finding Matches" onPress={handleComplete} variant="gradient" size="lg" loading={loading} fullWidth />
+        <TouchableOpacity style={styles.skipBtn} onPress={() => setOnboarded(true)}>
+          <Text style={styles.skipText}>Skip for now →</Text>
+        </TouchableOpacity>
       </View>
-
-      {/* Skip */}
-      <TouchableOpacity style={styles.skipBtn} onPress={() => setOnboarded(true)}>
-        <Text style={styles.skipText}>Skip for now</Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.white },
-  progressContainer: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: Spacing.xxl, paddingTop: Spacing.md, gap: Spacing.md,
+  scrollContent: { paddingHorizontal: Spacing.xxl, paddingBottom: 20 },
+  header: { alignItems: 'center', paddingTop: Spacing.xxxl, paddingBottom: Spacing.xxl },
+  emoji: { fontSize: 48, marginBottom: Spacing.md },
+  title: { ...Typography.title1, color: Colors.textPrimary, textAlign: 'center', marginBottom: Spacing.sm },
+  subtitle: { ...Typography.callout, color: Colors.textSecondary, textAlign: 'center', paddingHorizontal: Spacing.xl },
+  photoContainer: { marginBottom: Spacing.xxl },
+  photoUpload: {
+    alignItems: 'center', paddingVertical: Spacing.xxl, borderRadius: BorderRadius.xl,
+    borderWidth: 2, borderStyle: 'dashed', borderColor: Colors.primaryLight,
   },
-  progressBg: {
-    flex: 1, height: 6, borderRadius: 3, backgroundColor: Colors.background, overflow: 'hidden',
+  cameraCircle: {
+    width: 60, height: 60, borderRadius: 30, backgroundColor: Colors.white,
+    alignItems: 'center', justifyContent: 'center', marginBottom: Spacing.md,
+    shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 3,
   },
-  progressFill: { height: '100%', borderRadius: 3 },
-  stepText: { ...Typography.caption1, color: Colors.textSecondary, fontWeight: '600' },
-  header: { paddingHorizontal: Spacing.xxl, paddingTop: Spacing.xxl, paddingBottom: Spacing.lg },
-  title: { ...Typography.title1, color: Colors.textPrimary, marginBottom: Spacing.xs },
-  subtitle: { ...Typography.callout, color: Colors.textSecondary },
-  form: { flex: 1, paddingHorizontal: Spacing.xxl },
-  photoSection: { alignItems: 'center' },
-  photoGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.md, justifyContent: 'center' },
-  photoSlot: {
-    width: (width - 80) / 3, height: (width - 80) / 3,
-    borderRadius: BorderRadius.lg, borderWidth: 2, borderStyle: 'dashed',
-    borderColor: Colors.border, alignItems: 'center', justifyContent: 'center',
+  photoTitle: { ...Typography.bodyBold, color: Colors.textPrimary, marginBottom: Spacing.xs },
+  photoHint: { ...Typography.caption1, color: Colors.textSecondary },
+  photoPreview: {
+    alignItems: 'center', paddingVertical: Spacing.xxl, borderRadius: BorderRadius.xl, backgroundColor: Colors.primarySoft,
   },
-  photoText: { ...Typography.caption2, color: Colors.textTertiary, marginTop: 4 },
-  photoHint: { ...Typography.footnote, color: Colors.textSecondary, textAlign: 'center', marginTop: Spacing.lg },
-  actions: {
-    flexDirection: 'row', gap: Spacing.md,
-    paddingHorizontal: Spacing.xxl, paddingVertical: Spacing.lg,
-  },
-  skipBtn: { alignItems: 'center', paddingBottom: Spacing.lg },
-  skipText: { ...Typography.subhead, color: Colors.textTertiary },
+  photoSelectedText: { ...Typography.bodyBold, color: Colors.primary, marginTop: Spacing.sm },
+  form: { marginBottom: Spacing.lg },
+  actions: { paddingHorizontal: Spacing.xxl, paddingTop: Spacing.md, paddingBottom: Spacing.xxl },
+  skipBtn: { alignItems: 'center', paddingTop: Spacing.lg },
+  skipText: { ...Typography.subhead, color: Colors.textTertiary, fontWeight: '500' },
 });

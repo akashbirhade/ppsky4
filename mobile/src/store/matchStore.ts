@@ -11,6 +11,9 @@ interface MatchProfile {
   city?: string;
   profession?: string;
   isVerified?: boolean;
+  bio?: string;
+  religion?: string;
+  education?: string;
   user: {
     id: string;
     gender: string;
@@ -23,6 +26,8 @@ interface MatchState {
   recommendedProfiles: MatchProfile[];
   nearbyProfiles: MatchProfile[];
   receivedLikes: MatchProfile[];
+  sentLikes: MatchProfile[];
+  viewedByMe: MatchProfile[];
   favorites: MatchProfile[];
   isLoading: boolean;
   currentFeed: 'new' | 'recommended' | 'nearby' | 'verified' | 'premium';
@@ -32,6 +37,8 @@ interface MatchState {
   loadRecommended: (page?: number) => Promise<void>;
   loadNearby: (lat?: number, lng?: number) => Promise<void>;
   loadReceivedLikes: () => Promise<void>;
+  loadSentLikes: () => Promise<void>;
+  loadViewedByMe: () => Promise<void>;
   loadFavorites: () => Promise<void>;
   likeProfile: (userId: string) => Promise<boolean>;
   superLikeProfile: (userId: string, message?: string) => Promise<void>;
@@ -48,6 +55,8 @@ export const useMatchStore = create<MatchState>((set, get) => ({
   recommendedProfiles: [],
   nearbyProfiles: [],
   receivedLikes: [],
+  sentLikes: [],
+  viewedByMe: [],
   favorites: [],
   isLoading: false,
   currentFeed: 'new',
@@ -56,7 +65,7 @@ export const useMatchStore = create<MatchState>((set, get) => ({
     set({ isLoading: true });
     try {
       const { data } = await matchService.getNewProfiles({ page });
-      set({ newProfiles: data.data || [] });
+      set({ newProfiles: data.data?.profiles || [] });
     } finally {
       set({ isLoading: false });
     }
@@ -66,7 +75,7 @@ export const useMatchStore = create<MatchState>((set, get) => ({
     set({ isLoading: true });
     try {
       const { data } = await matchService.getRecommended({ page });
-      set({ recommendedProfiles: data.data || [] });
+      set({ recommendedProfiles: data.data?.profiles || [] });
     } finally {
       set({ isLoading: false });
     }
@@ -76,20 +85,42 @@ export const useMatchStore = create<MatchState>((set, get) => ({
     set({ isLoading: true });
     try {
       const { data } = await matchService.getNearMe({ lat, lng });
-      set({ nearbyProfiles: data.data || [] });
+      set({ nearbyProfiles: data.data?.profiles || [] });
     } finally {
       set({ isLoading: false });
     }
   },
 
   loadReceivedLikes: async () => {
-    const { data } = await matchService.getReceivedLikes();
-    set({ receivedLikes: data.data || [] });
+    try {
+      const { data } = await matchService.getReceivedLikes();
+      set({ receivedLikes: data.data?.profiles || [] });
+    } catch {
+      // Premium required - fail silently
+    }
+  },
+
+  loadSentLikes: async () => {
+    try {
+      const { data } = await matchService.getSentLikes();
+      set({ sentLikes: data.data?.likes || [] });
+    } catch {
+      // fail silently
+    }
+  },
+
+  loadViewedByMe: async () => {
+    try {
+      const { data } = await matchService.getViewedByMe();
+      set({ viewedByMe: data.data?.views || [] });
+    } catch {
+      // fail silently
+    }
   },
 
   loadFavorites: async () => {
     const { data } = await matchService.getFavorites();
-    set({ favorites: data.data || [] });
+    set({ favorites: data.data?.favorites || [] });
   },
 
   likeProfile: async (userId) => {
