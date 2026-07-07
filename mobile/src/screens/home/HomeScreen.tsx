@@ -54,7 +54,7 @@ export const HomeScreen = () => {
             <Text style={styles.subGreeting}>Find your perfect match today</Text>
           </View>
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.notifBtn} onPress={() => {}}>
+            <TouchableOpacity style={styles.notifBtn} onPress={() => navigation.navigate('Notifications')}>
               <Ionicons name="notifications-outline" size={22} color={Colors.textPrimary} />
               <View style={styles.notifDot} />
             </TouchableOpacity>
