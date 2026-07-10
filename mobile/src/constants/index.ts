@@ -1,13 +1,33 @@
 // ─── API CONFIGURATION ────────────────────────────────────────────────────────
-// Use machine's local network IP so physical devices can connect
-const LOCAL_IP = '10.141.31.42';
+// Auto-detect the dev machine's LAN IP from the Expo host URI so physical
+// devices / simulators always connect to the running Metro host — no need to
+// hardcode an IP that breaks whenever the network changes.
+import Constants from 'expo-constants';
+
+const DEV_PORT = 5001;
+
+// Fallback IP (only used if the host URI cannot be resolved)
+const FALLBACK_IP = '10.201.43.42';
+
+const getDevHost = (): string => {
+  // e.g. hostUri = "10.201.43.42:8081" → we want the IP part
+  const hostUri =
+    Constants.expoConfig?.hostUri ||
+    (Constants as any).expoGoConfig?.debuggerHost ||
+    (Constants as any).manifest2?.extra?.expoGo?.debuggerHost ||
+    '';
+  const host = hostUri.split(':')[0];
+  return host && host !== 'localhost' ? host : FALLBACK_IP;
+};
+
+const DEV_HOST = getDevHost();
 
 export const API_BASE_URL = __DEV__
-  ? `http://${LOCAL_IP}:5001/api/v1`
+  ? `http://${DEV_HOST}:${DEV_PORT}/api/v1`
   : 'https://api.soulmatesync.com/api/v1';
 
 export const SOCKET_URL = __DEV__
-  ? `http://${LOCAL_IP}:5001`
+  ? `http://${DEV_HOST}:${DEV_PORT}`
   : 'https://api.soulmatesync.com';
 
 // ─── APP CONSTANTS ────────────────────────────────────────────────────────────
@@ -56,6 +76,54 @@ export const INCOME_RANGES = [
 export const MAX_PHOTOS = 10;
 export const MAX_BIO_LENGTH = 500;
 export const PROFILES_PER_PAGE = 20;
+
+export const HEIGHT_RANGE = { min: 120, max: 220 }; // cm
+
+export const BODY_TYPES = [
+  'Slim', 'Athletic', 'Average', 'Heavy', 'Plus Size',
+] as const;
+
+export const COMPLEXION = [
+  'Very Fair', 'Fair', 'Wheatish', 'Wheatish Brown', 'Dark',
+] as const;
+
+export const DIET = [
+  'Vegetarian', 'Non-Vegetarian', 'Eggetarian', 'Vegan', 'Jain',
+] as const;
+
+export const SMOKING = [
+  'Never', 'Occasionally', 'Regularly',
+] as const;
+
+export const DRINKING = [
+  'Never', 'Socially', 'Regularly',
+] as const;
+
+export const FAMILY_TYPE = [
+  'Joint Family', 'Nuclear Family',
+] as const;
+
+export const FAMILY_STATUS = [
+  'Middle Class', 'Upper Middle Class', 'Rich', 'Affluent',
+] as const;
+
+export const FAMILY_VALUES = [
+  'Orthodox', 'Traditional', 'Moderate', 'Liberal',
+] as const;
+
+export const MOTHER_TONGUE = [
+  'Hindi', 'Bengali', 'Telugu', 'Marathi', 'Tamil',
+  'Gujarati', 'Kannada', 'Malayalam', 'Odia', 'Punjabi',
+  'Assamese', 'Maithili', 'Urdu', 'English', 'Other',
+] as const;
+
+export const MANGLIK_STATUS = [
+  'Yes', 'No', 'Don\'t Know',
+] as const;
+
+export const HOROSCOPE_MATCH = [
+  'Must', 'Not Necessary', 'Not Required',
+] as const;
 
 // ─── KUNDALI MATCHING ─────────────────────────────────────────────────────────
 

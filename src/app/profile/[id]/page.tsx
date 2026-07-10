@@ -52,6 +52,28 @@ export default function ProfileDetailPage() {
     } catch {}
   }, [profile, authFetch])
 
+  // ─── Profile Navigation (Section 24) ───────────────────────────────────────
+  const navigateProfile = useCallback((direction: 'prev' | 'next') => {
+    if (similarProfiles.length === 0) return
+    const currentIdx = similarProfiles.findIndex((p: any) => p.id === params.id)
+    const targetIdx = direction === 'next'
+      ? (currentIdx + 1) % similarProfiles.length
+      : (currentIdx - 1 + similarProfiles.length) % similarProfiles.length
+    const target = similarProfiles[targetIdx]
+    if (target) router.push(`/profile/${target.id}`)
+  }, [similarProfiles, params.id, router])
+
+  // Keyboard navigation (← →)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      if (e.key === 'ArrowLeft') { e.preventDefault(); navigateProfile('prev') }
+      if (e.key === 'ArrowRight') { e.preventDefault(); navigateProfile('next') }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [navigateProfile])
+
   const fetchProfile = useCallback(async () => {
     try {
       const res = await authFetch('/api/profiles')
@@ -406,6 +428,26 @@ export default function ProfileDetailPage() {
 
   return (
     <div className="min-h-screen bg-mesh pt-4 sm:pt-[104px] pb-32 md:pb-12 px-4">
+      {/* Fixed navigation arrows (Section 24 - desktop) */}
+      {similarProfiles.length > 1 && (
+        <>
+          <button
+            onClick={() => navigateProfile('prev')}
+            className="hidden md:flex fixed left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 items-center justify-center rounded-full bg-purple-900/60 border border-purple-500/30 text-purple-200 hover:bg-purple-800/80 hover:text-white transition-all shadow-lg backdrop-blur-sm"
+            title="Previous Profile (←)"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => navigateProfile('next')}
+            className="hidden md:flex fixed right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 items-center justify-center rounded-full bg-purple-900/60 border border-purple-500/30 text-purple-200 hover:bg-purple-800/80 hover:text-white transition-all shadow-lg backdrop-blur-sm"
+            title="Next Profile (→)"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </>
+      )}
+
       <div className="max-w-5xl mx-auto">
         <button onClick={() => router.back()} className="flex items-center gap-2 text-purple-300/50 hover:text-purple-200 mb-3 sm:mb-6 transition-colors text-sm">
           <ArrowLeft className="h-4 w-4" /> Back

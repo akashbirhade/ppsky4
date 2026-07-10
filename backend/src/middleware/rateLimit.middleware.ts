@@ -24,7 +24,7 @@ export const authRateLimit = rateLimit({
   legacyHeaders: false,
   keyGenerator: (req) => req.ip ?? 'unknown',
   handler: createHandler('Too many authentication attempts. Please wait 15 minutes.'),
-  skip: () => config.env === 'test',
+  skip: () => config.env === 'test' || config.env === 'development',
 });
 
 // OTP rate limiter

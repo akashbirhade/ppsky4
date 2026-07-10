@@ -39,6 +39,14 @@ interface Profile {
   profileCompletionPercentage?: number;
   whatsappNumber?: string;
   whatsappVisible?: boolean;
+  fatherOccupation?: string;
+  motherOccupation?: string;
+  siblings?: number;
+  familyType?: string;
+  familyStatus?: string;
+  familyValues?: string;
+  maritalStatus?: string;
+  compatibilityScore?: number;
 }
 
 interface AuthState {

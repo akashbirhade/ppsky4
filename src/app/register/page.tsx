@@ -31,7 +31,7 @@ export default function RegisterPage() {
 
   // Redirect if already logged in (only on initial load, not after registration)
   useEffect(() => {
-    if (!authLoading && user && !justRegistered) router.replace('/dashboard')
+    if (!authLoading && user && !justRegistered) router.replace('/matches')
   }, [user, authLoading, router, justRegistered])
 
   // Load Google Identity Services

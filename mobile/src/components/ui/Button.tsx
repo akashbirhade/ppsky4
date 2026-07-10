@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -6,9 +6,13 @@ import {
   ActivityIndicator,
   ViewStyle,
   TextStyle,
+  Animated,
+  GestureResponderEvent,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, BorderRadius, Typography, Shadows } from '@/constants/theme';
+import * as Haptics from '@/utils/haptics';
+import { useReducedMotion } from '@/components/anim/useReducedMotion';
 
 interface ButtonProps {
   title: string;
@@ -21,7 +25,17 @@ interface ButtonProps {
   style?: ViewStyle;
   textStyle?: TextStyle;
   fullWidth?: boolean;
+  /** Haptic feedback fired on press-in */
+  haptic?: 'none' | 'light' | 'medium' | 'heavy' | 'selection';
 }
+
+const HAPTIC_MAP = {
+  light: Haptics.lightTap,
+  medium: Haptics.mediumTap,
+  heavy: Haptics.heavyTap,
+  selection: Haptics.selectionChanged,
+  none: () => {},
+};
 
 export const Button: React.FC<ButtonProps> = ({
   title,
@@ -34,7 +48,30 @@ export const Button: React.FC<ButtonProps> = ({
   style,
   textStyle,
   fullWidth = false,
+  haptic = 'light',
 }) => {
+  const scale = useRef(new Animated.Value(1)).current;
+  const reducedMotion = useReducedMotion();
+
+  const handlePressIn = () => {
+    if (disabled || loading) return;
+    HAPTIC_MAP[haptic]?.();
+    if (!reducedMotion) {
+      Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, friction: 8, tension: 220 }).start();
+    }
+  };
+
+  const handlePressOut = () => {
+    if (!reducedMotion) {
+      Animated.spring(scale, { toValue: 1, useNativeDriver: true, friction: 5, tension: 180 }).start();
+    }
+  };
+
+  const handlePress = (_e: GestureResponderEvent) => {
+    if (disabled || loading) return;
+    onPress();
+  };
+
   const sizeStyles = {
     sm: { paddingVertical: 8, paddingHorizontal: 16 },
     md: { paddingVertical: 14, paddingHorizontal: 24 },
@@ -49,11 +86,14 @@ export const Button: React.FC<ButtonProps> = ({
 
   if (variant === 'gradient') {
     return (
+      <Animated.View style={[fullWidth && { width: '100%' }, { transform: [{ scale }] }, style]}>
       <TouchableOpacity
-        onPress={onPress}
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
         disabled={disabled || loading}
-        activeOpacity={0.8}
-        style={[fullWidth && { width: '100%' }, style]}
+        activeOpacity={0.9}
+        style={fullWidth ? { width: '100%' } : undefined}
       >
         <LinearGradient
           colors={Colors.gradientPrimary as any}
@@ -79,6 +119,7 @@ export const Button: React.FC<ButtonProps> = ({
           )}
         </LinearGradient>
       </TouchableOpacity>
+      </Animated.View>
     );
   }
 
@@ -97,10 +138,13 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   return (
+    <Animated.View style={[fullWidth && { width: '100%' }, { transform: [{ scale }] }]}>
     <TouchableOpacity
-      onPress={onPress}
+      onPress={handlePress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       disabled={disabled || loading}
-      activeOpacity={0.7}
+      activeOpacity={0.85}
       style={[
         styles.base,
         sizeStyles[size],
@@ -121,6 +165,7 @@ export const Button: React.FC<ButtonProps> = ({
         </>
       )}
     </TouchableOpacity>
+    </Animated.View>
   );
 };
 

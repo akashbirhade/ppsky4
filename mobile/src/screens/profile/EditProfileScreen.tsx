@@ -40,6 +40,12 @@ export const EditProfileScreen = () => {
     state: profile?.state || '',
     height: profile?.height?.toString() || '',
     hobbies: profile?.hobbies?.join(', ') || '',
+    fatherOccupation: profile?.fatherOccupation || '',
+    motherOccupation: profile?.motherOccupation || '',
+    siblings: profile?.siblings?.toString() || '',
+    familyType: profile?.familyType || '',
+    familyStatus: profile?.familyStatus || '',
+    familyValues: profile?.familyValues || '',
   });
 
   const updateField = (key: string, value: string) => {
@@ -157,6 +163,15 @@ export const EditProfileScreen = () => {
         <Input label="Annual Income" value={form.annualIncome} onChangeText={(v) => updateField('annualIncome', v)} icon="cash-outline" placeholder="e.g. 10-15 Lakhs" />
         <Input label="City" value={form.city} onChangeText={(v) => updateField('city', v)} icon="location-outline" />
         <Input label="State" value={form.state} onChangeText={(v) => updateField('state', v)} icon="map-outline" />
+
+        {/* Family Details */}
+        <Text style={styles.sectionTitle}>Family Details</Text>
+        <Input label="Father's Occupation" value={form.fatherOccupation} onChangeText={(v) => updateField('fatherOccupation', v)} icon="man-outline" placeholder="e.g. Business, Retired" />
+        <Input label="Mother's Occupation" value={form.motherOccupation} onChangeText={(v) => updateField('motherOccupation', v)} icon="woman-outline" placeholder="e.g. Homemaker, Teacher" />
+        <Input label="No. of Siblings" value={form.siblings} onChangeText={(v) => updateField('siblings', v)} icon="people-outline" placeholder="e.g. 2" keyboardType="numeric" />
+        <Input label="Family Type" value={form.familyType} onChangeText={(v) => updateField('familyType', v)} icon="home-outline" placeholder="Joint / Nuclear" />
+        <Input label="Family Status" value={form.familyStatus} onChangeText={(v) => updateField('familyStatus', v)} icon="trending-up-outline" placeholder="Middle Class / Upper Middle / Rich" />
+        <Input label="Family Values" value={form.familyValues} onChangeText={(v) => updateField('familyValues', v)} icon="shield-checkmark-outline" placeholder="Traditional / Moderate / Liberal" />
 
         {/* Interests */}
         <Text style={styles.sectionTitle}>Interests</Text>

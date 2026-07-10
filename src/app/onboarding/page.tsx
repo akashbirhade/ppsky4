@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Camera, MapPin, GraduationCap, Briefcase, Users, Star, ArrowRight, ArrowLeft, CheckCircle, Sparkles, Moon, User } from 'lucide-react'
 import HalfHeart from '@/components/HalfHeart'
 import LocationSelector from '@/components/LocationSelector'
+import { getCastesForReligion, getSubCastesForCaste } from '@/lib/caste-data'
 
 const STEPS = [
   { title: 'Profile Photo', icon: Camera, subtitle: 'First impressions matter' },
@@ -43,6 +44,7 @@ function OnboardingContent() {
     about: '',
     religion: '',
     caste: '',
+    subCaste: '',
     motherTongue: '',
     height: '',
     // Step 3: Education & Career
@@ -132,6 +134,7 @@ function OnboardingContent() {
           about: formData.about,
           religion: formData.religion,
           caste: formData.caste,
+          subCaste: formData.subCaste,
           motherTongue: formData.motherTongue,
           height: formData.height,
           education: formData.education,
@@ -312,7 +315,7 @@ function OnboardingContent() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Religion *</label>
-                  <select name="religion" value={formData.religion} onChange={handleChange} className="input-field w-full">
+                  <select name="religion" value={formData.religion} onChange={e => { setFormData(prev => ({ ...prev, religion: e.target.value, caste: '', subCaste: '' })) }} className="input-field w-full">
                     <option value="">Select</option>
                     <option value="Hindu">Hindu</option>
                     <option value="Muslim">Muslim</option>
@@ -325,8 +328,23 @@ function OnboardingContent() {
                 </div>
                 <div>
                   <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Caste</label>
-                  <input type="text" name="caste" value={formData.caste} onChange={handleChange}
-                    placeholder="Enter caste" className="input-field w-full" />
+                  <select name="caste" value={formData.caste} onChange={e => { setFormData(prev => ({ ...prev, caste: e.target.value, subCaste: '' })) }} className="input-field w-full">
+                    <option value="">Select Caste</option>
+                    {getCastesForReligion(formData.religion).map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-slate-700 dark:text-purple-200 mb-2 block">Sub-Caste</label>
+                  <select name="subCaste" value={formData.subCaste} onChange={handleChange} className="input-field w-full">
+                    <option value="">Select Sub-Caste</option>
+                    {getSubCastesForCaste(formData.caste).map(sc => (
+                      <option key={sc} value={sc}>{sc}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">

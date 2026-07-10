@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { User, Save, Camera, Upload, BadgeCheck, MapPin, GraduationCap, Briefcase, Heart, Globe, BookOpen, Sparkles, TrendingUp, Star, Video, Share2, FileText } from 'lucide-react'
 import BiodataUpload from '@/components/BiodataUpload'
 import LocationSelector from '@/components/LocationSelector'
+import { getCastesForReligion, getSubCastesForCaste } from '@/lib/caste-data'
 
 export default function ProfilePage() {
   const { user, authFetch, updateUserData, loading: authLoading } = useAuth()
@@ -21,7 +22,7 @@ export default function ProfilePage() {
   const [photos, setPhotos] = useState<string[]>([])
   const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number; percent: number } | null>(null)
   const [profile, setProfile] = useState({
-    religion: '', caste: '', motherTongue: '', height: '',
+    religion: '', caste: '', subCaste: '', motherTongue: '', height: '',
     education: '', occupation: '', income: '',
     city: '', state: '', country: 'India', district: '', taluka: '', pincode: '', about: '',
     partnerAgeMin: '22', partnerAgeMax: '35',
@@ -55,6 +56,7 @@ export default function ProfilePage() {
           const loadedProfile = {
             religion: p.religion || '',
             caste: p.caste || '',
+            subCaste: p.subCaste || '',
             motherTongue: p.motherTongue || '',
             height: p.height || '',
             education: p.education || '',
@@ -264,6 +266,23 @@ export default function ProfilePage() {
           <div className="relative flex flex-col sm:flex-row items-center gap-6">
             {/* Avatar */}
             <div className="relative group">
+              {/* Profile completion ring */}
+              <svg className="absolute -inset-2 w-32 h-32 -rotate-90 pointer-events-none" viewBox="0 0 128 128">
+                <circle cx="64" cy="64" r="60" stroke="rgba(147,51,234,0.12)" strokeWidth="4" fill="none" />
+                <circle
+                  cx="64" cy="64" r="60" fill="none" strokeWidth="4" strokeLinecap="round"
+                  stroke="url(#avatarRingGradient)"
+                  strokeDasharray={2 * Math.PI * 60}
+                  strokeDashoffset={2 * Math.PI * 60 * (1 - completionScore / 100)}
+                  className="transition-all duration-700 ease-out"
+                />
+                <defs>
+                  <linearGradient id="avatarRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#7c3aed" />
+                    <stop offset="100%" stopColor="#d946ef" />
+                  </linearGradient>
+                </defs>
+              </svg>
               <div className="w-28 h-28 rounded-full bg-gradient-to-br from-purple-500/30 to-fuchsia-500/30 flex items-center justify-center border-2 border-teal-200/50 dark:border-purple-400/30 shadow-[0_0_30px_rgba(147,51,234,0.2)]">
                 {photos.length > 0 ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -271,6 +290,10 @@ export default function ProfilePage() {
                 ) : (
                   <User className="h-12 w-12 text-slate-400 dark:text-purple-300/60" />
                 )}
+              </div>
+              {/* Completion percentage pill */}
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-md border border-white/25 whitespace-nowrap">
+                {completionScore}%
               </div>
               <label className="absolute bottom-0 right-0 w-9 h-9 bg-purple-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg border-2 border-dark-900 hover:bg-purple-500 transition-colors group-hover:scale-110">
                 <Camera className="h-4 w-4 text-slate-800 dark:text-white" />
@@ -409,7 +432,7 @@ export default function ProfilePage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs text-slate-500 dark:text-purple-200/50 mb-1.5">Religion</label>
-                  <select name="religion" value={profile.religion} onChange={handleChange} className="input-field">
+                  <select name="religion" value={profile.religion} onChange={e => { setProfile(prev => ({ ...prev, religion: e.target.value, caste: '', subCaste: '' })) }} className="input-field">
                     <option value="" className="bg-white dark:bg-dark-900">Select</option>
                     {['Hindu','Muslim','Sikh','Christian','Jain','Buddhist','Other'].map(r => (
                       <option key={r} value={r} className="bg-white dark:bg-dark-900">{r}</option>
@@ -418,7 +441,21 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <label className="block text-xs text-slate-500 dark:text-purple-200/50 mb-1.5">Caste</label>
-                  <input type="text" name="caste" value={profile.caste} onChange={handleChange} className="input-field" placeholder="Enter caste" />
+                  <select name="caste" value={profile.caste} onChange={e => { setProfile(prev => ({ ...prev, caste: e.target.value, subCaste: '' })) }} className="input-field">
+                    <option value="" className="bg-white dark:bg-dark-900">Select Caste</option>
+                    {getCastesForReligion(profile.religion).map(c => (
+                      <option key={c} value={c} className="bg-white dark:bg-dark-900">{c}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-500 dark:text-purple-200/50 mb-1.5">Sub-Caste</label>
+                  <select name="subCaste" value={profile.subCaste} onChange={handleChange} className="input-field">
+                    <option value="" className="bg-white dark:bg-dark-900">Select Sub-Caste</option>
+                    {getSubCastesForCaste(profile.caste).map(sc => (
+                      <option key={sc} value={sc} className="bg-white dark:bg-dark-900">{sc}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-xs text-slate-500 dark:text-purple-200/50 mb-1.5">Mother Tongue</label>

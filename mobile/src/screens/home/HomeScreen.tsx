@@ -108,6 +108,42 @@ export const HomeScreen = () => {
           ))}
         </View>
 
+        {/* Feature Row */}
+        <View style={styles.quickActions}>
+          {[
+            { icon: 'eye', label: 'Activity', color: Colors.info, screen: 'Activity' },
+            { icon: 'rocket', label: 'Boost', color: Colors.secondary, screen: 'ProfileBoost' },
+            { icon: 'options', label: 'Preferences', color: Colors.accent, screen: 'PartnerPreferences' },
+            { icon: 'heart-circle', label: 'Stories', color: Colors.love, screen: 'SuccessStories' },
+            { icon: 'gift', label: 'Vendors', color: Colors.gold, screen: 'WeddingVendors' },
+          ].map((item, i) => (
+            <TouchableOpacity key={i} style={styles.quickActionItem} onPress={() => navigation.navigate(item.screen)}>
+              <View style={[styles.quickActionIcon, { backgroundColor: item.color + '12' }]}>
+                <Ionicons name={item.icon as any} size={22} color={item.color} />
+              </View>
+              <Text style={styles.quickActionLabel}>{item.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Feature Row 3 */}
+        <View style={styles.quickActions}>
+          {[
+            { icon: 'people-circle', label: 'Community', color: Colors.primary, screen: 'Community' },
+            { icon: 'calendar', label: 'Events', color: Colors.gold, screen: 'Events' },
+            { icon: 'home', label: 'Family', color: Colors.secondary, screen: 'Family' },
+            { icon: 'call', label: 'Contacts', color: Colors.success, screen: 'ContactDirectory' },
+            { icon: 'people', label: 'Hosts', color: Colors.accent, screen: 'Hosts' },
+          ].map((item, i) => (
+            <TouchableOpacity key={i} style={styles.quickActionItem} onPress={() => navigation.navigate(item.screen)}>
+              <View style={[styles.quickActionIcon, { backgroundColor: item.color + '12' }]}>
+                <Ionicons name={item.icon as any} size={22} color={item.color} />
+              </View>
+              <Text style={styles.quickActionLabel}>{item.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         {/* Community Hosts Banner */}
         <TouchableOpacity
           style={styles.hostBanner}
@@ -130,7 +166,7 @@ export const HomeScreen = () => {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>New Profiles</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Discover')}>
+            <TouchableOpacity onPress={() => navigation.navigate('Matches')}>
               <Text style={styles.seeAll}>See All</Text>
             </TouchableOpacity>
           </View>
@@ -200,6 +236,50 @@ export const HomeScreen = () => {
               </Text>
             </View>
           </View>
+        </View>
+
+        {/* Today's Picks - Premium Feature */}
+        <View style={[styles.section, { paddingHorizontal: Spacing.xl }]}>
+          <TouchableOpacity
+            style={styles.todayPicksBanner}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('Premium')}
+          >
+            <LinearGradient
+              colors={Colors.gradientGold as any}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+              style={styles.todayPicksGradient}
+            >
+              <View style={styles.todayPicksContent}>
+                <Ionicons name="diamond" size={24} color={Colors.white} />
+                <View style={{ flex: 1, marginLeft: Spacing.md }}>
+                  <Text style={styles.todayPicksTitle}>Today's Premium Picks</Text>
+                  <Text style={styles.todayPicksSub}>
+                    3 hand-picked matches selected just for you daily
+                  </Text>
+                </View>
+                <Ionicons name="arrow-forward-circle" size={28} color={Colors.white} />
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
+        {/* Success Stories CTA */}
+        <View style={[styles.section, { paddingHorizontal: Spacing.xl }]}>
+          <TouchableOpacity
+            style={styles.storiesCta}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('SuccessStories')}
+          >
+            <View style={styles.storiesCtaIcon}>
+              <Ionicons name="heart-circle" size={24} color={Colors.love} />
+            </View>
+            <View style={{ flex: 1, marginLeft: Spacing.md }}>
+              <Text style={styles.storiesCtaTitle}>Success Stories</Text>
+              <Text style={styles.storiesCtaSub}>Read how couples found their soulmate</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={Colors.textTertiary} />
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -297,4 +377,20 @@ const styles = StyleSheet.create({
   },
   tipTitle: { ...Typography.footnote, fontWeight: '600', color: Colors.goldDark },
   tipText: { ...Typography.caption1, color: Colors.textSecondary, marginTop: 2 },
+  todayPicksBanner: { borderRadius: BorderRadius.lg, overflow: 'hidden' },
+  todayPicksGradient: { padding: Spacing.lg, borderRadius: BorderRadius.lg },
+  todayPicksContent: { flexDirection: 'row', alignItems: 'center' },
+  todayPicksTitle: { ...Typography.bodyBold, color: Colors.white },
+  todayPicksSub: { ...Typography.caption1, color: Colors.white, opacity: 0.85, marginTop: 2 },
+  storiesCta: {
+    flexDirection: 'row', alignItems: 'center', padding: Spacing.lg,
+    backgroundColor: Colors.surface, borderRadius: BorderRadius.lg,
+    ...Shadows.small,
+  },
+  storiesCtaIcon: {
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: Colors.loveSoft, alignItems: 'center', justifyContent: 'center',
+  },
+  storiesCtaTitle: { ...Typography.bodyBold, color: Colors.textPrimary },
+  storiesCtaSub: { ...Typography.caption1, color: Colors.textTertiary, marginTop: 2 },
 });

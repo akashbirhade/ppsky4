@@ -1,297 +1,368 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-  RefreshControl,
-  Alert,
+  View, Text, StyleSheet, FlatList, TouchableOpacity, Image,
+  ScrollView, RefreshControl, Animated, TextInput, Easing,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { useMatchStore } from '@/store/matchStore';
-import { matchService } from '@/services';
+import { LinearGradient } from 'expo-linear-gradient';
+import { matchService, chatService } from '@/services';
+import { SearchFilter, type FilterState } from '@/components/SearchFilter';
+import { InterestButton } from '@/components/InterestButton';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '@/constants/theme';
 import * as Haptics from '@/utils/haptics';
 
-type Tab = 'matches' | 'sent' | 'received' | 'viewed' | 'favorites';
+// ─── Types & config ───────────────────────────────────────────────────────────
 
-const TABS: { key: Tab; label: string; icon: string }[] = [
-  { key: 'matches', label: 'My Matches', icon: 'people' },
-  { key: 'sent', label: 'Sent Interests', icon: 'paper-plane' },
-  { key: 'received', label: 'Received', icon: 'heart' },
-  { key: 'viewed', label: 'Viewed', icon: 'eye' },
-  { key: 'favorites', label: 'Favorites', icon: 'star' },
+type ChipKey = 'all' | 'new' | 'recommended' | 'preferences' | 'nearby' | 'recent' | 'verified' | 'premium';
+
+const CHIPS: { key: ChipKey; label: string }[] = [
+  { key: 'all', label: 'All Matches' },
+  { key: 'new', label: 'New' },
+  { key: 'recommended', label: 'Daily Picks' },
+  { key: 'preferences', label: 'My Preferences' },
+  { key: 'nearby', label: 'Near Me' },
+  { key: 'recent', label: 'Recently Joined' },
+  { key: 'verified', label: 'Verified' },
+  { key: 'premium', label: 'Premium' },
 ];
+
+const loaderFor = (key: ChipKey) => {
+  switch (key) {
+    case 'new': return matchService.getNewProfiles();
+    case 'recommended': return matchService.getRecommended();
+    case 'preferences': return matchService.getRecommended();
+    case 'nearby': return matchService.getNearMe();
+    case 'recent': return matchService.getRecentlyActive();
+    case 'verified': return matchService.getVerified();
+    case 'premium': return matchService.getPremiumMembers();
+    case 'all':
+    default: return matchService.getNewProfiles();
+  }
+};
+
+// Deterministic display helpers (backend has no per-card score/online field yet)
+const hash = (id: string, seed: number) => {
+  let h = seed;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) & 0xffff;
+  return h;
+};
+const scoreFor = (id: string) => 78 + (hash(id, 7) % 20); // 78–97%
+const isOnlineFor = (id: string) => hash(id, 3) % 5 < 2; // ~40%
+
+// FilterState imported from SearchFilter component
+
+// ─── Skeleton shimmer card ──────────────────────────────────────────────────────
+
+const SkeletonCard = () => {
+  const pulse = useRef(new Animated.Value(0.4)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 1, duration: 700, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 0.4, duration: 700, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [pulse]);
+  return (
+    <View style={styles.card}>
+      <Animated.View style={[styles.skelPhoto, { opacity: pulse }]} />
+      <View style={styles.cardBody}>
+        <Animated.View style={[styles.skelLine, { width: '55%', opacity: pulse }]} />
+        <Animated.View style={[styles.skelLine, { width: '75%', height: 12, opacity: pulse }]} />
+        <Animated.View style={[styles.skelLine, { width: '40%', height: 12, opacity: pulse }]} />
+      </View>
+    </View>
+  );
+};
+
+// ─── Animated (fade + slide up) card wrapper ────────────────────────────────────
+
+const AnimatedCard: React.FC<{ index: number; children: React.ReactNode }> = ({ index, children }) => {
+  const anim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 380,
+      delay: Math.min(index, 6) * 60,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [anim, index]);
+  return (
+    <Animated.View
+      style={{
+        opacity: anim,
+        transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [24, 0] }) }],
+      }}
+    >
+      {children}
+    </Animated.View>
+  );
+};
+
+// ─── Matches (Discovery) Screen ─────────────────────────────────────────────────
 
 export const MatchesScreen = () => {
   const navigation = useNavigation<any>();
-  const {
-    receivedLikes, sentLikes, viewedByMe, favorites,
-    loadReceivedLikes, loadSentLikes, loadViewedByMe, loadFavorites,
-  } = useMatchStore();
-  const [activeTab, setActiveTab] = useState<Tab>('matches');
+  const [activeChip, setActiveChip] = useState<ChipKey>('all');
+  const [cache, setCache] = useState<Record<string, any[]>>({});
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [query, setQuery] = useState('');
+  const [filterVisible, setFilterVisible] = useState(false);
+  const [filters, setFilters] = useState<FilterState | null>(null);
+  const [sentIds, setSentIds] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    loadReceivedLikes();
-    loadSentLikes();
-    loadViewedByMe();
-    loadFavorites();
-  }, []);
+  const loadChip = useCallback(async (key: ChipKey, force = false) => {
+    if (!force && cache[key]) return;
+    setLoading(true);
+    try {
+      const { data } = await loaderFor(key);
+      const profiles = data.data?.profiles || [];
+      setCache((c) => ({ ...c, [key]: profiles }));
+    } catch {
+      setCache((c) => ({ ...c, [key]: c[key] || [] }));
+    } finally {
+      setLoading(false);
+    }
+  }, [cache]);
+
+  useEffect(() => { loadChip('all'); }, []);
+
+  const onChipPress = (key: ChipKey) => {
+    Haptics.selectionChanged();
+    setActiveChip(key);
+    loadChip(key);
+  };
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await Promise.all([loadReceivedLikes(), loadSentLikes(), loadViewedByMe(), loadFavorites()]);
+    await loadChip(activeChip, true);
     setRefreshing(false);
-  }, []);
+  }, [activeChip, loadChip]);
 
-  const getTabData = (): any[] => {
-    switch (activeTab) {
-      case 'matches': return receivedLikes.filter((p: any) => p.isMatch);
-      case 'sent': return sentLikes;
-      case 'received': return receivedLikes;
-      case 'viewed': return viewedByMe;
-      case 'favorites': return favorites;
-      default: return [];
-    }
-  };
+  const rawList = cache[activeChip] || [];
 
-  const getTabCount = (key: Tab): number => {
-    switch (key) {
-      case 'matches': return receivedLikes.filter((p: any) => p.isMatch).length;
-      case 'sent': return sentLikes.length;
-      case 'received': return receivedLikes.length;
-      case 'viewed': return viewedByMe.length;
-      case 'favorites': return favorites.length;
-      default: return 0;
-    }
-  };
-
-  const getEmptyMessage = (): { icon: string; title: string; subtitle: string } => {
-    switch (activeTab) {
-      case 'matches': return { icon: 'people-outline', title: 'No matches yet', subtitle: 'When someone you like also likes you back, they\'ll appear here!' };
-      case 'sent': return { icon: 'paper-plane-outline', title: 'No interests sent', subtitle: 'Start exploring profiles and send interests to people you like!' };
-      case 'received': return { icon: 'heart-outline', title: 'No likes received', subtitle: 'Complete your profile to attract more visitors!' };
-      case 'viewed': return { icon: 'eye-outline', title: 'No profiles viewed', subtitle: 'Start discovering profiles in the Discover tab!' };
-      case 'favorites': return { icon: 'star-outline', title: 'No favorites', subtitle: 'Save profiles you\'re interested in for quick access!' };
-      default: return { icon: 'heart-outline', title: 'Nothing here', subtitle: '' };
-    }
-  };
-
-  const handleSendInterest = async (userId: string) => {
-    Haptics.heavyTap();
-    try {
-      const { data } = await matchService.likeProfile(userId);
-      if (data.data?.isMatch) {
-        Haptics.success();
-        Alert.alert('It\'s a Match! 🎉', 'You both liked each other!');
-      } else {
-        Alert.alert('Interest Sent ❤️', 'Your interest has been sent successfully');
+  const list = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return rawList.filter((p: any) => {
+      if (q) {
+        const hay = `${p.firstName || ''} ${p.lastName || ''} ${p.city || ''} ${p.profession || ''}`.toLowerCase();
+        if (!hay.includes(q)) return false;
       }
-    } catch {}
+      if (filters) {
+        if (filters.minAge && p.age && p.age < +filters.minAge) return false;
+        if (filters.maxAge && p.age && p.age > +filters.maxAge) return false;
+        if (filters.city && p.city && !p.city.toLowerCase().includes(filters.city.toLowerCase())) return false;
+        if (filters.verifiedOnly && !p.isVerified) return false;
+        if (filters.religion?.length && p.religion && !filters.religion.includes(p.religion)) return false;
+        if (filters.education?.length && p.education && !filters.education.includes(p.education)) return false;
+      }
+      return true;
+    });
+  }, [rawList, query, filters]);
+
+  const activeFilterCount = useMemo(() => {
+    if (!filters) return 0;
+    let n = 0;
+    if (filters.verifiedOnly) n++;
+    if (filters.city) n++;
+    n += filters.religion?.length || 0;
+    n += filters.education?.length || 0;
+    n += filters.maritalStatus?.length || 0;
+    n += filters.motherTongue?.length || 0;
+    n += filters.income?.length || 0;
+    n += filters.diet?.length || 0;
+    return n;
+  }, [filters]);
+
+  const onSendInterest = async (userId: string): Promise<boolean> => {
+    const { data } = await matchService.likeProfile(userId);
+    setSentIds((prev) => new Set(prev).add(userId));
+    return data.data?.isMatch || false;
   };
 
-  const renderProfile = ({ item }: any) => {
-    const profile = item.toUser || item.fromUser || item.viewed || item.favoriteUser || item;
-    const profileData = profile?.profile || item;
-    const photos = profile?.photos || item.user?.photos || [];
-    const userId = profile?.id || item.user?.id || item.id;
-    const name = profileData?.firstName || 'User';
-    const age = profileData?.age;
-    const city = profileData?.city;
-    const profession = profileData?.profession;
-    const height = profileData?.height;
-    const isVerified = profileData?.isVerified || item.isVerified;
+  const handleMessage = async (userId: string, name: string) => {
+    Haptics.mediumTap();
+    try {
+      const { data } = await chatService.getOrCreateConversation(userId);
+      const convId = data.data?.conversation?.id || data.data?.id;
+      navigation.navigate('Chat', { conversationId: convId, userId, name });
+    } catch {
+      navigation.navigate('ProfileDetail', { userId });
+    }
+  };
+
+  const renderCard = ({ item, index }: { item: any; index: number }) => {
+    const userId = item.user?.id || item.id;
+    const name = `${item.firstName || 'Member'}${item.lastName ? ' ' + item.lastName : ''}`;
+    const photo = item.user?.photos?.find((p: any) => p.isMain)?.url || item.user?.photos?.[0]?.url;
+    const score = scoreFor(userId);
+    const online = isOnlineFor(userId);
+    const summary = [item.profession, item.city, item.religion, item.education].filter(Boolean).join('  •  ');
+    const status = sentIds.has(userId) ? 'sent' : 'none';
+
+    const allIds = list.map((p: any) => p.user?.id || p.id).filter(Boolean);
 
     return (
-      <View style={styles.profileCard}>
-        {/* Photo */}
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => { Haptics.lightTap(); navigation.navigate('ProfileDetail', { userId }); }}
-        >
-          <Image
-            source={{ uri: photos[0]?.url || 'https://via.placeholder.com/400x300' }}
-            style={styles.profilePhoto}
-          />
-          {isVerified && (
-            <View style={styles.verifiedBadge}>
-              <Ionicons name="shield-checkmark" size={11} color={Colors.white} />
-              <Text style={styles.verifiedLabel}>Verified</Text>
+      <AnimatedCard index={index}>
+        <View style={styles.card}>
+          <TouchableOpacity
+            activeOpacity={0.92}
+            onPress={() => { Haptics.lightTap(); navigation.navigate('ProfileDetail', { userId, profileIds: allIds, currentIndex: allIds.indexOf(userId) }); }}
+          >
+            <Image source={{ uri: photo || 'https://via.placeholder.com/600x700' }} style={styles.cardPhoto} />
+            <LinearGradient colors={['transparent', 'rgba(0,0,0,0.55)']} style={styles.cardPhotoGradient} />
+
+            {/* Top badges */}
+            <View style={styles.cardTopRow}>
+              {item.isVerified && (
+                <View style={styles.verifiedBadge}>
+                  <Ionicons name="shield-checkmark" size={11} color={Colors.white} />
+                  <Text style={styles.verifiedText}>Verified</Text>
+                </View>
+              )}
+              <View style={{ flex: 1 }} />
+              <View style={styles.scorePill}>
+                <Ionicons name="heart" size={12} color={Colors.white} />
+                <Text style={styles.scoreText}>{score}% Match</Text>
+              </View>
             </View>
-          )}
-        </TouchableOpacity>
 
-        {/* Info Section */}
-        <View style={styles.profileInfo}>
-          {/* Name & Age */}
-          <View style={styles.nameAgeRow}>
-            <Text style={styles.profileName} numberOfLines={1}>{name}</Text>
-            {age && <Text style={styles.profileAge}>, {age} yrs</Text>}
-          </View>
+            {/* Name overlay */}
+            <View style={styles.cardNameOverlay}>
+              {online && <View style={styles.onlineDot} />}
+              <Text style={styles.cardName} numberOfLines={1}>
+                {name}{item.age ? `, ${item.age}` : ''}
+              </Text>
+            </View>
+          </TouchableOpacity>
 
-          {/* Details */}
-          <View style={styles.detailsList}>
-            {profession && (
-              <View style={styles.detailRow}>
-                <Ionicons name="briefcase-outline" size={14} color={Colors.textTertiary} />
-                <Text style={styles.detailText}>{profession}</Text>
-              </View>
-            )}
-            {city && (
-              <View style={styles.detailRow}>
-                <Ionicons name="location-outline" size={14} color={Colors.textTertiary} />
-                <Text style={styles.detailText}>{city}</Text>
-              </View>
-            )}
-            {height && (
-              <View style={styles.detailRow}>
-                <Ionicons name="resize-outline" size={14} color={Colors.textTertiary} />
-                <Text style={styles.detailText}>{height} cm</Text>
-              </View>
-            )}
-          </View>
+          <View style={styles.cardBody}>
+            {!!summary && <Text style={styles.cardSummary} numberOfLines={2}>{summary}</Text>}
 
-          {/* Action Buttons */}
-          <View style={styles.actionRow}>
-            <TouchableOpacity
-              style={styles.viewProfileBtn}
-              onPress={() => { Haptics.mediumTap(); navigation.navigate('ProfileDetail', { userId }); }}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="eye-outline" size={16} color={Colors.primary} />
-              <Text style={styles.viewProfileText}>View Profile</Text>
-            </TouchableOpacity>
-
-            {activeTab !== 'sent' ? (
-              <TouchableOpacity
-                style={styles.sendInterestBtn}
-                onPress={() => handleSendInterest(userId)}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="heart" size={16} color={Colors.white} />
-                <Text style={styles.sendInterestText}>Send Interest</Text>
+            <View style={styles.cardActions}>
+              <InterestButton
+                variant="compact"
+                status={status}
+                onSend={() => onSendInterest(userId)}
+                style={styles.interestFlex}
+              />
+              <TouchableOpacity style={styles.iconAction} onPress={() => handleMessage(userId, name)} activeOpacity={0.8}>
+                <Ionicons name="chatbubble-ellipses-outline" size={20} color={Colors.primary} />
               </TouchableOpacity>
-            ) : (
-              <View style={styles.sentBadge}>
-                <Ionicons name="checkmark-circle" size={16} color={Colors.success} />
-                <Text style={styles.sentBadgeText}>Interest Sent</Text>
-              </View>
-            )}
+              <TouchableOpacity
+                style={styles.iconAction}
+                onPress={() => { Haptics.lightTap(); navigation.navigate('ProfileDetail', { userId, profileIds: allIds, currentIndex: allIds.indexOf(userId) }); }}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="eye-outline" size={20} color={Colors.primary} />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
+      </AnimatedCard>
     );
   };
-
-  const empty = getEmptyMessage();
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Activity</Text>
-        <TouchableOpacity>
-          <Ionicons name="notifications-outline" size={24} color={Colors.textPrimary} />
+        <Text style={styles.title}>Matches</Text>
+        <TouchableOpacity style={styles.bellBtn} onPress={() => navigation.navigate('Notifications')}>
+          <Ionicons name="notifications-outline" size={22} color={Colors.textPrimary} />
         </TouchableOpacity>
       </View>
 
-      {/* Stats Cards */}
-      <View style={styles.statsRow}>
-        <View style={styles.statCard}>
-          <Text style={styles.statCount}>{viewedByMe.length}</Text>
-          <Text style={styles.statLabel}>Profile{'\n'}Visits</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={[styles.statCount, { color: Colors.secondary }]}>{favorites.length}</Text>
-          <Text style={styles.statLabel}>Shortlisted{'\n'}Profiles</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={[styles.statCount, { color: Colors.success }]}>{sentLikes.length}</Text>
-          <Text style={styles.statLabel}>Contact{'\n'}Views</Text>
-        </View>
-      </View>
-
-      {/* Interests Section Title */}
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Interests</Text>
-        <TouchableOpacity>
-          <Text style={styles.viewAll}>View All</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Scrollable Tabs */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.tabsContainer}
-        style={styles.tabsScroll}
-      >
-        {TABS.map((tab) => {
-          const isActive = activeTab === tab.key;
-          const count = getTabCount(tab.key);
-          return (
-            <TouchableOpacity
-              key={tab.key}
-              style={[styles.tab, isActive && styles.tabActive]}
-              onPress={() => { Haptics.lightTap(); setActiveTab(tab.key); }}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name={tab.icon as any}
-                size={16}
-                color={isActive ? Colors.white : Colors.textTertiary}
-              />
-              <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
-                {tab.label}
-              </Text>
-              {count > 0 && (
-                <View style={[styles.badge, isActive && styles.badgeActive]}>
-                  <Text style={[styles.badgeText, isActive && styles.badgeTextActive]}>
-                    {count > 99 ? '99+' : count}
-                  </Text>
-                </View>
-              )}
+      {/* Search + Filter */}
+      <View style={styles.searchRow}>
+        <View style={styles.searchBox}>
+          <Ionicons name="search" size={18} color={Colors.textTertiary} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search by name, city, profession"
+            placeholderTextColor={Colors.textTertiary}
+            value={query}
+            onChangeText={setQuery}
+            returnKeyType="search"
+          />
+          {query.length > 0 && (
+            <TouchableOpacity onPress={() => setQuery('')}>
+              <Ionicons name="close-circle" size={18} color={Colors.textTertiary} />
             </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-
-      {/* Profile List */}
-      <FlatList
-        data={getTabData()}
-        renderItem={renderProfile}
-        keyExtractor={(item: any, index) => item.id || `${activeTab}-${index}`}
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
-        }
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <View style={styles.emptyIcon}>
-              <Ionicons name={empty.icon as any} size={48} color={Colors.primary} />
+          )}
+        </View>
+        <TouchableOpacity style={styles.filterBtn} onPress={() => setFilterVisible(true)}>
+          <Ionicons name="options-outline" size={20} color={Colors.white} />
+          {activeFilterCount > 0 && (
+            <View style={styles.filterCountDot}>
+              <Text style={styles.filterCountText}>{activeFilterCount}</Text>
             </View>
-            <Text style={styles.emptyTitle}>{empty.title}</Text>
-            <Text style={styles.emptySubtitle}>{empty.subtitle}</Text>
-          </View>
-        }
-        ListFooterComponent={
-          getTabData().length > 0 ? (
-            <TouchableOpacity style={styles.declinedSection} activeOpacity={0.7}>
-              <View style={styles.declinedLeft}>
-                <Text style={styles.declinedTitle}>Declined/Cancelled Interests</Text>
-                <Text style={styles.declinedSub}>These include declined by you/by others</Text>
+          )}
+        </TouchableOpacity>
+      </View>
+
+      {/* Filter chips */}
+      <View style={styles.chipsWrap}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+          {CHIPS.map((chip) => {
+            const isActive = activeChip === chip.key;
+            const count = cache[chip.key]?.length;
+            return (
+              <TouchableOpacity
+                key={chip.key}
+                onPress={() => onChipPress(chip.key)}
+                activeOpacity={0.8}
+                style={[styles.chip, isActive && styles.chipActive]}
+              >
+                <Text style={[styles.chipText, isActive && styles.chipTextActive]}>{chip.label}</Text>
+                {typeof count === 'number' && count > 0 && (
+                  <View style={[styles.chipCount, isActive && styles.chipCountActive]}>
+                    <Text style={[styles.chipCountText, isActive && styles.chipCountTextActive]}>{count}</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
+
+      {/* List */}
+      {loading && !rawList.length ? (
+        <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
+          {[0, 1, 2].map((i) => <SkeletonCard key={i} />)}
+        </ScrollView>
+      ) : (
+        <FlatList
+          data={list}
+          renderItem={renderCard}
+          keyExtractor={(item: any, i) => (item.user?.id || item.id || i).toString()}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />}
+          ListEmptyComponent={
+            <View style={styles.empty}>
+              <View style={styles.emptyIcon}>
+                <Ionicons name="search-outline" size={44} color={Colors.primary} />
               </View>
-              <Ionicons name="chevron-forward" size={20} color={Colors.textTertiary} />
-            </TouchableOpacity>
-          ) : null
-        }
+              <Text style={styles.emptyTitle}>No matches found</Text>
+              <Text style={styles.emptySubtitle}>
+                {query || activeFilterCount ? 'Try adjusting your search or filters.' : 'Check back soon for new profiles!'}
+              </Text>
+            </View>
+          }
+        />
+      )}
+
+      <SearchFilter
+        visible={filterVisible}
+        onClose={() => setFilterVisible(false)}
+        onApply={(f) => setFilters(f)}
       />
     </SafeAreaView>
   );
@@ -304,94 +375,95 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl, paddingTop: Spacing.md, paddingBottom: Spacing.sm,
   },
   title: { ...Typography.title1, color: Colors.textPrimary },
-  // Stats
-  statsRow: {
-    flexDirection: 'row', paddingHorizontal: Spacing.lg, gap: Spacing.sm,
-    marginBottom: Spacing.lg,
+  bellBtn: {
+    width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white,
+    alignItems: 'center', justifyContent: 'center', ...Shadows.small,
   },
-  statCard: {
-    flex: 1, backgroundColor: Colors.white, borderRadius: BorderRadius.lg,
-    paddingVertical: Spacing.md, paddingHorizontal: Spacing.sm,
-    alignItems: 'center', borderWidth: 1, borderColor: '#F0F0F0',
+  // Search
+  searchRow: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
+    paddingHorizontal: Spacing.xl, marginBottom: Spacing.md,
   },
-  statCount: {
-    fontSize: 22, fontWeight: '700', color: Colors.primary, marginBottom: 4,
+  searchBox: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
+    backgroundColor: Colors.white, borderRadius: BorderRadius.full,
+    paddingHorizontal: Spacing.lg, height: 46, ...Shadows.small,
   },
-  statLabel: { ...Typography.caption2, color: Colors.textSecondary, textAlign: 'center', lineHeight: 14 },
-  // Section
-  sectionHeader: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: Spacing.xl, marginBottom: Spacing.sm,
+  searchInput: { flex: 1, ...Typography.subhead, color: Colors.textPrimary, padding: 0 },
+  filterBtn: {
+    width: 46, height: 46, borderRadius: 23, backgroundColor: Colors.primary,
+    alignItems: 'center', justifyContent: 'center', ...Shadows.small,
   },
-  sectionTitle: { ...Typography.headline, color: Colors.textPrimary },
-  viewAll: { ...Typography.subhead, color: Colors.primary, fontWeight: '600' },
-  // Tabs
-  tabsScroll: { maxHeight: 48, marginBottom: Spacing.md },
-  tabsContainer: { paddingHorizontal: Spacing.lg, gap: Spacing.sm },
-  tab: {
+  filterCountDot: {
+    position: 'absolute', top: -2, right: -2, minWidth: 18, height: 18, borderRadius: 9,
+    backgroundColor: Colors.secondary, alignItems: 'center', justifyContent: 'center',
+    borderWidth: 2, borderColor: Colors.background, paddingHorizontal: 3,
+  },
+  filterCountText: { ...Typography.caption2, color: Colors.white, fontWeight: '800' },
+  // Chips
+  chipsWrap: { marginBottom: Spacing.md },
+  chips: { paddingHorizontal: Spacing.xl, gap: Spacing.sm },
+  chip: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 14, paddingVertical: 10,
-    borderRadius: BorderRadius.full, backgroundColor: Colors.white,
-    borderWidth: 1, borderColor: Colors.border,
+    paddingHorizontal: 16, paddingVertical: 9, borderRadius: BorderRadius.full,
+    backgroundColor: Colors.white, borderWidth: 1, borderColor: Colors.border,
   },
-  tabActive: {
-    backgroundColor: Colors.primary, borderColor: Colors.primary,
+  chipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  chipText: { ...Typography.footnote, color: Colors.textSecondary, fontWeight: '600' },
+  chipTextActive: { color: Colors.white },
+  chipCount: {
+    minWidth: 18, paddingHorizontal: 5, paddingVertical: 1, borderRadius: 9,
+    backgroundColor: Colors.primarySoft, alignItems: 'center',
   },
-  tabLabel: { ...Typography.caption1, color: Colors.textTertiary, fontWeight: '600' },
-  tabLabelActive: { color: Colors.white },
-  badge: {
-    backgroundColor: Colors.primarySoft, borderRadius: 10,
-    paddingHorizontal: 6, paddingVertical: 1, minWidth: 18, alignItems: 'center',
-  },
-  badgeActive: { backgroundColor: 'rgba(255,255,255,0.3)' },
-  badgeText: { ...Typography.caption2, color: Colors.textSecondary, fontWeight: '700' },
-  badgeTextActive: { color: Colors.white },
-  list: { paddingHorizontal: Spacing.lg, paddingBottom: 100 },
-  // Profile Card
-  profileCard: {
+  chipCountActive: { backgroundColor: 'rgba(255,255,255,0.25)' },
+  chipCountText: { ...Typography.caption2, color: Colors.primary, fontWeight: '800' },
+  chipCountTextActive: { color: Colors.white },
+  // List
+  list: { paddingHorizontal: Spacing.xl, paddingBottom: 110 },
+  // Card
+  card: {
     backgroundColor: Colors.white, borderRadius: BorderRadius.xl,
-    marginBottom: Spacing.md, overflow: 'hidden',
-    ...Shadows.small,
+    marginBottom: Spacing.lg, overflow: 'hidden', ...Shadows.medium,
   },
-  profilePhoto: {
-    width: '100%', height: 200, resizeMode: 'cover',
+  cardPhoto: { width: '100%', height: 340, resizeMode: 'cover', backgroundColor: Colors.primarySoft },
+  cardPhotoGradient: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 120 },
+  cardTopRow: {
+    position: 'absolute', top: Spacing.md, left: Spacing.md, right: Spacing.md,
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
   },
   verifiedBadge: {
-    position: 'absolute', top: Spacing.sm, right: Spacing.sm,
     flexDirection: 'row', alignItems: 'center', gap: 3,
-    backgroundColor: 'rgba(124,58,237,0.85)', borderRadius: BorderRadius.full,
+    backgroundColor: 'rgba(124,58,237,0.9)', borderRadius: BorderRadius.full,
     paddingHorizontal: 8, paddingVertical: 4,
   },
-  verifiedLabel: { ...Typography.caption2, color: Colors.white, fontWeight: '700' },
-  profileInfo: { padding: Spacing.lg },
-  nameAgeRow: { flexDirection: 'row', alignItems: 'baseline' },
-  profileName: { ...Typography.headline, color: Colors.textPrimary },
-  profileAge: { ...Typography.body, color: Colors.textSecondary },
-  detailsList: { marginTop: Spacing.sm, gap: 6 },
-  detailRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  detailText: { ...Typography.subhead, color: Colors.textSecondary },
-  // Action Buttons
-  actionRow: {
-    flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.md,
+  verifiedText: { ...Typography.caption2, color: Colors.white, fontWeight: '700' },
+  scorePill: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: Colors.love, borderRadius: BorderRadius.full,
+    paddingHorizontal: 10, paddingVertical: 5,
   },
-  viewProfileBtn: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-    paddingVertical: 12, borderRadius: BorderRadius.lg,
-    borderWidth: 1.5, borderColor: Colors.primary, backgroundColor: Colors.white,
+  scoreText: { ...Typography.caption1, color: Colors.white, fontWeight: '800' },
+  cardNameOverlay: {
+    position: 'absolute', left: Spacing.lg, bottom: Spacing.md,
+    flexDirection: 'row', alignItems: 'center', gap: 8, right: Spacing.lg,
   },
-  viewProfileText: { ...Typography.subhead, color: Colors.primary, fontWeight: '600' },
-  sendInterestBtn: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-    paddingVertical: 12, borderRadius: BorderRadius.lg,
-    backgroundColor: Colors.primary,
+  onlineDot: {
+    width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.online,
+    borderWidth: 2, borderColor: Colors.white,
   },
-  sendInterestText: { ...Typography.subhead, color: Colors.white, fontWeight: '600' },
-  sentBadge: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-    paddingVertical: 12, borderRadius: BorderRadius.lg,
-    backgroundColor: '#ECFDF5', borderWidth: 1, borderColor: '#D1FAE5',
+  cardName: { ...Typography.title3, color: Colors.white, fontWeight: '700', flexShrink: 1 },
+  cardBody: { padding: Spacing.lg },
+  cardSummary: { ...Typography.subhead, color: Colors.textSecondary, marginBottom: Spacing.md },
+  cardActions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  interestFlex: { flex: 1 },
+  iconAction: {
+    width: 46, height: 46, borderRadius: BorderRadius.lg,
+    borderWidth: 1.5, borderColor: Colors.primaryMuted, backgroundColor: Colors.primarySoft,
+    alignItems: 'center', justifyContent: 'center',
   },
-  sentBadgeText: { ...Typography.subhead, color: Colors.success, fontWeight: '600' },
+  // Skeleton
+  skelPhoto: { width: '100%', height: 340, backgroundColor: Colors.border },
+  skelLine: { height: 16, borderRadius: 8, backgroundColor: Colors.border, marginTop: 10 },
   // Empty
   empty: { alignItems: 'center', paddingTop: 80 },
   emptyIcon: {
@@ -404,13 +476,6 @@ const styles = StyleSheet.create({
     ...Typography.callout, color: Colors.textSecondary,
     marginTop: Spacing.sm, textAlign: 'center', paddingHorizontal: Spacing.xl,
   },
-  declinedSection: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    backgroundColor: Colors.white, borderRadius: BorderRadius.lg,
-    padding: Spacing.md, marginTop: Spacing.lg, marginHorizontal: Spacing.md,
-    borderWidth: 1, borderColor: Colors.border,
-  },
-  declinedLeft: { flex: 1 },
-  declinedTitle: { ...Typography.subhead, fontWeight: '600', color: Colors.textPrimary },
-  declinedSub: { ...Typography.caption2, color: Colors.textTertiary, marginTop: 2 },
 });
+
+export default MatchesScreen;

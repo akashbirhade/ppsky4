@@ -53,6 +53,7 @@ function toSupabaseRow(user: any) {
     age: user.age,
     religion: user.religion,
     caste: user.caste,
+    sub_caste: user.subCaste,
     mother_tongue: user.motherTongue,
     height: user.height,
     education: user.education,
@@ -96,6 +97,7 @@ function fromSupabaseRow(row: any): any {
     age: row.age,
     religion: row.religion,
     caste: row.caste,
+    subCaste: row.sub_caste,
     motherTongue: row.mother_tongue,
     height: row.height,
     education: row.education,
@@ -269,6 +271,7 @@ export interface UserProfile {
   age: number
   religion: string
   caste: string
+  subCaste?: string
   motherTongue: string
   height: string
   education: string
@@ -777,6 +780,7 @@ export function createUser(data: Partial<UserProfile>): UserProfile {
     age: data.age || 0,
     religion: data.religion || '',
     caste: data.caste || '',
+    subCaste: data.subCaste || '',
     motherTongue: data.motherTongue || '',
     height: data.height || '',
     education: data.education || '',

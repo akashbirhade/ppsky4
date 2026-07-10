@@ -44,7 +44,7 @@ export default function LoginPage() {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (!authLoading && user) router.replace('/dashboard')
+    if (!authLoading && user) router.replace('/matches')
   }, [user, authLoading, router])
 
   // Load Google Identity Services
@@ -69,7 +69,7 @@ export default function LoginPage() {
           setLoading(true)
           const result = await loginWithGoogle(response.credential)
           if (result.success) {
-            router.push(result.isNewUser ? '/onboarding' : '/dashboard')
+            router.push(result.isNewUser ? '/onboarding' : '/matches')
           } else {
             setError(result.error || 'Google login failed')
           }
@@ -111,7 +111,7 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
     const success = await login(email, password)
-    if (success) router.push('/dashboard')
+    if (success) router.push('/matches')
     else setError('Invalid email or password. Please check your credentials and try again.')
     setLoading(false)
   }
@@ -191,7 +191,7 @@ export default function LoginPage() {
           const data = await res.json()
           if (res.ok && data.token) {
             setSession(data.user, data.token)
-            router.push('/dashboard')
+            router.push('/matches')
           } else {
             setError(data.error || 'Login failed')
           }
@@ -218,7 +218,7 @@ export default function LoginPage() {
       const data = await res.json()
       if (res.ok && data.verified && data.token) {
         setSession(data.user, data.token)
-        router.push(data.isNewUser ? '/onboarding' : '/dashboard')
+        router.push(data.isNewUser ? '/onboarding' : '/matches')
       } else {
         setError(data.error || 'Invalid OTP')
       }

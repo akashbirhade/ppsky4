@@ -11,6 +11,7 @@ interface Conversation {
   lastMessage?: string;
   lastMessageAt?: string;
   lastMessageBy?: string;
+  unreadCount?: number;
   user1UnreadCount: number;
   user2UnreadCount: number;
   isActive: boolean;
@@ -95,29 +96,45 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   addIncomingMessage: (message) => {
     const { activeConversation } = get();
-    if (message.conversationId === activeConversation) {
+    const isActive = message.conversationId === activeConversation;
+    if (isActive) {
       set((state) => ({
         currentMessages: [...state.currentMessages, message],
       }));
     }
-    // Update conversation list
-    set((state) => ({
-      conversations: state.conversations.map((c) =>
-        c.id === message.conversationId
-          ? { ...c, lastMessage: message.content, lastMessageAt: message.createdAt }
-          : c
-      ),
-      unreadCount: state.unreadCount + 1,
-    }));
+    // Update conversation list + unread counters (skip if chat is open)
+    set((state) => {
+      let deltaUnread = 0;
+      const conversations = state.conversations.map((c) => {
+        if (c.id !== message.conversationId) return c;
+        const inc = isActive ? 0 : 1;
+        if (inc) deltaUnread = 1;
+        return {
+          ...c,
+          lastMessage: message.content,
+          lastMessageAt: message.createdAt,
+          lastMessageBy: message.senderId,
+          unreadCount: (c.unreadCount || 0) + inc,
+        };
+      });
+      return { conversations, unreadCount: state.unreadCount + deltaUnread };
+    });
   },
 
   markAsRead: async (conversationId) => {
     await chatService.markAsRead(conversationId);
-    set((state) => ({
-      conversations: state.conversations.map((c) =>
-        c.id === conversationId ? { ...c, user1UnreadCount: 0, user2UnreadCount: 0 } : c
-      ),
-    }));
+    set((state) => {
+      const conv = state.conversations.find((c) => c.id === conversationId);
+      const cleared = conv?.unreadCount || 0;
+      return {
+        conversations: state.conversations.map((c) =>
+          c.id === conversationId
+            ? { ...c, unreadCount: 0, user1UnreadCount: 0, user2UnreadCount: 0 }
+            : c
+        ),
+        unreadCount: Math.max(0, state.unreadCount - cleared),
+      };
+    });
   },
 
   setTyping: (isTyping, userId) => {

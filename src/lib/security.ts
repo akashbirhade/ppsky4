@@ -42,7 +42,7 @@ export function sanitizeProfileData(data: Record<string, any>): Record<string, a
   const sanitized: Record<string, any> = {}
 
   const stringFields = [
-    'religion', 'caste', 'motherTongue', 'height', 'education',
+    'religion', 'caste', 'subCaste', 'motherTongue', 'height', 'education',
     'occupation', 'income', 'city', 'state', 'country', 'about',
     'maritalStatus', 'diet', 'name', 'phone'
   ]

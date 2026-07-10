@@ -12,10 +12,36 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Circle } from 'react-native-svg';
 import { useAuthStore } from '@/store/authStore';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '@/constants/theme';
 
 const { width } = Dimensions.get('window');
+
+// ─── Circular completion ring around the profile avatar ─────────────────────────
+
+const RING_SIZE = 118;
+const RING_RADIUS = 55;
+const RING_CIRC = 2 * Math.PI * RING_RADIUS;
+
+const AvatarRing = ({ percent }: { percent: number }) => {
+  const pct = Math.max(0, Math.min(100, percent));
+  return (
+    <Svg width={RING_SIZE} height={RING_SIZE} style={StyleSheet.absoluteFill}>
+      <Circle
+        cx={RING_SIZE / 2} cy={RING_SIZE / 2} r={RING_RADIUS}
+        stroke={Colors.border} strokeWidth={5} fill="none"
+      />
+      <Circle
+        cx={RING_SIZE / 2} cy={RING_SIZE / 2} r={RING_RADIUS}
+        stroke={Colors.primary} strokeWidth={5} fill="none" strokeLinecap="round"
+        strokeDasharray={RING_CIRC}
+        strokeDashoffset={RING_CIRC * (1 - pct / 100)}
+        transform={`rotate(-90 ${RING_SIZE / 2} ${RING_SIZE / 2})`}
+      />
+    </Svg>
+  );
+};
 
 export const MyProfileScreen = () => {
   const navigation = useNavigation<any>();
@@ -23,12 +49,22 @@ export const MyProfileScreen = () => {
   const profile = user?.profile;
   const mainPhoto = user?.photos?.find((p) => p.isMain)?.url;
   const subscription = user?.subscription;
+  const completion = profile?.profileCompletionPercentage || 0;
 
   const menuItems = [
     { icon: 'person-outline', label: 'Edit Profile', screen: 'EditProfile', color: Colors.primary },
+    { icon: 'options-outline', label: 'Partner Preferences', screen: 'PartnerPreferences', color: Colors.accent },
     { icon: 'diamond-outline', label: 'Premium Plans', screen: 'Premium', color: Colors.gold },
+    { icon: 'rocket-outline', label: 'Boost Profile', screen: 'ProfileBoost', color: Colors.secondary },
     { icon: 'planet-outline', label: 'Kundali Match', screen: 'Kundali', color: Colors.secondary },
-    { icon: 'eye-outline', label: 'Who Viewed Me', screen: 'ProfileViews', color: Colors.info },
+    { icon: 'eye-outline', label: 'Who Viewed Me', screen: 'Activity', color: Colors.info },
+    { icon: 'people-circle-outline', label: 'Community Groups', screen: 'Community', color: Colors.primary },
+    { icon: 'calendar-outline', label: 'Events', screen: 'Events', color: Colors.gold },
+    { icon: 'home-outline', label: 'Family Account', screen: 'Family', color: Colors.secondary },
+    { icon: 'call-outline', label: 'Contact Directory', screen: 'ContactDirectory', color: Colors.success },
+    { icon: 'heart-circle-outline', label: 'Success Stories', screen: 'SuccessStories', color: Colors.love },
+    { icon: 'gift-outline', label: 'Wedding Vendors', screen: 'WeddingVendors', color: Colors.gold },
+    { icon: 'lock-closed-outline', label: 'Privacy Settings', screen: 'PrivacySettings', color: Colors.warning },
     { icon: 'settings-outline', label: 'Settings', screen: 'Settings', color: Colors.textSecondary },
     { icon: 'shield-checkmark-outline', label: 'Verification', screen: 'Verification', color: Colors.success },
     { icon: 'help-circle-outline', label: 'Help & Support', screen: 'Help', color: Colors.warning },
@@ -44,6 +80,7 @@ export const MyProfileScreen = () => {
           </TouchableOpacity>
 
           <View style={styles.avatarContainer}>
+            <AvatarRing percent={completion} />
             {mainPhoto ? (
               <Image source={{ uri: mainPhoto }} style={styles.avatar} />
             ) : (
@@ -54,6 +91,11 @@ export const MyProfileScreen = () => {
             <TouchableOpacity style={styles.editAvatarBtn}>
               <Ionicons name="camera" size={16} color={Colors.white} />
             </TouchableOpacity>
+            <View style={styles.completionPillWrap}>
+              <View style={styles.completionPill}>
+                <Text style={styles.completionPillText}>{completion}%</Text>
+              </View>
+            </View>
           </View>
 
           <Text style={styles.name}>
@@ -148,19 +190,31 @@ const styles = StyleSheet.create({
     width: 40, height: 40, borderRadius: 20,
     backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center',
   },
-  avatarContainer: { position: 'relative', marginBottom: Spacing.lg },
+  avatarContainer: {
+    width: RING_SIZE, height: RING_SIZE,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: Spacing.xl,
+  },
   avatar: {
-    width: 100, height: 100, borderRadius: 50, borderWidth: 3, borderColor: Colors.primary,
+    width: 100, height: 100, borderRadius: 50, borderWidth: 3, borderColor: Colors.white,
   },
   avatarPlaceholder: {
     backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center',
   },
   editAvatarBtn: {
-    position: 'absolute', bottom: 0, right: 0,
+    position: 'absolute', bottom: 6, right: 6,
     width: 32, height: 32, borderRadius: 16,
     backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center',
     borderWidth: 3, borderColor: Colors.white,
   },
+  completionPillWrap: {
+    position: 'absolute', bottom: -6, left: 0, right: 0, alignItems: 'center',
+  },
+  completionPill: {
+    backgroundColor: Colors.primary, borderRadius: BorderRadius.full,
+    paddingHorizontal: 8, paddingVertical: 2, borderWidth: 2, borderColor: Colors.white,
+  },
+  completionPillText: { color: Colors.white, fontWeight: '800', fontSize: 10 },
   name: { ...Typography.title2, color: Colors.textPrimary },
   location: { ...Typography.subhead, color: Colors.textSecondary, marginTop: 4 },
   subscriptionBadge: {

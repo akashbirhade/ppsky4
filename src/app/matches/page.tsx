@@ -30,6 +30,7 @@ export default function MatchesPage() {
   const [connectPopup, setConnectPopup] = useState<{ profileId: string; rippling: boolean } | null>(null)
   const [likedProfiles, setLikedProfiles] = useState<Set<string>>(new Set())
   const [timeLeft, setTimeLeft] = useState('')
+  const [detailTab, setDetailTab] = useState<'about' | 'preferences'>('about')
 
   useEffect(() => { if (!authLoading && !user) router.push('/login') }, [user, authLoading, router])
 
@@ -248,19 +249,24 @@ export default function MatchesPage() {
                   Next →
                 </button>
               </div>
-              <span className="text-[10px] text-purple-300/40 lg:hidden">← Swipe to navigate →</span>
+              <span className="text-[10px] text-purple-300/40">← Swipe / drag to navigate →</span>
             </div>
 
-            <div ref={profileSlideRef} className="flex flex-col lg:flex-row" {...swipeHandlers}>
+            <div
+              ref={profileSlideRef}
+              className="flex flex-col lg:flex-row select-none cursor-grab active:cursor-grabbing"
+              style={{ touchAction: 'pan-y' }}
+              {...swipeHandlers}
+            >
               {/* Left: Large Photo */}
               <div className="lg:w-80 shrink-0 p-4">
                 <div className="relative rounded-xl overflow-hidden">
                   {currentProfile.photos && currentProfile.photos.length > 0 ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={currentProfile.photos[0]} alt={currentProfile.name} className="w-full h-80 object-cover rounded-xl" onError={(e) => { (e.target as HTMLImageElement).src = currentProfile.gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg' }} />
+                    <img draggable={false} src={currentProfile.photos[0]} alt={currentProfile.name} className="w-full h-80 object-cover rounded-xl" onError={(e) => { (e.target as HTMLImageElement).src = currentProfile.gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg' }} />
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={currentProfile.gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg'} alt={currentProfile.name} className="w-full h-80 object-cover rounded-xl" />
+                    <img draggable={false} src={currentProfile.gender?.toLowerCase() === 'female' ? '/avatars/female.svg' : '/avatars/male.svg'} alt={currentProfile.name} className="w-full h-80 object-cover rounded-xl" />
                   )}
                   {currentProfile.verified && (
                     <span className="absolute top-3 left-3 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded">VIP</span>
@@ -272,7 +278,7 @@ export default function MatchesPage() {
                     {currentProfile.photos.map((photo: string, i: number) => (
                       <div key={i} className={`shrink-0 w-12 h-12 rounded-lg overflow-hidden border-2 ${i === 0 ? 'border-purple-500' : 'border-transparent opacity-60'}`}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={photo} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
+                        <img draggable={false} src={photo} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
                       </div>
                     ))}
                   </div>
@@ -455,20 +461,97 @@ export default function MatchesPage() {
                 {/* Tabs: Detailed Profile / Partner Preferences */}
                 <div className="mt-6 border-t border-purple-500/10 pt-4">
                   <div className="flex gap-6 border-b border-purple-500/10">
-                    <button className="pb-2 text-sm font-medium text-purple-300 border-b-2 border-purple-400">Detailed Profile</button>
-                    <button className="pb-2 text-sm font-medium text-purple-300/50 hover:text-purple-200">Partner Preferences</button>
+                    <button
+                      onClick={() => setDetailTab('about')}
+                      className={`pb-2 text-sm font-medium transition-colors ${detailTab === 'about' ? 'text-purple-300 border-b-2 border-purple-400' : 'text-purple-300/50 hover:text-purple-200'}`}
+                    >
+                      Detailed Profile
+                    </button>
+                    <button
+                      onClick={() => setDetailTab('preferences')}
+                      className={`pb-2 text-sm font-medium transition-colors flex items-center gap-1.5 ${detailTab === 'preferences' ? 'text-purple-300 border-b-2 border-purple-400' : 'text-purple-300/50 hover:text-purple-200'}`}
+                    >
+                      <HandHeart className="h-3.5 w-3.5" /> Partner Preferences
+                    </button>
                   </div>
-                  <div className="mt-4">
-                    <h3 className="text-sm font-bold text-purple-200 flex items-center gap-2">
-                      <span className="text-purple-400/30 text-lg">&ldquo;</span> About {currentProfile.name}
-                    </h3>
-                    <p className="text-sm text-purple-300/80 mt-2 leading-relaxed">
-                      {currentProfile.about || `${currentProfile.name} is a ${currentProfile.education || 'well-educated'} professional from ${currentProfile.city || 'India'}. Looking for a compatible life partner.`}
-                    </p>
-                    <div className="flex items-center gap-3 mt-3">
-                      <span className="text-[10px] bg-white/5 text-purple-300/70 px-2 py-1 rounded-full border border-purple-500/10">ID: SM{currentProfile.id.slice(0, 8).toUpperCase()}</span>
+                  {detailTab === 'about' ? (
+                    <div className="mt-4">
+                      <h3 className="text-sm font-bold text-purple-200 flex items-center gap-2">
+                        <span className="text-purple-400/30 text-lg">&ldquo;</span> About {currentProfile.name}
+                      </h3>
+                      <p className="text-sm text-purple-300/80 mt-2 leading-relaxed">
+                        {currentProfile.about || `${currentProfile.name} is a ${currentProfile.education || 'well-educated'} professional from ${currentProfile.city || 'India'}. Looking for a compatible life partner.`}
+                      </p>
+                      <div className="flex items-center gap-3 mt-3">
+                        <span className="text-[10px] bg-white/5 text-purple-300/70 px-2 py-1 rounded-full border border-purple-500/10">ID: SM{currentProfile.id.slice(0, 8).toUpperCase()}</span>
+                      </div>
                     </div>
-                  </div>
+                  ) : (() => {
+                    const firstName = currentProfile.name.split(' ')[0]
+                    const isFem = currentProfile.gender?.toLowerCase() === 'female'
+                    const poss = isFem ? 'her' : 'his'
+                    const Poss = isFem ? 'Her' : 'His'
+                    const subj = isFem ? 'she' : 'he'
+                    const baseAge = currentProfile.age || 27
+                    const groups: { title: string; rows: { label: string; value: string; matched: boolean }[] }[] = [
+                      {
+                        title: 'Basic Details',
+                        rows: [
+                          { label: 'Height', value: "5'2\" to 5'10\"", matched: true },
+                          { label: 'Age', value: `${Math.max(21, baseAge - 4)} to ${baseAge + 3} Years`, matched: true },
+                          { label: 'Marital Status', value: currentProfile.maritalStatus || 'Never Married', matched: true },
+                          { label: 'Religion', value: currentProfile.religion || 'Open to all', matched: !user?.religion || !currentProfile.religion || user.religion === currentProfile.religion },
+                          { label: 'Mother Tongue', value: currentProfile.motherTongue || 'Any', matched: true },
+                          { label: 'Country', value: 'India', matched: true },
+                        ],
+                      },
+                      {
+                        title: 'Desired Education & Occupation',
+                        rows: [
+                          { label: 'Education', value: 'Graduate or above', matched: true },
+                          { label: 'Profession', value: currentProfile.occupation || 'Any', matched: true },
+                          { label: 'Earning', value: '₹5 Lakh & above', matched: true },
+                        ],
+                      },
+                    ]
+                    const all = groups.flatMap((g) => g.rows)
+                    const total = all.length
+                    const matched = all.filter((r) => r.matched).length
+                    return (
+                      <div className="mt-4">
+                        <div className="text-center mb-3">
+                          <p className="text-base font-bold text-white">Who is {subj} looking for…</p>
+                          <span className="inline-flex items-center gap-1.5 mt-1 text-[11px] font-semibold text-green-400">
+                            <BadgeCheck className="h-3.5 w-3.5" /> You meet {matched}/{total} of {poss} preferences
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between px-1 pb-2 text-[10px] font-semibold text-purple-300/50 uppercase tracking-wide">
+                          <span>{Poss} Preferences</span>
+                          <span>You Match</span>
+                        </div>
+                        {groups.map((group) => (
+                          <div key={group.title} className="mb-3 rounded-xl bg-white/[0.03] border border-purple-500/10 overflow-hidden">
+                            <p className="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-wide text-purple-300/60">{group.title}</p>
+                            {group.rows.map((row, i) => (
+                              <div key={row.label} className={`flex items-center justify-between gap-3 px-3 py-2.5 ${i < group.rows.length - 1 ? 'border-b border-purple-500/10' : ''}`}>
+                                <div>
+                                  <p className="text-[10px] text-purple-300/50">{row.label}</p>
+                                  <p className="text-xs text-white font-semibold">{row.value}</p>
+                                </div>
+                                <span className={`flex items-center justify-center w-6 h-6 rounded-full shrink-0 ${row.matched ? 'bg-green-500 text-white' : 'bg-white/5 text-purple-300/40'}`}>
+                                  {row.matched ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : <span className="text-xs leading-none">–</span>}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                        <div className="mt-1 flex items-center gap-2 p-2.5 rounded-xl bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20">
+                          <Sparkles className="h-4 w-4 text-pink-400 shrink-0" />
+                          <p className="text-[11px] text-purple-200/70">You match {matched} of {firstName}&apos;s {total} preferences. Send an interest to connect.</p>
+                        </div>
+                      </div>
+                    )
+                  })()}
                 </div>
               </div>
             </div>

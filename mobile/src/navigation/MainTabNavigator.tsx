@@ -8,7 +8,6 @@ import { useChatStore } from '@/store/chatStore';
 import * as Haptics from '@/utils/haptics';
 
 import { HomeScreen } from '@/screens/home/HomeScreen';
-import { DiscoverScreen } from '@/screens/discover/DiscoverScreen';
 import { MatchesScreen } from '@/screens/matches/MatchesScreen';
 import { MessagesScreen } from '@/screens/messages/MessagesScreen';
 import { MyProfileScreen } from '@/screens/profile/MyProfileScreen';
@@ -20,6 +19,7 @@ export const MainTabNavigator = () => {
 
   return (
     <Tab.Navigator
+      initialRouteName="Matches"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarShowLabel: true,
@@ -54,9 +54,6 @@ export const MainTabNavigator = () => {
             case 'Home':
               iconName = focused ? 'home' : 'home-outline';
               break;
-            case 'Discover':
-              iconName = focused ? 'compass' : 'compass-outline';
-              break;
             case 'Matches':
               iconName = focused ? 'heart' : 'heart-outline';
               break;
@@ -82,7 +79,6 @@ export const MainTabNavigator = () => {
       }}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Discover" component={DiscoverScreen} />
       <Tab.Screen
         name="Matches"
         component={MatchesScreen}
@@ -92,6 +88,7 @@ export const MainTabNavigator = () => {
         name="Messages"
         component={MessagesScreen}
         options={{
+          tabBarLabel: 'Inbox',
           tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
           tabBarBadgeStyle: {
             backgroundColor: Colors.secondary,

@@ -24,6 +24,7 @@ import hostRoutes from '@routes/host.routes';
 import kundaliRoutes from '@routes/kundali.routes';
 import aiRoutes from '@routes/ai.routes';
 import verificationRoutes from '@routes/verification.routes';
+import masterdataRoutes from '@routes/masterdata.routes';
 
 // Notification routes inline
 import { NotificationService } from '@services/notification.service';
@@ -109,6 +110,7 @@ app.use(`${apiPrefix}/hosts`, hostRoutes);
 app.use(`${apiPrefix}/kundali`, kundaliRoutes);
 app.use(`${apiPrefix}/ai`, aiRoutes);
 app.use(`${apiPrefix}/verification`, verificationRoutes);
+app.use(`${apiPrefix}/masterdata`, masterdataRoutes);
 
 // Notification routes
 app.use(`${apiPrefix}/notifications`, authenticate, (async (req, res, next) => {

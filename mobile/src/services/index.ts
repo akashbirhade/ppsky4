@@ -213,3 +213,117 @@ export const hostService = {
   getEvents: (hostId: string) => api.get(`/hosts/${hostId}/events`),
   getMembers: (hostId: string) => api.get(`/hosts/${hostId}/members`),
 };
+
+// ─── SUBSCRIPTION SERVICE ─────────────────────────────────────────────────────
+
+export const subscriptionService = {
+  getPlans: () => api.get('/subscriptions/plans'),
+  getMySubscription: () => api.get('/subscriptions/me'),
+  purchase: (data: { planId: string; duration: string }) =>
+    api.post('/subscriptions/purchase', data),
+  verifyPayment: (data: { orderId: string; paymentId: string; signature: string }) =>
+    api.post('/subscriptions/verify', data),
+  getBoostStatus: () => api.get('/subscriptions/boost'),
+  activateBoost: () => api.post('/subscriptions/boost'),
+};
+
+// ─── SUCCESS STORIES SERVICE ──────────────────────────────────────────────────
+
+export const successStoryService = {
+  getAll: (params?: { page?: number }) => api.get('/success-stories', params),
+  submit: (data: { partnerUserId: string; story: string; weddingDate: string; photo?: string }) =>
+    api.post('/success-stories', data),
+};
+
+// ─── WEDDING VENDORS SERVICE ──────────────────────────────────────────────────
+
+export const vendorService = {
+  getAll: (params?: { category?: string; city?: string; page?: number }) =>
+    api.get('/vendors', params),
+  getById: (vendorId: string) => api.get(`/vendors/${vendorId}`),
+  getCategories: () => api.get('/vendors/categories'),
+  inquiry: (vendorId: string, data: { message: string; eventDate?: string }) =>
+    api.post(`/vendors/${vendorId}/inquiry`, data),
+};
+
+// ─── COMMUNITY SERVICE ────────────────────────────────────────────────────────
+
+export const communityService = {
+  getGroups: (params?: { category?: string; page?: number }) =>
+    api.get('/community/groups', params),
+  getGroupById: (groupId: string) => api.get(`/community/groups/${groupId}`),
+  joinGroup: (groupId: string) => api.post(`/community/groups/${groupId}/join`),
+  leaveGroup: (groupId: string) => api.post(`/community/groups/${groupId}/leave`),
+  getPosts: (groupId: string, params?: { page?: number }) =>
+    api.get(`/community/groups/${groupId}/posts`, params),
+  createPost: (groupId: string, data: { content: string }) =>
+    api.post(`/community/groups/${groupId}/posts`, data),
+};
+
+// ─── FAMILY SERVICE ───────────────────────────────────────────────────────────
+
+export const familyService = {
+  getMembers: () => api.get('/family/members'),
+  addMember: (data: { name: string; relation: string; email?: string; mobile?: string; role: string }) =>
+    api.post('/family/members', data),
+  removeMember: (memberId: string) => api.delete(`/family/members/${memberId}`),
+  updateMemberRole: (memberId: string, role: string) =>
+    api.put(`/family/members/${memberId}`, { role }),
+  getManagedProfiles: () => api.get('/family/profiles'),
+};
+
+// ─── EVENTS SERVICE ───────────────────────────────────────────────────────────
+
+export const eventService = {
+  getAll: (params?: { type?: string; page?: number }) => api.get('/events', params),
+  getById: (eventId: string) => api.get(`/events/${eventId}`),
+  register: (eventId: string) => api.post(`/events/${eventId}/register`),
+  cancelRegistration: (eventId: string) => api.delete(`/events/${eventId}/register`),
+  getMyEvents: () => api.get('/events/my'),
+};
+
+// ─── MASTER DATA SERVICE (Section 27) ─────────────────────────────────────────
+
+export const masterDataService = {
+  // Bulk load all reference data
+  getAll: () => api.get('/masterdata/all'),
+
+  // Location (dependent: country → state → city)
+  getCountries: (params?: { search?: string }) => api.get('/masterdata/countries', params),
+  getStates: (countryId: string, params?: { search?: string }) =>
+    api.get('/masterdata/states', { countryId, ...params }),
+  getCities: (stateId: string, params?: { search?: string }) =>
+    api.get('/masterdata/cities', { stateId, ...params }),
+
+  // Religion & Community (dependent: religion → community → sub-community)
+  getReligions: () => api.get('/masterdata/religions'),
+  getCommunities: (religionId: string) => api.get('/masterdata/communities', { religionId }),
+  getSubCommunities: (communityId: string) => api.get('/masterdata/sub-communities', { communityId }),
+
+  // Languages
+  getLanguages: () => api.get('/masterdata/languages'),
+
+  // Education
+  getQualifications: () => api.get('/masterdata/qualifications'),
+  getEducationFields: () => api.get('/masterdata/education-fields'),
+
+  // Career
+  getProfessions: () => api.get('/masterdata/professions'),
+  getIndustries: () => api.get('/masterdata/industries'),
+  getEmploymentTypes: () => api.get('/masterdata/employment-types'),
+
+  // Lifestyle
+  getDiet: () => api.get('/masterdata/diet'),
+  getSmoking: () => api.get('/masterdata/smoking'),
+  getDrinking: () => api.get('/masterdata/drinking'),
+
+  // Family
+  getFamilyTypes: () => api.get('/masterdata/family-types'),
+  getFamilyStatuses: () => api.get('/masterdata/family-statuses'),
+  getIncomeRanges: () => api.get('/masterdata/income-ranges'),
+
+  // Personal
+  getMaritalStatuses: () => api.get('/masterdata/marital-statuses'),
+  getHeightRange: () => api.get('/masterdata/height-range'),
+  getAgeRange: () => api.get('/masterdata/age-range'),
+};

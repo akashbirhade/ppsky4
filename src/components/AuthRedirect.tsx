@@ -10,7 +10,7 @@ export default function AuthRedirect() {
 
   useEffect(() => {
     if (!loading && user) {
-      router.replace('/dashboard')
+      router.replace('/matches')
     }
   }, [user, loading, router])
 

@@ -3,14 +3,17 @@
 import { useRef, useCallback } from 'react'
 
 interface SwipeHandlers {
-  onTouchStart: (e: React.TouchEvent) => void
-  onTouchMove: (e: React.TouchEvent) => void
-  onTouchEnd: () => void
+  onPointerDown: (e: React.PointerEvent) => void
+  onPointerMove: (e: React.PointerEvent) => void
+  onPointerUp: (e: React.PointerEvent) => void
+  onPointerCancel: (e: React.PointerEvent) => void
 }
 
 /**
- * Detects horizontal swipe gestures on touch devices.
- * Returns touch handlers to attach to a swipeable element.
+ * Detects horizontal swipe/drag gestures using Pointer Events so it works with
+ * BOTH touch (mobile) and mouse (desktop). Returns handlers to spread on the
+ * swipeable element. Pair with `style={{ touchAction: 'pan-y' }}` on that element
+ * so vertical scrolling still works while horizontal drags are captured.
  */
 export function useSwipe(
   onSwipeLeft: () => void,
@@ -22,28 +25,40 @@ export function useSwipe(
   const deltaX = useRef(0)
   const swiping = useRef(false)
 
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    startX.current = e.touches[0].clientX
-    startY.current = e.touches[0].clientY
+  const onPointerDown = useCallback((e: React.PointerEvent) => {
+    // Ignore secondary mouse buttons
+    if (e.pointerType === 'mouse' && e.button !== 0) return
+    startX.current = e.clientX
+    startY.current = e.clientY
     deltaX.current = 0
     swiping.current = true
+    try {
+      ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+    } catch {
+      /* setPointerCapture can throw if the pointer was already released */
+    }
   }, [])
 
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
+  const onPointerMove = useCallback((e: React.PointerEvent) => {
     if (!swiping.current) return
-    const dx = e.touches[0].clientX - startX.current
-    const dy = e.touches[0].clientY - startY.current
-    // If vertical movement is larger, don't treat as swipe
-    if (Math.abs(dy) > Math.abs(dx)) {
+    const dx = e.clientX - startX.current
+    const dy = e.clientY - startY.current
+    // If the gesture is clearly vertical, let the page scroll instead
+    if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 12) {
       swiping.current = false
       return
     }
     deltaX.current = dx
   }, [])
 
-  const onTouchEnd = useCallback(() => {
+  const finish = useCallback((e: React.PointerEvent) => {
     if (!swiping.current) return
     swiping.current = false
+    try {
+      ;(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId)
+    } catch {
+      /* ignore */
+    }
     if (deltaX.current > threshold) {
       onSwipeRight()
     } else if (deltaX.current < -threshold) {
@@ -52,5 +67,15 @@ export function useSwipe(
     deltaX.current = 0
   }, [onSwipeLeft, onSwipeRight, threshold])
 
-  return { onTouchStart, onTouchMove, onTouchEnd }
+  const onPointerCancel = useCallback((e: React.PointerEvent) => {
+    swiping.current = false
+    deltaX.current = 0
+    try {
+      ;(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId)
+    } catch {
+      /* ignore */
+    }
+  }, [])
+
+  return { onPointerDown, onPointerMove, onPointerUp: finish, onPointerCancel }
 }

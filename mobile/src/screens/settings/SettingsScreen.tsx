@@ -23,19 +23,28 @@ export const SettingsScreen = () => {
       title: 'Account',
       items: [
         { icon: 'person-outline', label: 'Edit Profile', action: () => navigation.navigate('EditProfile') },
-        { icon: 'images-outline', label: 'Manage Photos', action: () => {} },
-        { icon: 'heart-outline', label: 'Partner Preferences', action: () => {} },
+        { icon: 'images-outline', label: 'Manage Photos', action: () => navigation.navigate('EditProfile') },
+        { icon: 'heart-outline', label: 'Partner Preferences', action: () => navigation.navigate('PartnerPreferences') },
         { icon: 'shield-checkmark-outline', label: 'Verification', action: () => navigation.navigate('Verification') },
       ],
     },
     {
       title: 'Privacy & Safety',
       items: [
+        { icon: 'lock-closed-outline', label: 'Privacy Settings', action: () => navigation.navigate('PrivacySettings') },
         { icon: 'eye-off-outline', label: 'Profile Visibility', toggle: true },
         { icon: 'hand-left-outline', label: 'Blocked Users', action: () => {} },
         { icon: 'location-outline', label: 'Location Sharing', toggle: true },
         { icon: 'notifications-outline', label: 'Push Notifications', toggle: true },
         { icon: 'chatbubble-outline', label: 'WhatsApp Visibility', toggle: true },
+      ],
+    },
+    {
+      title: 'Premium',
+      items: [
+        { icon: 'diamond-outline', label: 'Subscription Plans', action: () => navigation.navigate('Premium') },
+        { icon: 'rocket-outline', label: 'Boost Profile', action: () => navigation.navigate('ProfileBoost') },
+        { icon: 'call-outline', label: 'Call History', action: () => {} },
       ],
     },
     {
@@ -54,6 +63,7 @@ export const SettingsScreen = () => {
         { icon: 'chatbox-outline', label: 'Contact Support', action: () => {} },
         { icon: 'flag-outline', label: 'Report a Problem', action: () => {} },
         { icon: 'document-text-outline', label: 'Terms & Privacy', action: () => {} },
+        { icon: 'heart-circle-outline', label: 'Success Stories', action: () => navigation.navigate('SuccessStories') },
       ],
     },
   ];

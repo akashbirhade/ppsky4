@@ -12,15 +12,33 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Button, Input } from '@/components/ui';
 import { useAuthStore } from '@/store/authStore';
-import { Colors, Spacing, Typography } from '@/constants/theme';
+import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
+
+// Oldest allowed = 80 years ago, youngest allowed = exactly 18 years ago today.
+const today = new Date();
+const MAX_DOB = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+const MIN_DOB = new Date(today.getFullYear() - 80, today.getMonth(), today.getDate());
+
+const formatDob = (d: Date) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
+const formatDobLabel = (d: Date) =>
+  d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 
 export const RegisterScreen = () => {
   const navigation = useNavigation<any>();
   const { register } = useAuthStore();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [dobDate, setDobDate] = useState<Date | null>(null);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -38,6 +56,14 @@ export const RegisterScreen = () => {
   const updateField = (key: string, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => ({ ...prev, [key]: '' }));
+  };
+
+  const handleDateChange = (event: DateTimePickerEvent, selected?: Date) => {
+    // On Android the picker is a dialog — close it after any interaction.
+    if (Platform.OS === 'android') setShowDatePicker(false);
+    if (event.type === 'dismissed' || !selected) return;
+    setDobDate(selected);
+    updateField('dateOfBirth', formatDob(selected));
   };
 
   const validateStep1 = () => {
@@ -65,9 +91,12 @@ export const RegisterScreen = () => {
     if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required';
     else {
       const dob = new Date(formData.dateOfBirth);
-      const age = Math.floor((Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+      const now = new Date();
+      let age = now.getFullYear() - dob.getFullYear();
+      const m = now.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) age--;
       if (age < 18) newErrors.dateOfBirth = 'You must be at least 18 years old';
-      if (age > 80) newErrors.dateOfBirth = 'Please enter a valid date';
+      else if (age > 80) newErrors.dateOfBirth = 'Please enter a valid date';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -195,15 +224,37 @@ export const RegisterScreen = () => {
                 icon="lock-closed-outline"
                 error={errors.confirmPassword}
               />
-              <Input
-                label="Date of Birth"
-                placeholder="YYYY-MM-DD"
-                value={formData.dateOfBirth}
-                onChangeText={(v) => updateField('dateOfBirth', v)}
-                keyboardType="default"
-                icon="calendar-outline"
-                error={errors.dateOfBirth}
-              />
+
+              {/* Date of Birth — calendar picker (must be 18+) */}
+              <Text style={styles.dobLabel}>Date of Birth</Text>
+              <TouchableOpacity
+                style={[styles.dobField, errors.dateOfBirth && styles.dobFieldError]}
+                onPress={() => setShowDatePicker(true)}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="calendar-outline" size={20} color={Colors.textTertiary} />
+                <Text style={[styles.dobValue, !dobDate && styles.dobPlaceholder]}>
+                  {dobDate ? formatDobLabel(dobDate) : 'Select your date of birth'}
+                </Text>
+                <Ionicons name="chevron-down" size={18} color={Colors.textTertiary} />
+              </TouchableOpacity>
+              {errors.dateOfBirth
+                ? <Text style={styles.errorText}>{errors.dateOfBirth}</Text>
+                : <Text style={styles.dobHint}>You must be at least 18 years old</Text>}
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={dobDate || MAX_DOB}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
+                  maximumDate={MAX_DOB}
+                  minimumDate={MIN_DOB}
+                  onChange={handleDateChange}
+                />
+              )}
+              {Platform.OS === 'ios' && showDatePicker && (
+                <Button title="Done" onPress={() => setShowDatePicker(false)} variant="outline" size="md" fullWidth />
+              )}
 
               {/* Gender Selection */}
               <Text style={styles.genderLabel}>I am a</Text>
@@ -281,9 +332,23 @@ const styles = StyleSheet.create({
   title: { ...Typography.largeTitle, color: Colors.textPrimary, marginBottom: Spacing.sm },
   subtitle: { ...Typography.callout, color: Colors.textSecondary },
   form: { marginBottom: Spacing.xxl },
+  dobLabel: {
+    ...Typography.subhead, fontWeight: '600',
+    color: Colors.textPrimary, marginBottom: Spacing.sm,
+  },
+  dobField: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
+    paddingHorizontal: Spacing.lg, paddingVertical: Spacing.lg,
+    borderRadius: BorderRadius.md, borderWidth: 1.5, borderColor: Colors.borderDark,
+    backgroundColor: Colors.white,
+  },
+  dobFieldError: { borderColor: Colors.error },
+  dobValue: { ...Typography.body, color: Colors.textPrimary, flex: 1 },
+  dobPlaceholder: { color: Colors.textTertiary },
+  dobHint: { ...Typography.caption1, color: Colors.textTertiary, marginTop: Spacing.xs },
   genderLabel: {
     ...Typography.subhead, fontWeight: '600',
-    color: Colors.textPrimary, marginBottom: Spacing.md,
+    color: Colors.textPrimary, marginBottom: Spacing.md, marginTop: Spacing.lg,
   },
   genderRow: { flexDirection: 'row', gap: Spacing.lg },
   genderBtn: {
