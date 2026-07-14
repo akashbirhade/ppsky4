@@ -305,7 +305,6 @@ export default function MatchesPage() {
                       currentProfile.religion && user?.religion && currentProfile.religion === user.religion ? `Same religion (${currentProfile.religion})` : null,
                       currentProfile.city && user?.city && currentProfile.city === user.city ? `Same city (${currentProfile.city})` : null,
                       currentProfile.education ? currentProfile.education : null,
-                      currentProfile.verified ? 'Verified profile' : null,
                       currentProfile.occupation ? currentProfile.occupation : null,
                     ].filter(Boolean).slice(0, 3)
                     return (

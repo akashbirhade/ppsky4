@@ -27,6 +27,11 @@ import { ContactDirectoryScreen } from '@/screens/contacts/ContactDirectoryScree
 import { CommunityScreen } from '@/screens/community/CommunityScreen';
 import { FamilyScreen } from '@/screens/family/FamilyScreen';
 import { EventsScreen } from '@/screens/events/EventsScreen';
+import { EventTicketsScreen } from '@/screens/tickets/EventTicketsScreen';
+import { EventTicketDetailScreen } from '@/screens/tickets/EventTicketDetailScreen';
+import { TicketCheckoutScreen } from '@/screens/tickets/TicketCheckoutScreen';
+import { MyTicketsScreen } from '@/screens/tickets/MyTicketsScreen';
+import { CallHistoryScreen } from '@/screens/call/CallHistoryScreen';
 
 export type RootStackParamList = {
   Auth: undefined;
@@ -55,6 +60,12 @@ export type RootStackParamList = {
   Community: undefined;
   Family: undefined;
   Events: undefined;
+  EventTickets: undefined;
+  EventTicketDetail: { eventId: string };
+  TicketCheckout: { eventId: string; ticketId: string };
+  MyTickets: undefined;
+  CallHistory: undefined;
+  Help: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -118,6 +129,16 @@ export const RootNavigator = () => {
           <Stack.Screen name="Community" component={CommunityScreen} />
           <Stack.Screen name="Family" component={FamilyScreen} />
           <Stack.Screen name="Events" component={EventsScreen} />
+          <Stack.Screen name="EventTickets" component={EventTicketsScreen} />
+          <Stack.Screen name="EventTicketDetail" component={EventTicketDetailScreen} />
+          <Stack.Screen
+            name="TicketCheckout"
+            component={TicketCheckoutScreen}
+            options={{ animation: 'slide_from_bottom' }}
+          />
+          <Stack.Screen name="MyTickets" component={MyTicketsScreen} />
+          <Stack.Screen name="CallHistory" component={CallHistoryScreen} />
+          <Stack.Screen name="Help" component={SettingsScreen} />
         </>
       )}
     </Stack.Navigator>

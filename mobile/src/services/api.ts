@@ -4,6 +4,15 @@ import { API_BASE_URL } from '@/constants';
 
 // ─── API CLIENT ───────────────────────────────────────────────────────────────
 
+// Event listeners for auth state changes
+type AuthExpiredListener = () => void;
+const authExpiredListeners: Set<AuthExpiredListener> = new Set();
+
+export const onAuthExpired = (listener: AuthExpiredListener) => {
+  authExpiredListeners.add(listener);
+  return () => { authExpiredListeners.delete(listener); };
+};
+
 class ApiClient {
   private client: AxiosInstance;
   private refreshPromise: Promise<string> | null = null;
@@ -46,6 +55,8 @@ class ApiClient {
         return this.client(originalRequest);
       } catch {
         await this.clearTokens();
+        // Notify listeners that auth has expired
+        authExpiredListeners.forEach((fn) => fn());
         throw error;
       } finally {
         this.refreshPromise = null;

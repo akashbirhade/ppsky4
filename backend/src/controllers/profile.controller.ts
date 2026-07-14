@@ -1,8 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
 import prisma from '@config/prisma';
 import { AppError } from '@middleware/error.middleware';
 import { config } from '@config/index';
 import { sendProfileUpdateAlert, sendPhotoUploadAlert } from '@services/alert.service';
+import { UploadService } from '@services/upload.service';
+
+const uploadService = new UploadService();
 
 // ─── GET MY PROFILE ──────────────────────────────────────────────────────────
 
@@ -134,14 +140,56 @@ export const uploadPhoto = async (req: Request, res: Response, next: NextFunctio
 
     const isMain = photoCount === 0;
 
+    // Persist the uploaded file. The route uses multer memory storage, so the
+    // binary lives in `file.buffer`. Prefer Cloudinary when it is configured and
+    // working, but always fall back to local disk so uploads never fail silently.
+    let url = '';
+    let publicId: string | undefined;
+    let size: number | undefined = file.size;
+    let width: number | undefined;
+    let height: number | undefined;
+    let stored = false;
+
+    const cloudinaryReady = Boolean(
+      config.cloudinary.cloudName && config.cloudinary.apiKey && config.cloudinary.apiSecret
+    );
+
+    if (cloudinaryReady) {
+      try {
+        const result = await uploadService.uploadProfilePhoto(file.buffer, userId, file.mimetype);
+        url = result.url;
+        publicId = result.publicId;
+        size = result.size;
+        width = result.width;
+        height = result.height;
+        stored = true;
+      } catch {
+        // Invalid/misconfigured Cloudinary credentials — fall back to local disk.
+        stored = false;
+      }
+    }
+
+    if (!stored) {
+      const ext = (file.originalname?.split('.').pop() || 'jpg').toLowerCase();
+      const safeExt = ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext) ? ext : 'jpg';
+      const fileName = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}.${safeExt}`;
+      const absDir = path.join(process.cwd(), 'uploads', 'profiles', userId);
+      fs.mkdirSync(absDir, { recursive: true });
+      fs.writeFileSync(path.join(absDir, fileName), file.buffer);
+      publicId = `profiles/${userId}/${fileName}`;
+      url = `${req.protocol}://${req.get('host')}/uploads/profiles/${userId}/${fileName}`;
+    }
+
     const photo = await prisma.photo.create({
       data: {
         userId,
-        url: file.path || file.url,
-        publicId: file.filename || file.public_id,
+        url,
+        publicId,
         isMain,
         order: photoCount,
-        size: file.size,
+        size,
+        width,
+        height,
       },
     });
 

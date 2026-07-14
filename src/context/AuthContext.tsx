@@ -16,9 +16,11 @@ interface User {
   photos: string[]
   verified: boolean
   religion?: string
+  caste?: string
   education?: string
   occupation?: string
   city?: string
+  state?: string
   about?: string
   height?: string
   partnerPreferences?: Record<string, any>

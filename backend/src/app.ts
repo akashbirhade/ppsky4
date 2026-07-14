@@ -82,6 +82,16 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' });
 });
 
+// ─── STATIC UPLOADS ──────────────────────────────────────────────────────────
+// Serves locally-stored profile photos (used when Cloudinary is not configured).
+app.use(
+  '/uploads',
+  express.static(path.join(process.cwd(), 'uploads'), {
+    maxAge: '7d',
+    fallthrough: true,
+  })
+);
+
 // ─── SWAGGER DOCS ────────────────────────────────────────────────────────────
 try {
   const swaggerDoc = YAML.load(path.join(__dirname, '..', 'swagger.yaml'));

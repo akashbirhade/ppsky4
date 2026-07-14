@@ -162,6 +162,24 @@ export const HomeScreen = () => {
           <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
         </TouchableOpacity>
 
+        {/* Event Passes Banner */}
+        <TouchableOpacity
+          style={styles.ticketBanner}
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate('EventTickets')}
+        >
+          <View style={styles.hostBannerLeft}>
+            <View style={styles.ticketBannerIcon}>
+              <Ionicons name="ticket" size={22} color={Colors.white} />
+            </View>
+            <View>
+              <Text style={styles.hostBannerTitle}>Marriage Event Passes</Text>
+              <Text style={styles.hostBannerSub}>Book tickets for matchmaking events & meetups</Text>
+            </View>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={Colors.gold} />
+        </TouchableOpacity>
+
         {/* New Profiles */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -171,14 +189,16 @@ export const HomeScreen = () => {
             </TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: Spacing.xl }}>
-            {newProfiles.slice(0, 8).map((profile, i) => (
+            {newProfiles.slice(0, 8).map((profile, i) => {
+              const comp = profile.profileCompletionPercentage ?? 0;
+              return (
               <TouchableOpacity
                 key={profile.id || i}
                 style={styles.profileMini}
                 onPress={() => navigation.navigate('ProfileDetail', { userId: profile.user.id })}
               >
                 <Image
-                  source={{ uri: profile.user.photos[0]?.url || 'https://via.placeholder.com/150' }}
+                  source={{ uri: profile.user.photos?.[0]?.url || 'https://via.placeholder.com/150' }}
                   style={styles.profileMiniImage}
                 />
                 <LinearGradient colors={['transparent', 'rgba(0,0,0,0.7)']} style={styles.profileMiniGradient} />
@@ -186,13 +206,20 @@ export const HomeScreen = () => {
                   <Text style={styles.profileMiniName}>{profile.firstName}, {profile.age}</Text>
                   <Text style={styles.profileMiniCity}>{profile.city}</Text>
                 </View>
+                {comp > 0 && (
+                  <View style={styles.miniCompletion}>
+                    <View style={[styles.miniCompletionDot, { backgroundColor: comp >= 80 ? Colors.success : Colors.gold }]} />
+                    <Text style={styles.miniCompletionText}>{comp}%</Text>
+                  </View>
+                )}
                 {profile.isVerified && (
                   <View style={styles.miniVerified}>
                     <Ionicons name="shield-checkmark" size={12} color={Colors.white} />
                   </View>
                 )}
               </TouchableOpacity>
-            ))}
+              );
+            })}
           </ScrollView>
         </View>
 
@@ -200,28 +227,39 @@ export const HomeScreen = () => {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recommended for You</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Matches')}>
               <Text style={styles.seeAll}>See All</Text>
             </TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: Spacing.xl }}>
-            {recommendedProfiles.slice(0, 6).map((profile, i) => (
+            {recommendedProfiles.slice(0, 6).map((profile, i) => {
+              const comp = profile.profileCompletionPercentage ?? 0;
+              return (
               <TouchableOpacity
                 key={profile.id || i}
                 style={styles.recommendCard}
                 onPress={() => navigation.navigate('ProfileDetail', { userId: profile.user.id })}
               >
                 <Image
-                  source={{ uri: profile.user.photos[0]?.url || 'https://via.placeholder.com/200' }}
+                  source={{ uri: profile.user.photos?.[0]?.url || 'https://via.placeholder.com/200' }}
                   style={styles.recommendImage}
                 />
                 <View style={styles.recommendInfo}>
                   <Text style={styles.recommendName}>{profile.firstName} {profile.lastName?.[0]}.</Text>
                   <Text style={styles.recommendDetail}>{profile.profession}</Text>
                   <Text style={styles.recommendDetail}>{profile.city} • {profile.age} yrs</Text>
+                  {comp > 0 && (
+                    <View style={styles.recCompletionRow}>
+                      <View style={styles.recCompletionTrack}>
+                        <View style={[styles.recCompletionFill, { width: `${Math.min(100, comp)}%`, backgroundColor: comp >= 80 ? Colors.success : Colors.gold }]} />
+                      </View>
+                      <Text style={styles.recCompletionText}>{comp}%</Text>
+                    </View>
+                  )}
                 </View>
               </TouchableOpacity>
-            ))}
+              );
+            })}
           </ScrollView>
         </View>
 
@@ -340,6 +378,17 @@ const styles = StyleSheet.create({
   },
   hostBannerTitle: { ...Typography.subhead, fontWeight: '700', color: Colors.textPrimary },
   hostBannerSub: { ...Typography.caption2, color: Colors.textTertiary },
+  ticketBanner: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    marginHorizontal: Spacing.xl, marginBottom: Spacing.lg, padding: Spacing.md,
+    backgroundColor: Colors.goldSoft, borderRadius: BorderRadius.lg,
+    borderWidth: 1, borderColor: Colors.gold + '40',
+    ...Shadows.small,
+  },
+  ticketBannerIcon: {
+    width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.gold,
+    justifyContent: 'center', alignItems: 'center',
+  },
   section: { marginBottom: Spacing.xxl },
   sectionHeader: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
@@ -361,6 +410,14 @@ const styles = StyleSheet.create({
     width: 20, height: 20, borderRadius: 10,
     backgroundColor: Colors.info, alignItems: 'center', justifyContent: 'center',
   },
+  miniCompletion: {
+    position: 'absolute', top: Spacing.sm, left: Spacing.sm,
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    paddingHorizontal: 7, paddingVertical: 3, borderRadius: 10,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+  },
+  miniCompletionDot: { width: 6, height: 6, borderRadius: 3 },
+  miniCompletionText: { ...Typography.caption2, color: Colors.white, fontWeight: '700' },
   recommendCard: {
     width: 180, borderRadius: BorderRadius.xl,
     backgroundColor: Colors.white, marginRight: Spacing.md,
@@ -370,6 +427,10 @@ const styles = StyleSheet.create({
   recommendInfo: { padding: Spacing.md },
   recommendName: { ...Typography.subhead, fontWeight: '600', color: Colors.textPrimary },
   recommendDetail: { ...Typography.caption1, color: Colors.textSecondary, marginTop: 2 },
+  recCompletionRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: Spacing.sm },
+  recCompletionTrack: { flex: 1, height: 5, borderRadius: 3, backgroundColor: Colors.border, overflow: 'hidden' },
+  recCompletionFill: { height: '100%', borderRadius: 3 },
+  recCompletionText: { ...Typography.caption2, color: Colors.textSecondary, fontWeight: '700', minWidth: 28, textAlign: 'right' },
   tipCard: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: Colors.goldSoft, borderRadius: BorderRadius.lg,

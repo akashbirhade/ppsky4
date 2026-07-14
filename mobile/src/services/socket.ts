@@ -9,6 +9,13 @@ class SocketService {
   private listeners: Map<string, Set<(...args: any[]) => void>> = new Map();
 
   async connect() {
+    // Disconnect existing socket to avoid duplicates
+    if (this.socket?.connected) return;
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
+    }
+
     const token = await SecureStore.getItemAsync('accessToken');
     if (!token) return;
 

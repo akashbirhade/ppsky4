@@ -25,10 +25,16 @@ export const VideoCallScreen = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeaker, setIsSpeaker] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(type === 'AUDIO');
+  const callIdRef = React.useRef(callId);
 
   useEffect(() => {
     initiateCall();
-    return () => { /* cleanup WebRTC */ };
+    return () => {
+      // Cleanup: end call on unmount if still active
+      if (callIdRef.current) {
+        callService.endCall(callIdRef.current).catch(() => {});
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -41,7 +47,9 @@ export const VideoCallScreen = () => {
 
   const initiateCall = async () => {
     try {
-      await callService.initiateCall({ receiverId, type });
+      const { data } = await callService.initiateCall({ receiverId, type });
+      // Track the call ID from server response for proper cleanup
+      if (data?.data?.id) callIdRef.current = data.data.id;
       setCallState('ringing');
       // Simulate connection for demo
       setTimeout(() => setCallState('connected'), 3000);
@@ -51,8 +59,10 @@ export const VideoCallScreen = () => {
   };
 
   const handleEndCall = async () => {
-    if (callId) {
-      await callService.endCall(callId).catch(() => {});
+    const activeCallId = callIdRef.current;
+    callIdRef.current = ''; // Prevent double-end on unmount
+    if (activeCallId) {
+      await callService.endCall(activeCallId).catch(() => {});
     }
     navigation.goBack();
   };

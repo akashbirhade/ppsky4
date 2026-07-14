@@ -1,13 +1,40 @@
-import React from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, StyleSheet, Platform, Animated } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/constants/theme';
 import { useChatStore } from '@/store/chatStore';
 import * as Haptics from '@/utils/haptics';
 
+// Animated tab icon: gentle scale-up + fading pill background on focus.
+// (Replaces the old dot indicator for a cleaner, premium active state.)
+const TabIcon: React.FC<{
+  name: keyof typeof Ionicons.glyphMap;
+  color: string;
+  focused: boolean;
+}> = ({ name, color, focused }) => {
+  const anim = useRef(new Animated.Value(focused ? 1 : 0)).current;
+  useEffect(() => {
+    Animated.spring(anim, {
+      toValue: focused ? 1 : 0,
+      useNativeDriver: true,
+      friction: 7,
+      tension: 120,
+    }).start();
+  }, [focused, anim]);
+  const scale = anim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.18] });
+  return (
+    <View style={styles.iconContainer}>
+      <Animated.View style={[styles.activePill, { opacity: anim, transform: [{ scale: anim }] }]} />
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <Ionicons name={name} size={23} color={color} />
+      </Animated.View>
+    </View>
+  );
+};
+
 import { HomeScreen } from '@/screens/home/HomeScreen';
+import { InboxScreen } from '@/screens/inbox/InboxScreen';
 import { MatchesScreen } from '@/screens/matches/MatchesScreen';
 import { MessagesScreen } from '@/screens/messages/MessagesScreen';
 import { MyProfileScreen } from '@/screens/profile/MyProfileScreen';
@@ -54,6 +81,9 @@ export const MainTabNavigator = () => {
             case 'Home':
               iconName = focused ? 'home' : 'home-outline';
               break;
+            case 'Inbox':
+              iconName = focused ? 'mail' : 'mail-outline';
+              break;
             case 'Matches':
               iconName = focused ? 'heart' : 'heart-outline';
               break;
@@ -65,13 +95,7 @@ export const MainTabNavigator = () => {
               break;
           }
 
-          return (
-            <View style={styles.iconContainer}>
-              {focused && <View style={styles.activeGlow} />}
-              <Ionicons name={iconName} size={23} color={color} />
-              {focused && <View style={styles.activeDot} />}
-            </View>
-          );
+          return <TabIcon name={iconName} color={color} focused={focused} />;
         },
       })}
       screenListeners={{
@@ -79,6 +103,11 @@ export const MainTabNavigator = () => {
       }}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen
+        name="Inbox"
+        component={InboxScreen}
+        options={{ tabBarLabel: 'Inbox' }}
+      />
       <Tab.Screen
         name="Matches"
         component={MatchesScreen}
@@ -88,7 +117,7 @@ export const MainTabNavigator = () => {
         name="Messages"
         component={MessagesScreen}
         options={{
-          tabBarLabel: 'Inbox',
+          tabBarLabel: 'Chat',
           tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
           tabBarBadgeStyle: {
             backgroundColor: Colors.secondary,
@@ -111,20 +140,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+    width: 46,
+    height: 34,
   },
-  activeGlow: {
+  activePill: {
     position: 'absolute',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 46,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: Colors.primarySoft,
-  },
-  activeDot: {
-    position: 'absolute',
-    bottom: -10,
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: Colors.primary,
   },
 });

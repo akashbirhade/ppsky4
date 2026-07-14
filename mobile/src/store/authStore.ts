@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 import { authService, profileService } from '@/services';
 import { socketService } from '@/services/socket';
+import { onAuthExpired } from '@/services/api';
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 
@@ -159,3 +160,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   setOnboarded: (val) => set({ isOnboarded: val }),
 }));
+
+// Listen for auth token expiry and reset the store
+onAuthExpired(() => {
+  useAuthStore.getState().logout();
+});

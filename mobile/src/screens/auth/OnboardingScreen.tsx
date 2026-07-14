@@ -117,6 +117,7 @@ export const OnboardingScreen = () => {
       }
 
       // Upload photos
+      let photosFailed = 0;
       for (const photoUri of photos) {
         try {
           const formData = new FormData();
@@ -126,13 +127,22 @@ export const OnboardingScreen = () => {
             name: `profile_${Date.now()}.jpg`,
           } as any);
           await profileService.uploadPhoto(formData);
-        } catch {}
+        } catch {
+          photosFailed++;
+        }
+      }
+
+      if (photosFailed > 0) {
+        Alert.alert('Note', `${photosFailed} photo(s) could not be uploaded. You can add them later from Edit Profile.`);
       }
 
       Haptics.success();
       setOnboarded(true);
-    } catch {
-      setOnboarded(true);
+    } catch (err: any) {
+      Alert.alert(
+        'Error',
+        err?.response?.data?.message || 'Could not save profile. Please try again.'
+      );
     } finally {
       setLoading(false);
     }

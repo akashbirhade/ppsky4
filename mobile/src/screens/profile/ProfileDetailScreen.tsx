@@ -14,6 +14,7 @@ import {
   Linking,
   ActivityIndicator,
   Animated,
+  Easing,
   PanResponder,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -29,6 +30,16 @@ import { formatDistanceToNow } from 'date-fns';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '@/constants/theme';
 import * as Haptics from '@/utils/haptics';
 import { ActionSheetIOS, Platform } from 'react-native';
+import {
+  shouldStartHorizontalSwipe,
+  allowDrag,
+  resolveSwipeDirection,
+  nextIndex,
+  buildSwipeList,
+  resolveCurrentUserId,
+  computeNavFlags,
+  buildFallbackIds,
+} from './swipeNavigation';
 
 const { width, height } = Dimensions.get('window');
 const SWIPE_THRESHOLD = width * 0.25;
@@ -97,15 +108,25 @@ const DockAction: React.FC<{
   active?: boolean;
 }> = ({ icon, label, onPress, tint, highlight, active }) => {
   const filled = !!(highlight || active);
+  const scaleAnim = useRef(new Animated.Value(filled ? 1 : 0)).current;
+  useEffect(() => {
+    Animated.spring(scaleAnim, {
+      toValue: filled ? 1 : 0,
+      useNativeDriver: true,
+      friction: 6,
+      tension: 140,
+    }).start();
+  }, [filled, scaleAnim]);
+  const iconScale = scaleAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.12] });
   return (
     <TouchableOpacity
       style={styles.dockAction}
       activeOpacity={0.85}
       onPress={() => { Haptics.lightTap(); onPress(); }}
     >
-      <View style={[styles.dockIconCircle, filled && { backgroundColor: tint, borderColor: tint }]}>
+      <Animated.View style={[styles.dockIconCircle, filled && { backgroundColor: tint, borderColor: tint }, { transform: [{ scale: iconScale }] }]}>
         <Ionicons name={icon} size={22} color={filled ? Colors.white : 'rgba(255,255,255,0.92)'} />
-      </View>
+      </Animated.View>
       <Text style={styles.dockLabel}>{label}</Text>
     </TouchableOpacity>
   );
@@ -119,11 +140,15 @@ export const ProfileDetailScreen = () => {
   const isPremium = !!currentUser?.subscription?.isActive && currentUser?.subscription?.plan !== 'free';
 
   // Horizontal navigation between profiles (Section 7)
-  const navList: string[] = profileIds || [];
+  // When opened with an explicit list (profileIds) we use it. Otherwise we
+  // lazily fetch a recommended list (see effect below) so swipe-to-next-profile
+  // still works from any entry point (Home, Messages, Activity, notifications…).
+  const paramIds: string[] = profileIds || [];
+  const [fallbackIds, setFallbackIds] = useState<string[]>([]);
+  const navList: string[] = buildSwipeList(paramIds, fallbackIds);
   const [navIndex, setNavIndex] = useState<number>(typeof initIdx === 'number' ? initIdx : 0);
-  const userId = navList.length > 0 ? navList[navIndex] : initialUserId;
-  const canGoPrev = navList.length > 0 && navIndex > 0;
-  const canGoNext = navList.length > 0 && navIndex < navList.length - 1;
+  const userId = resolveCurrentUserId(navList, navIndex, initialUserId);
+  const { canGoPrev, canGoNext } = computeNavFlags(navList, navIndex);
 
   // The PanResponder below is created once (useRef), so it would capture the
   // first render's canGoPrev/canGoNext/goToProfile. Mirror the latest values in
@@ -132,39 +157,121 @@ export const ProfileDetailScreen = () => {
   navStateRef.current = { canGoPrev, canGoNext, len: navList.length };
   const goToProfileRef = useRef<(dir: -1 | 1) => void>(() => {});
 
-  // ─── Swipe Navigation (Section 24) ───────────────────────────────────────
-  const swipeX = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  // ─── Swipe / slide navigation (Section 24) ───────────────────────────────
+  // A SINGLE translate value drives both the finger drag and the programmatic
+  // slide, so a released swipe flows continuously into the transition instead
+  // of two Animated values (drag + slide) fighting each other.
+  const translateX = useRef(new Animated.Value(0)).current;
+  const dockAnim = useRef(new Animated.Value(1)).current; // dock fade/slide in sync w/ profile
   const scrollRef = useRef<ScrollView>(null);
+  // Loaded profiles cached by id so next/prev is instant (see prefetch effect).
+  const profileCacheRef = useRef<Map<string, any>>(new Map());
+  // Connect-status overrides so a cached re-visit reflects actions taken this
+  // session (e.g. interest already sent) rather than stale backend flags.
+  const statusOverrideRef = useRef<Map<string, ConnectStatus>>(new Map());
+  // Guards against overlapping transitions (rapid taps / swipes).
+  const animatingRef = useRef(false);
 
-  const goToProfile = (dir: -1 | 1) => {
-    const next = navIndex + dir;
-    if (next < 0 || next >= navList.length) return;
-    // Slide out current profile
-    Animated.timing(slideAnim, {
-      toValue: -dir * width,
-      duration: 220,
-      useNativeDriver: true,
-    }).start(() => {
-      setNavIndex(next);
-      setProfile(null);
-      setLoading(true);
-      setCurrentPhotoIndex(0);
-      setConnectStatus('none');
-      setAboutExpanded(false);
-      setContactRevealed(false);
-      // Slide in new profile from opposite side
-      slideAnim.setValue(dir * width);
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        useNativeDriver: true,
-        friction: 20,
-        tension: 80,
-      }).start();
-      // Reset scroll
-      scrollRef.current?.scrollTo({ y: 0, animated: false });
+  const deriveConnectStatus = (p: any): ConnectStatus => {
+    if (p?.isMatched || p?.isConnected) return 'connected';
+    if (p?.interestAccepted) return 'accepted';
+    if (p?.interestSent) return 'sent';
+    return 'none';
+  };
+
+  // Cache-first fetch. Returns the profile (fetching + caching on a miss) or
+  // null on failure. Safe to call for prefetch (fire-and-forget).
+  const fetchProfile = async (id: string): Promise<any | null> => {
+    const cache = profileCacheRef.current;
+    if (cache.has(id)) return cache.get(id);
+    try {
+      const { data } = await profileService.getProfileById(id);
+      const p = data.data;
+      if (p) cache.set(id, p);
+      return p ?? null;
+    } catch {
+      return null;
+    }
+  };
+
+  const prefetchNeighbors = (index: number, list: string[]) => {
+    [index - 1, index + 1].forEach((i) => {
+      if (i >= 0 && i < list.length) {
+        // Warm the data cache, then warm the image cache for the main photo so
+        // the photo area isn't blank while it downloads on arrival.
+        void fetchProfile(list[i]).then((p) => {
+          const photos = p?.user?.photos || [];
+          const url = photos.find((ph: any) => ph?.isMain)?.url || photos[0]?.url;
+          if (url) Image.prefetch(url).catch(() => {});
+        });
+      }
     });
+  };
+
+  // Swap in a freshly-navigated profile and reset its per-profile UI state.
+  const showProfile = (p: any, id: string) => {
+    setProfile(p);
+    setConnectStatus(statusOverrideRef.current.get(id) ?? deriveConnectStatus(p));
+    setCurrentPhotoIndex(0);
+    setAboutExpanded(false);
+    setContactRevealed(false);
+  };
+
+  const goToProfile = async (dir: -1 | 1) => {
+    if (animatingRef.current) return;
+    const next = nextIndex(navIndex, dir, navList.length);
+    if (next === null) {
+      // Nothing there — settle the card back to rest.
+      Animated.spring(translateX, { toValue: 0, useNativeDriver: true, friction: 9 }).start();
+      return;
+    }
+    const targetId = navList[next];
+    animatingRef.current = true;
     Haptics.selectionChanged();
+
+    // Start the fetch now (usually already cached via prefetch) so the content
+    // is ready by the time the outgoing card has slid away.
+    const wasCached = profileCacheRef.current.has(targetId);
+    const targetPromise = fetchProfile(targetId);
+
+    // Phase 1 — slide the current card fully out, continuing from wherever the
+    // finger left it (translateX already holds the live drag offset on swipes).
+    Animated.parallel([
+      Animated.timing(translateX, {
+        toValue: -dir * width,
+        duration: 190,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(dockAnim, { toValue: 0, duration: 150, useNativeDriver: true }),
+    ]).start(async () => {
+      // Only show a loader if the target wasn't prefetched (rare).
+      if (!wasCached) setLoading(true);
+      const p = await targetPromise;
+      if (!p) {
+        // Fetch failed — snap the current card back and stay put.
+        setLoading(false);
+        Animated.spring(translateX, { toValue: 0, useNativeDriver: true, friction: 9 }).start();
+        Animated.spring(dockAnim, { toValue: 1, useNativeDriver: true, friction: 9 }).start();
+        animatingRef.current = false;
+        return;
+      }
+      // Swap content while off-screen, then slide the NEW card in from the
+      // opposite edge. The Animated.View stays mounted throughout so the
+      // native-driven springs settle correctly.
+      setNavIndex(next);
+      showProfile(p, targetId);
+      setLoading(false);
+      scrollRef.current?.scrollTo({ y: 0, animated: false });
+      translateX.setValue(dir * width);
+      Animated.parallel([
+        Animated.spring(translateX, { toValue: 0, useNativeDriver: true, friction: 22, tension: 90 }),
+        Animated.spring(dockAnim, { toValue: 1, useNativeDriver: true, friction: 9, tension: 80 }),
+      ]).start(() => {
+        animatingRef.current = false;
+        prefetchNeighbors(next, navList);
+      });
+    });
   };
   // Always keep the ref pointing at the latest goToProfile closure
   goToProfileRef.current = goToProfile;
@@ -172,23 +279,25 @@ export const ProfileDetailScreen = () => {
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, gs) =>
-        Math.abs(gs.dx) > 15 && Math.abs(gs.dx) > Math.abs(gs.dy) * 1.5 && navStateRef.current.len > 1,
+        !animatingRef.current && shouldStartHorizontalSwipe(gs.dx, gs.dy, navStateRef.current.len),
       onPanResponderMove: (_, gs) => {
         // Only allow drag if navigable in that direction
-        if (gs.dx > 0 && !navStateRef.current.canGoPrev) return;
-        if (gs.dx < 0 && !navStateRef.current.canGoNext) return;
-        swipeX.setValue(gs.dx);
+        const { canGoPrev, canGoNext } = navStateRef.current;
+        if (!allowDrag(gs.dx, canGoPrev, canGoNext)) return;
+        translateX.setValue(gs.dx);
       },
       onPanResponderRelease: (_, gs) => {
-        if (gs.dx > SWIPE_THRESHOLD && navStateRef.current.canGoPrev) {
-          goToProfileRef.current(-1);
-        } else if (gs.dx < -SWIPE_THRESHOLD && navStateRef.current.canGoNext) {
-          goToProfileRef.current(1);
+        const { canGoPrev, canGoNext } = navStateRef.current;
+        const dir = resolveSwipeDirection(gs.dx, SWIPE_THRESHOLD, canGoPrev, canGoNext);
+        if (dir !== 0) {
+          // Flow straight into the transition (no competing snap-back).
+          goToProfileRef.current(dir);
+        } else {
+          Animated.spring(translateX, { toValue: 0, useNativeDriver: true, friction: 8 }).start();
         }
-        Animated.spring(swipeX, { toValue: 0, useNativeDriver: true, friction: 8 }).start();
       },
       onPanResponderTerminate: () => {
-        Animated.spring(swipeX, { toValue: 0, useNativeDriver: true, friction: 8 }).start();
+        Animated.spring(translateX, { toValue: 0, useNativeDriver: true, friction: 8 }).start();
       },
     })
   ).current;
@@ -203,27 +312,55 @@ export const ProfileDetailScreen = () => {
   const [contactRevealed, setContactRevealed] = useState(false);
   const [shortlisted, setShortlisted] = useState(false);
 
+  // Initial profile load (mount only). All subsequent navigation is handled by
+  // goToProfile, which controls exactly when the content swaps vs. the slide.
   useEffect(() => {
-    loadProfile();
-  }, [userId]);
-
-  const loadProfile = async () => {
-    try {
-      const { data } = await profileService.getProfileById(userId);
-      const p = data.data;
-      setProfile(p);
-      // Derive relationship status from backend flags if present
-      if (p.isMatched || p.isConnected) setConnectStatus('connected');
-      else if (p.interestAccepted) setConnectStatus('accepted');
-      else if (p.interestSent) setConnectStatus('sent');
-      else if (p.interestReceived) setConnectStatus('none');
-    } catch {
-      Alert.alert('Error', 'Could not load profile');
-      navigation.goBack();
-    } finally {
+    let cancelled = false;
+    (async () => {
+      const p = await fetchProfile(userId);
+      if (cancelled) return;
+      if (!p) {
+        Alert.alert('Error', 'Could not load profile');
+        navigation.goBack();
+        return;
+      }
+      showProfile(p, userId);
       setLoading(false);
-    }
-  };
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep the adjacent profiles warm in the cache so next/prev is instant.
+  useEffect(() => {
+    if (navList.length > 1) prefetchNeighbors(navIndex, navList);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navIndex, navList.length]);
+
+  // Lazily build a swipe list when opened without an explicit profileIds list,
+  // so users can always swipe to the next profile from any entry point.
+  useEffect(() => {
+    if (paramIds.length > 1) return;
+    let cancelled = false;
+    matchService
+      .getRecommended()
+      .then(({ data }) => {
+        if (cancelled) return;
+        const profiles = data.data?.profiles || [];
+        const ids = buildFallbackIds(profiles, initialUserId);
+        if (ids.length <= 1) return;
+        setFallbackIds(ids);
+        setNavIndex(Math.max(0, ids.indexOf(initialUserId)));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   const handleCancelInterest = () => {
     Alert.alert('Cancel Request', 'Withdraw your interest in this profile?', [
@@ -232,6 +369,7 @@ export const ProfileDetailScreen = () => {
         text: 'Withdraw', style: 'destructive',
         onPress: async () => {
           setConnectStatus('none');
+          statusOverrideRef.current.set(userId, 'none');
           Haptics.selectionChanged();
           try { await matchService.unlikeProfile(userId); } catch {}
         },
@@ -248,11 +386,14 @@ export const ProfileDetailScreen = () => {
     try {
       const { data } = await matchService.likeProfile(userId);
       const isMatch = !!data?.data?.isMatch;
-      setConnectStatus(isMatch ? 'connected' : 'interested');
+      const status: ConnectStatus = isMatch ? 'connected' : 'interested';
+      setConnectStatus(status);
+      statusOverrideRef.current.set(userId, status);
       return isMatch;
     } catch {
       // Optimistic local update if backend unavailable
       setConnectStatus('interested');
+      statusOverrideRef.current.set(userId, 'interested');
       return false;
     } finally {
       setConnecting(false);
@@ -426,7 +567,7 @@ export const ProfileDetailScreen = () => {
     });
   };
 
-  if (loading || !profile) {
+  if (!profile) {
     return (
       <View style={[styles.container, styles.center]}>
         <ActivityIndicator size="large" color={Colors.primary} />
@@ -565,7 +706,7 @@ export const ProfileDetailScreen = () => {
   return (
     <View style={styles.container}>
       <Animated.View
-        style={{ flex: 1, transform: [{ translateX: Animated.add(swipeX, slideAnim) }] }}
+        style={{ flex: 1, transform: [{ translateX }] }}
         {...panResponder.panHandlers}
       >
       <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} bounces={false} contentContainerStyle={{ paddingBottom: 120 }}>
@@ -867,11 +1008,30 @@ export const ProfileDetailScreen = () => {
             </LinearGradient>
           </TouchableOpacity>
 
-          {/* Swipe hint (Section 24) */}
+          {/* Profile pager: prev / next arrows + counter (Section 24) */}
           {navList.length > 1 && (
-            <View style={styles.swipeHint}>
-              <Ionicons name="swap-horizontal" size={16} color={Colors.textTertiary} />
-              <Text style={styles.swipeHintText}>Swipe left or right to browse profiles</Text>
+            <View style={styles.profilePager}>
+              <TouchableOpacity
+                style={[styles.pagerArrow, !canGoPrev && styles.pagerArrowDisabled]}
+                onPress={() => goToProfile(-1)}
+                disabled={!canGoPrev}
+                activeOpacity={0.85}
+              >
+                <Ionicons name="chevron-back" size={20} color={canGoPrev ? Colors.primary : Colors.textTertiary} />
+                <Text style={[styles.pagerArrowText, !canGoPrev && styles.pagerArrowTextDisabled]}>Previous</Text>
+              </TouchableOpacity>
+
+              <Text style={styles.pagerCounter}>{navIndex + 1} / {navList.length}</Text>
+
+              <TouchableOpacity
+                style={[styles.pagerArrow, !canGoNext && styles.pagerArrowDisabled]}
+                onPress={() => goToProfile(1)}
+                disabled={!canGoNext}
+                activeOpacity={0.85}
+              >
+                <Text style={[styles.pagerArrowText, !canGoNext && styles.pagerArrowTextDisabled]}>Next</Text>
+                <Ionicons name="chevron-forward" size={20} color={canGoNext ? Colors.primary : Colors.textTertiary} />
+              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -879,6 +1039,12 @@ export const ProfileDetailScreen = () => {
       </Animated.View>
 
       {/* ─── Fixed Bottom Action Dock (reference redesign) ─── */}
+      <Animated.View
+        style={{
+          opacity: dockAnim,
+          transform: [{ translateY: dockAnim.interpolate({ inputRange: [0, 1], outputRange: [14, 0] }) }],
+        }}
+      >
       {isDeclined ? (
         <View style={styles.bottomDock}>
           <View style={styles.declinedBar}>
@@ -897,20 +1063,21 @@ export const ProfileDetailScreen = () => {
             </>
           ) : (
             <>
-              <DockAction
-                icon={interestStatus === 'none' ? 'mail' : 'checkmark-circle'}
-                label={interestStatus === 'none' ? 'Interest' : 'Sent'}
-                onPress={handleInterest}
-                tint={Colors.love}
-                highlight
-              />
               <DockAction icon="heart" label="Super Interest" onPress={handleSuperInterest} tint={Colors.secondaryDark} />
               <DockAction icon={shortlisted ? 'star' : 'star-outline'} label="Shortlist" onPress={handleShortlist} tint={Colors.gold} active={shortlisted} />
               <DockAction icon="chatbubble-ellipses" label="Chat" onPress={handleChat} tint={Colors.primary} />
+              <DockAction
+                icon={interestStatus === 'none' ? 'heart' : 'checkmark-circle'}
+                label={interestStatus === 'none' ? 'Interest' : 'Interested'}
+                onPress={handleInterest}
+                tint={interestStatus === 'none' ? Colors.love : Colors.gold}
+                highlight
+              />
             </>
           )}
         </View>
       )}
+      </Animated.View>
 
       {/* ─── Premium Bottom Sheet (section 7) ─── */}
       <Modal visible={showPremiumSheet} transparent animationType="slide" onRequestClose={() => setShowPremiumSheet(false)}>
@@ -941,6 +1108,14 @@ export const ProfileDetailScreen = () => {
           </View>
         </TouchableOpacity>
       </Modal>
+
+      {/* Loading overlay shown while the next/previous profile is fetched.
+          Keeps the animated card mounted underneath so its slide-in settles. */}
+      {loading && (
+        <View style={styles.loadingOverlay} pointerEvents="auto">
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      )}
     </View>
   );
 };
@@ -948,7 +1123,12 @@ export const ProfileDetailScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   center: { alignItems: 'center', justifyContent: 'center' },
-  photoSection: { width, height: height * 0.55, position: 'relative' },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: Colors.background,
+  },
+  photoSection: { width, height: height * 0.55, position: 'relative', backgroundColor: Colors.primaryMuted },
   mainPhoto: { width: '100%', height: '100%', resizeMode: 'cover' },
   photoOverlay: { ...StyleSheet.absoluteFillObject },
   photoIndicators: {
@@ -1112,12 +1292,21 @@ const styles = StyleSheet.create({
   kundaliTitle: { ...Typography.bodyBold, color: Colors.white },
   kundaliSub: { ...Typography.caption1, color: 'rgba(255,255,255,0.8)' },
 
-  // Swipe hint (Section 24)
-  swipeHint: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm,
-    paddingVertical: Spacing.md, marginBottom: Spacing.lg, opacity: 0.6,
+  // Profile pager: prev/next arrows + counter (Section 24)
+  profilePager: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingVertical: Spacing.sm, marginBottom: Spacing.lg,
   },
-  swipeHintText: { ...Typography.caption1, color: Colors.textTertiary },
+  pagerArrow: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    paddingVertical: Spacing.sm, paddingHorizontal: Spacing.md,
+    borderRadius: BorderRadius.full, backgroundColor: Colors.primarySoft,
+    borderWidth: 1, borderColor: Colors.primaryMuted,
+  },
+  pagerArrowDisabled: { backgroundColor: Colors.border, borderColor: Colors.border, opacity: 0.6 },
+  pagerArrowText: { ...Typography.subhead, color: Colors.primary, fontWeight: '600' },
+  pagerArrowTextDisabled: { color: Colors.textTertiary },
+  pagerCounter: { ...Typography.footnote, color: Colors.textSecondary, fontWeight: '600' },
 
   // "Who is X looking for" (reference redesign)
   lookingCard: {
@@ -1185,7 +1374,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.10)',
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)',
   },
-  dockLabel: { ...Typography.caption2, color: 'rgba(255,255,255,0.88)', fontWeight: '600' },
+  dockLabel: { ...Typography.footnote, color: 'rgba(255,255,255,0.92)', fontWeight: '700', fontSize: 13 },
   declinedDockText: { ...Typography.footnote, color: 'rgba(255,255,255,0.9)', flex: 1 },
 
   // Bottom Action Bar

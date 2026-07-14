@@ -51,6 +51,64 @@ export const MyProfileScreen = () => {
   const subscription = user?.subscription;
   const completion = profile?.profileCompletionPercentage || 0;
 
+  // Actionable prompts for incomplete profile sections (item 34)
+  const completionPrompts = [
+    {
+      key: 'photos',
+      icon: 'images-outline',
+      label: 'Upload Photos',
+      hint: 'Profiles with photos get 5x more interest',
+      color: Colors.primary,
+      screen: 'EditProfile',
+      done: (user?.photos?.length || 0) >= 2,
+    },
+    {
+      key: 'education',
+      icon: 'school-outline',
+      label: 'Add Education & Career',
+      hint: 'Share your qualifications and profession',
+      color: Colors.info,
+      screen: 'EditProfile',
+      done: !!profile?.education && !!profile?.profession,
+    },
+    {
+      key: 'verify',
+      icon: 'shield-checkmark-outline',
+      label: 'Verify Mobile Number',
+      hint: 'Get a verified badge and build trust',
+      color: Colors.success,
+      screen: 'Verification',
+      done: !!user?.mobileVerified,
+    },
+    {
+      key: 'family',
+      icon: 'home-outline',
+      label: 'Complete Family Details',
+      hint: 'Add family background and values',
+      color: Colors.secondary,
+      screen: 'EditProfile',
+      done: !!profile?.familyType || !!profile?.fatherOccupation,
+    },
+    {
+      key: 'preferences',
+      icon: 'options-outline',
+      label: 'Add Partner Preferences',
+      hint: 'Tell us who you are looking for',
+      color: Colors.accent,
+      screen: 'PartnerPreferences',
+      done: !!user?.preferences && Object.keys(user.preferences || {}).length > 0,
+    },
+    {
+      key: 'bio',
+      icon: 'create-outline',
+      label: 'Write About Yourself',
+      hint: 'A short bio helps you stand out',
+      color: Colors.gold,
+      screen: 'EditProfile',
+      done: !!profile?.bio,
+    },
+  ].filter((p) => !p.done);
+
   const menuItems = [
     { icon: 'person-outline', label: 'Edit Profile', screen: 'EditProfile', color: Colors.primary },
     { icon: 'options-outline', label: 'Partner Preferences', screen: 'PartnerPreferences', color: Colors.accent },
@@ -153,6 +211,35 @@ export const MyProfileScreen = () => {
           </View>
         </View>
 
+        {/* Complete Your Profile prompts */}
+        {completionPrompts.length > 0 && (
+          <View style={styles.promptsSection}>
+            <View style={styles.promptsHeader}>
+              <Text style={styles.promptsTitle}>Complete Your Profile</Text>
+              <Text style={styles.promptsCount}>{completionPrompts.length} left</Text>
+            </View>
+            {completionPrompts.map((p) => (
+              <TouchableOpacity
+                key={p.key}
+                style={styles.promptCard}
+                activeOpacity={0.85}
+                onPress={() => navigation.navigate(p.screen)}
+              >
+                <View style={[styles.promptIcon, { backgroundColor: p.color + '15' }]}>
+                  <Ionicons name={p.icon as any} size={20} color={p.color} />
+                </View>
+                <View style={styles.promptTextWrap}>
+                  <Text style={styles.promptLabel}>{p.label}</Text>
+                  <Text style={styles.promptHint}>{p.hint}</Text>
+                </View>
+                <View style={[styles.promptAction, { backgroundColor: p.color }]}>
+                  <Ionicons name="add" size={18} color={Colors.white} />
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         {/* Menu Items */}
         <View style={styles.menu}>
           {menuItems.map((item, i) => (
@@ -243,6 +330,36 @@ const styles = StyleSheet.create({
     height: 8, borderRadius: 4, backgroundColor: Colors.background, overflow: 'hidden',
   },
   completionFill: { height: '100%', borderRadius: 4 },
+  promptsSection: {
+    backgroundColor: Colors.white, marginTop: Spacing.lg,
+    padding: Spacing.lg, marginHorizontal: Spacing.xl, borderRadius: BorderRadius.xl,
+    ...Shadows.small,
+  },
+  promptsHeader: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    marginBottom: Spacing.md, paddingHorizontal: Spacing.xs,
+  },
+  promptsTitle: { ...Typography.subhead, fontWeight: '700', color: Colors.textPrimary },
+  promptsCount: {
+    ...Typography.caption1, fontWeight: '700', color: Colors.primary,
+    backgroundColor: Colors.primarySoft, paddingHorizontal: 10, paddingVertical: 3,
+    borderRadius: BorderRadius.full, overflow: 'hidden',
+  },
+  promptCard: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
+    paddingVertical: Spacing.sm,
+  },
+  promptIcon: {
+    width: 40, height: 40, borderRadius: 12,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  promptTextWrap: { flex: 1 },
+  promptLabel: { ...Typography.subhead, fontWeight: '600', color: Colors.textPrimary },
+  promptHint: { ...Typography.caption1, color: Colors.textTertiary, marginTop: 1 },
+  promptAction: {
+    width: 28, height: 28, borderRadius: 14,
+    alignItems: 'center', justifyContent: 'center',
+  },
   menu: {
     backgroundColor: Colors.white, marginTop: Spacing.lg,
     marginHorizontal: Spacing.xl, borderRadius: BorderRadius.xl,

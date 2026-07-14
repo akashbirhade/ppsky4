@@ -7,11 +7,65 @@ import { SlidersHorizontal, User, Users, MapPin, GraduationCap, Settings, Check,
 
 type Tab = 'basic' | 'community' | 'location' | 'education' | 'other'
 
+// Height <-> inches helpers for the range sliders (stored as e.g. 5'10")
+const feetStrToInches = (s: string): number => {
+  const m = s.match(/(\d+)'(\d+)/)
+  return m ? parseInt(m[1], 10) * 12 + parseInt(m[2], 10) : 60
+}
+const inchesToFeetStr = (i: number): string => `${Math.floor(i / 12)}'${i % 12}"`
+
+function AgeRangeSlider({ min, max, onChange }: { min: number; max: number; onChange: (min: number, max: number) => void }) {
+  const RANGE_MIN = 18, RANGE_MAX = 65
+  const minPercent = ((min - RANGE_MIN) / (RANGE_MAX - RANGE_MIN)) * 100
+  const maxPercent = ((max - RANGE_MIN) / (RANGE_MAX - RANGE_MIN)) * 100
+  return (
+    <div className="w-full">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs text-slate-400 dark:text-purple-300/50">Age Range</span>
+        <span className="text-xs font-semibold text-slate-700 dark:text-purple-200 bg-teal-100/50 dark:bg-purple-500/20 px-2.5 py-0.5 rounded-full border border-teal-200/50 dark:border-purple-500/20">{min} – {max} yrs</span>
+      </div>
+      <div className="relative h-10 flex items-center">
+        <div className="absolute w-full h-1.5 bg-teal-50 dark:bg-purple-500/10 rounded-full" />
+        <div className="absolute h-1.5 bg-gradient-to-r from-purple-500 to-fuchsia-500 rounded-full" style={{ left: `${minPercent}%`, width: `${maxPercent - minPercent}%` }} />
+        <input type="range" min={RANGE_MIN} max={RANGE_MAX} value={min} onChange={e => { const v = Math.min(Number(e.target.value), max - 1); onChange(v, max) }} className="absolute w-full h-1.5 appearance-none bg-transparent cursor-pointer age-range-input" style={{ zIndex: min >= max - 1 ? 5 : 3 }} />
+        <input type="range" min={RANGE_MIN} max={RANGE_MAX} value={max} onChange={e => { const v = Math.max(Number(e.target.value), min + 1); onChange(min, v) }} className="absolute w-full h-1.5 appearance-none bg-transparent cursor-pointer age-range-input" style={{ zIndex: 4 }} />
+      </div>
+      <div className="flex justify-between text-[10px] text-slate-300 dark:text-purple-300/30 mt-1 px-0.5">
+        {[18, 25, 30, 35, 40, 50, 65].map(v => (<span key={v}>{v}</span>))}
+      </div>
+    </div>
+  )
+}
+
+function HeightRangeSlider({ min, max, onChange }: { min: number; max: number; onChange: (min: number, max: number) => void }) {
+  const RANGE_MIN = 48, RANGE_MAX = 78
+  const minPercent = ((min - RANGE_MIN) / (RANGE_MAX - RANGE_MIN)) * 100
+  const maxPercent = ((max - RANGE_MIN) / (RANGE_MAX - RANGE_MIN)) * 100
+  return (
+    <div className="w-full">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs text-slate-400 dark:text-purple-300/50">Height Range</span>
+        <span className="text-xs font-semibold text-slate-700 dark:text-purple-200 bg-teal-100/50 dark:bg-purple-500/20 px-2.5 py-0.5 rounded-full border border-teal-200/50 dark:border-purple-500/20">{inchesToFeetStr(min)} – {inchesToFeetStr(max)}</span>
+      </div>
+      <div className="relative h-10 flex items-center">
+        <div className="absolute w-full h-1.5 bg-teal-50 dark:bg-purple-500/10 rounded-full" />
+        <div className="absolute h-1.5 bg-gradient-to-r from-purple-500 to-fuchsia-500 rounded-full" style={{ left: `${minPercent}%`, width: `${maxPercent - minPercent}%` }} />
+        <input type="range" min={RANGE_MIN} max={RANGE_MAX} value={min} onChange={e => { const v = Math.min(Number(e.target.value), max - 1); onChange(v, max) }} className="absolute w-full h-1.5 appearance-none bg-transparent cursor-pointer age-range-input" style={{ zIndex: min >= max - 1 ? 5 : 3 }} />
+        <input type="range" min={RANGE_MIN} max={RANGE_MAX} value={max} onChange={e => { const v = Math.max(Number(e.target.value), min + 1); onChange(min, v) }} className="absolute w-full h-1.5 appearance-none bg-transparent cursor-pointer age-range-input" style={{ zIndex: 4 }} />
+      </div>
+      <div className="flex justify-between text-[10px] text-slate-300 dark:text-purple-300/30 mt-1 px-0.5">
+        {[48, 54, 60, 66, 72, 78].map(v => (<span key={v}>{inchesToFeetStr(v)}</span>))}
+      </div>
+    </div>
+  )
+}
+
 export default function PreferencesPage() {
-  const { user, loading: authLoading } = useAuth()
+  const { user, updateUserData, loading: authLoading } = useAuth()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('basic')
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   const [prefs, setPrefs] = useState({
     // Basic
@@ -40,10 +94,54 @@ export default function PreferencesPage() {
 
   useEffect(() => { if (!authLoading && !user) router.push('/login') }, [user, authLoading, router])
 
+  // Load previously saved preferences from the account (plus any local draft) on mount
+  useEffect(() => {
+    if (!user) return
+    setPrefs(prev => {
+      const merged = { ...prev }
+      const pp = user.partnerPreferences
+      if (pp) {
+        if (pp.ageMin) merged.ageMin = String(pp.ageMin)
+        if (pp.ageMax) merged.ageMax = String(pp.ageMax)
+        if (pp.heightMin) merged.heightMin = pp.heightMin
+        if (pp.heightMax) merged.heightMax = pp.heightMax
+        if (pp.religion) merged.religion = pp.religion
+        if (pp.education) merged.qualification = pp.education
+        if (pp.city) merged.city = pp.city
+      }
+      try {
+        const raw = localStorage.getItem('soulmateSync_preferences')
+        if (raw) Object.assign(merged, JSON.parse(raw))
+      } catch {}
+      return merged
+    })
+  }, [user])
+
   const handleSave = () => {
-    localStorage.setItem('soulmateSync_preferences', JSON.stringify(prefs))
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    if (!user) return
+    try {
+      // Persist the full preference set locally so it survives reloads
+      localStorage.setItem('soulmateSync_preferences', JSON.stringify(prefs))
+      // Reflect the saved partner preferences on the in-memory user so
+      // recommendations that read them update right away
+      updateUserData({
+        partnerPreferences: {
+          ...(user.partnerPreferences || {}),
+          ageMin: Number(prefs.ageMin),
+          ageMax: Number(prefs.ageMax),
+          heightMin: prefs.heightMin,
+          heightMax: prefs.heightMax,
+          religion: prefs.religion,
+          education: prefs.qualification,
+          city: prefs.city,
+        },
+      })
+      setSaveError('')
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch {
+      setSaveError('Could not save preferences. Please try again.')
+    }
   }
 
   if (!user) return null
@@ -95,37 +193,19 @@ export default function PreferencesPage() {
                 <User className="h-4 w-4 text-teal-600 dark:text-purple-400" /> Basic Details
               </h3>
               <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[11px] text-slate-400 dark:text-purple-300/50 mb-1.5">Min Age</label>
-                  <select value={prefs.ageMin} onChange={e => setPrefs(p => ({ ...p, ageMin: e.target.value }))} className="input-field text-sm">
-                    {Array.from({ length: 20 }, (_, i) => 18 + i).map(age => (
-                      <option key={age} value={age} className="bg-white dark:bg-dark-900">{age} years</option>
-                    ))}
-                  </select>
+                <div className="sm:col-span-2">
+                  <AgeRangeSlider
+                    min={Number(prefs.ageMin) || 18}
+                    max={Number(prefs.ageMax) || 30}
+                    onChange={(lo, hi) => setPrefs(p => ({ ...p, ageMin: String(lo), ageMax: String(hi) }))}
+                  />
                 </div>
-                <div>
-                  <label className="block text-[11px] text-slate-400 dark:text-purple-300/50 mb-1.5">Max Age</label>
-                  <select value={prefs.ageMax} onChange={e => setPrefs(p => ({ ...p, ageMax: e.target.value }))} className="input-field text-sm">
-                    {Array.from({ length: 20 }, (_, i) => 22 + i).map(age => (
-                      <option key={age} value={age} className="bg-white dark:bg-dark-900">{age} years</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[11px] text-slate-400 dark:text-purple-300/50 mb-1.5">Min Height</label>
-                  <select value={prefs.heightMin} onChange={e => setPrefs(p => ({ ...p, heightMin: e.target.value }))} className="input-field text-sm">
-                    {["4'6\"","4'8\"","4'10\"","5'0\"","5'2\"","5'4\"","5'6\"","5'8\"","5'10\"","6'0\"","6'2\"","6'4\""].map(h => (
-                      <option key={h} value={h} className="bg-white dark:bg-dark-900">{h}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[11px] text-slate-400 dark:text-purple-300/50 mb-1.5">Max Height</label>
-                  <select value={prefs.heightMax} onChange={e => setPrefs(p => ({ ...p, heightMax: e.target.value }))} className="input-field text-sm">
-                    {["4'8\"","4'10\"","5'0\"","5'2\"","5'4\"","5'6\"","5'8\"","5'10\"","6'0\"","6'2\"","6'4\"","6'6\""].map(h => (
-                      <option key={h} value={h} className="bg-white dark:bg-dark-900">{h}</option>
-                    ))}
-                  </select>
+                <div className="sm:col-span-2">
+                  <HeightRangeSlider
+                    min={feetStrToInches(prefs.heightMin)}
+                    max={feetStrToInches(prefs.heightMax)}
+                    onChange={(lo, hi) => setPrefs(p => ({ ...p, heightMin: inchesToFeetStr(lo), heightMax: inchesToFeetStr(hi) }))}
+                  />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-[11px] text-slate-400 dark:text-purple-300/50 mb-1.5">Marital Status</label>
@@ -282,7 +362,11 @@ export default function PreferencesPage() {
 
           {/* Save Button */}
           <div className="mt-6 pt-5 border-t border-teal-100 dark:border-purple-500/10 flex items-center justify-between">
-            <p className="text-[10px] text-slate-300 dark:text-purple-300/30">Changes auto-apply to your match recommendations</p>
+            {saveError ? (
+              <p className="text-[11px] text-red-400 flex-1 min-w-0">{saveError}</p>
+            ) : (
+              <p className="text-[10px] text-slate-300 dark:text-purple-300/30">Changes auto-apply to your match recommendations</p>
+            )}
             <button onClick={handleSave}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                 saved ? 'bg-green-600/30 text-green-300 border border-green-500/30' : 'btn-primary'

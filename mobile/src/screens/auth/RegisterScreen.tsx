@@ -120,9 +120,15 @@ export const RegisterScreen = () => {
         dateOfBirth: formData.dateOfBirth,
       });
     } catch (err: any) {
-      const message = err.response?.data?.message;
-      if (message) {
-        Alert.alert('Registration Failed', message);
+      const respData = err.response?.data;
+      if (respData?.details?.length) {
+        // Show field-level validation errors from backend
+        const fieldErrors: Record<string, string> = {};
+        respData.details.forEach((d: any) => { if (d.field) fieldErrors[d.field] = d.message; });
+        setErrors((prev) => ({ ...prev, ...fieldErrors }));
+        Alert.alert('Registration Failed', respData.message || 'Please fix the errors below.');
+      } else if (respData?.message) {
+        Alert.alert('Registration Failed', respData.message);
       } else if (err.message?.includes('Network') || err.code === 'ERR_NETWORK') {
         Alert.alert('Connection Error', 'Unable to reach server. Please check your internet connection.');
       } else {

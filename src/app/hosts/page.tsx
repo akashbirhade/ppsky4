@@ -21,10 +21,10 @@ interface Host {
 }
 
 export default function HostsPage() {
-  const { authFetch } = useAuth()
+  const { authFetch, user } = useAuth()
   const [hosts, setHosts] = useState<Host[]>([])
   const [loading, setLoading] = useState(true)
-  const [filters, setFilters] = useState({ region: '', district: '', city: '' })
+  const [filters, setFilters] = useState({ region: '', district: '', city: '', community: '' })
   const [showFilters, setShowFilters] = useState(false)
 
   const fetchHosts = useCallback(async () => {
@@ -34,6 +34,7 @@ export default function HostsPage() {
       if (filters.region) params.set('region', filters.region)
       if (filters.district) params.set('district', filters.district)
       if (filters.city) params.set('city', filters.city)
+      if (filters.community) params.set('community', filters.community)
       const res = await authFetch(`/api/hosts?${params.toString()}`)
       const json = await res.json()
       if (json.success) {
@@ -44,6 +45,36 @@ export default function HostsPage() {
   }, [filters, authFetch])
 
   useEffect(() => { fetchHosts() }, [fetchHosts])
+
+  const [myCommunity, setMyCommunity] = useState('')
+  const [myRegion, setMyRegion] = useState('')
+
+  // Load the logged-in user's community (caste) & region (state) to power the quick filters
+  useEffect(() => {
+    if (!user) return
+    // Instant: use cached profile / login fields
+    try {
+      const cached = localStorage.getItem(`profile_data_${user.id}`)
+      const p = cached ? JSON.parse(cached)?.profile : null
+      const c = (p?.caste || user.caste || '').trim()
+      const r = (p?.state || user.state || '').trim()
+      if (c) setMyCommunity(c)
+      if (r) setMyRegion(r)
+    } catch {}
+    // Fresh: fetch the latest profile for accurate values
+    ;(async () => {
+      try {
+        const res = await authFetch(`/api/profiles/${user.id}`)
+        if (!res.ok) return
+        const data = await res.json()
+        const p = data.profile
+        if (p?.caste?.trim()) setMyCommunity(p.caste.trim())
+        if (p?.state?.trim()) setMyRegion(p.state.trim())
+      } catch {}
+    })()
+  }, [user, authFetch])
+
+  const hasActiveFilters = !!(filters.region || filters.district || filters.city || filters.community)
 
   return (
     <div className="min-h-screen pt-[104px] pb-8 px-4 md:px-8">
@@ -83,9 +114,64 @@ export default function HostsPage() {
           </div>
         </div>
 
+        {/* Quick match filters */}
+        {(myCommunity || myRegion) && (
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+            <span className="text-sm text-slate-500 dark:text-purple-300/60 mr-1">Quick match:</span>
+            {myCommunity && (
+              <button
+                onClick={() =>
+                  setFilters(f => ({ ...f, community: f.community === myCommunity ? '' : myCommunity }))
+                }
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition ${
+                  filters.community === myCommunity
+                    ? 'bg-teal-500 text-white'
+                    : 'bg-teal-100 dark:bg-teal-500/15 text-teal-700 dark:text-teal-300 hover:bg-teal-200 dark:hover:bg-teal-500/25'
+                }`}
+              >
+                <Users size={14} />
+                My community ({myCommunity})
+              </button>
+            )}
+            {myRegion && (
+              <button
+                onClick={() =>
+                  setFilters(f => ({ ...f, region: f.region === myRegion ? '' : myRegion }))
+                }
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition ${
+                  filters.region === myRegion
+                    ? 'bg-purple-500 text-white'
+                    : 'bg-purple-100 dark:bg-purple-500/15 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-500/25'
+                }`}
+              >
+                <MapPin size={14} />
+                My region ({myRegion})
+              </button>
+            )}
+            {hasActiveFilters && (
+              <button
+                onClick={() => setFilters({ region: '', district: '', city: '', community: '' })}
+                className="px-3 py-1.5 rounded-full text-sm font-medium text-slate-500 dark:text-purple-300/60 hover:bg-slate-100 dark:hover:bg-white/5 transition"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Filters */}
         {showFilters && (
-          <div className="p-4 mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl">
+          <div className="p-4 mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl">
+            <div>
+              <label className="text-sm text-slate-600 dark:text-purple-300/70 mb-1 block">Community</label>
+              <input
+                type="text"
+                value={filters.community}
+                onChange={(e) => setFilters(f => ({ ...f, community: e.target.value }))}
+                placeholder="e.g. Maratha, Brahmin..."
+                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
             <div>
               <label className="text-sm text-slate-600 dark:text-purple-300/70 mb-1 block">Region</label>
               <input

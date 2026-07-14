@@ -65,26 +65,40 @@ export const useChatStore = create<ChatState>((set, get) => ({
   unreadCount: 0,
 
   loadConversations: async () => {
-    const { data } = await chatService.getConversations();
-    const conversations = data.data?.conversations || [];
-    const unreadCount = conversations.reduce(
-      (acc: number, c: any) => acc + (c.unreadCount || 0), 0
-    );
-    set({ conversations, unreadCount });
+    try {
+      const { data } = await chatService.getConversations();
+      const conversations = data.data?.conversations || [];
+      const unreadCount = conversations.reduce(
+        (acc: number, c: any) => acc + (c.unreadCount || 0), 0
+      );
+      set({ conversations, unreadCount });
+    } catch {
+      // Network error - keep existing state
+    }
   },
 
   loadMessages: async (conversationId) => {
-    const { data } = await chatService.getMessages(conversationId);
-    set({ currentMessages: data.data?.messages || data.data || [], activeConversation: conversationId });
-    socketService.joinConversation(conversationId);
+    try {
+      const { data } = await chatService.getMessages(conversationId);
+      set({ currentMessages: data.data?.messages || data.data || [], activeConversation: conversationId });
+      socketService.joinConversation(conversationId);
+    } catch {
+      // Network error - keep existing state
+    }
   },
 
   sendMessage: async (conversationId, content, type = 'TEXT') => {
-    const { data } = await chatService.sendMessage(conversationId, { content, type });
-    const newMessage = data.data;
-    set((state) => ({
-      currentMessages: [...state.currentMessages, newMessage],
-    }));
+    try {
+      const { data } = await chatService.sendMessage(conversationId, { content, type });
+      const newMessage = data.data;
+      if (newMessage) {
+        set((state) => ({
+          currentMessages: [...state.currentMessages, newMessage],
+        }));
+      }
+    } catch {
+      // Message send failed - could add retry UI here
+    }
   },
 
   setActiveConversation: (id) => {

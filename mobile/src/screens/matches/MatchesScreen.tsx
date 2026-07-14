@@ -131,7 +131,21 @@ export const MatchesScreen = () => {
     }
   }, [cache]);
 
-  useEffect(() => { loadChip('all'); }, []);
+  useEffect(() => {
+    loadChip('all');
+    // Prefetch counts for every chip so the badges show immediately on load
+    // (not only after a chip is tapped). Cached, so tapping a chip is instant.
+    CHIPS.forEach((c) => {
+      if (c.key === 'all') return;
+      loaderFor(c.key)
+        .then(({ data }) => {
+          const profiles = data.data?.profiles || [];
+          setCache((prev) => (prev[c.key] ? prev : { ...prev, [c.key]: profiles }));
+        })
+        .catch(() => {});
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onChipPress = (key: ChipKey) => {
     Haptics.selectionChanged();
@@ -203,6 +217,7 @@ export const MatchesScreen = () => {
     const photo = item.user?.photos?.find((p: any) => p.isMain)?.url || item.user?.photos?.[0]?.url;
     const score = scoreFor(userId);
     const online = isOnlineFor(userId);
+    const completion = item.profileCompletionPercentage ?? item.user?.profileCompletionPercentage ?? 0;
     const summary = [item.profession, item.city, item.religion, item.education].filter(Boolean).join('  •  ');
     const status = sentIds.has(userId) ? 'sent' : 'none';
 
@@ -244,6 +259,16 @@ export const MatchesScreen = () => {
 
           <View style={styles.cardBody}>
             {!!summary && <Text style={styles.cardSummary} numberOfLines={2}>{summary}</Text>}
+
+            {completion > 0 && (
+              <View style={styles.completionRow}>
+                <Ionicons name="person-circle" size={13} color={completion >= 80 ? Colors.success : Colors.gold} />
+                <View style={styles.completionTrack}>
+                  <View style={[styles.completionFill, { width: `${Math.min(100, completion)}%`, backgroundColor: completion >= 80 ? Colors.success : Colors.gold }]} />
+                </View>
+                <Text style={styles.completionText}>{completion}%</Text>
+              </View>
+            )}
 
             <View style={styles.cardActions}>
               <InterestButton
@@ -454,6 +479,10 @@ const styles = StyleSheet.create({
   cardName: { ...Typography.title3, color: Colors.white, fontWeight: '700', flexShrink: 1 },
   cardBody: { padding: Spacing.lg },
   cardSummary: { ...Typography.subhead, color: Colors.textSecondary, marginBottom: Spacing.md },
+  completionRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: Spacing.md },
+  completionTrack: { flex: 1, height: 6, borderRadius: 3, backgroundColor: Colors.border, overflow: 'hidden' },
+  completionFill: { height: '100%', borderRadius: 3 },
+  completionText: { ...Typography.caption1, color: Colors.textSecondary, fontWeight: '700', minWidth: 30, textAlign: 'right' },
   cardActions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   interestFlex: { flex: 1 },
   iconAction: {

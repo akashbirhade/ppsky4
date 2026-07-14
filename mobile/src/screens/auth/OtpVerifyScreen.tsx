@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -22,6 +22,17 @@ export const OtpVerifyScreen = () => {
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(30);
   const inputs = useRef<Array<TextInput | null>>([]);
+
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+    const interval = setInterval(() => {
+      setResendTimer((t) => {
+        if (t <= 1) { clearInterval(interval); return 0; }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   const handleOtpChange = (text: string, index: number) => {
     const newOtp = [...otp];

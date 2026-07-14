@@ -14,6 +14,7 @@ interface MatchProfile {
   bio?: string;
   religion?: string;
   education?: string;
+  profileCompletionPercentage?: number;
   user: {
     id: string;
     gender: string;
@@ -119,8 +120,12 @@ export const useMatchStore = create<MatchState>((set, get) => ({
   },
 
   loadFavorites: async () => {
-    const { data } = await matchService.getFavorites();
-    set({ favorites: data.data?.favorites || [] });
+    try {
+      const { data } = await matchService.getFavorites();
+      set({ favorites: data.data?.favorites || [] });
+    } catch {
+      // Premium required or network error - fail silently
+    }
   },
 
   likeProfile: async (userId) => {

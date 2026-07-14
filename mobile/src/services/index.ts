@@ -20,7 +20,7 @@ export const authService = {
     api.post('/auth/send-email-otp', { email }),
 
   verifyEmail: (data: { email: string; otp: string }) =>
-    api.post('/auth/verify-email', data),
+    api.post('/auth/verify-email', { otp: data.otp, type: 'email' }),
 
   forgotPassword: (email: string) =>
     api.post('/auth/forgot-password', { email }),

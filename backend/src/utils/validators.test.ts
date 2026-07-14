@@ -37,7 +37,8 @@ describe('validators', () => {
 
   it('validates login payload', () => {
     expect(loginSchema.safeParse({ email: 'a@b.com', password: 'x' }).success).toBe(true);
-    expect(loginSchema.safeParse({ email: 'invalid', password: 'x' }).success).toBe(false);
+    // loginSchema uses min(1) not .email() — supports mobile number login too
+    expect(loginSchema.safeParse({ email: '', password: 'x' }).success).toBe(false);
   });
 
   it('accepts partial profile updates', () => {

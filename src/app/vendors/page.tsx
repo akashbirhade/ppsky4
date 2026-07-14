@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Store, Star, MapPin, Phone, Filter, Search, Crown, Camera, Music, Palette, Utensils, Gift, Gem, Flower, Building } from 'lucide-react'
+import { Store, Star, MapPin, Phone, Filter, Search, Crown, Camera, Music, Palette, Utensils, Gift, Gem, Flower, Building, BadgeCheck } from 'lucide-react'
 import HalfHeart from '@/components/HalfHeart'
 
 interface Vendor {
@@ -175,12 +175,16 @@ export default function VendorsPage() {
               <div className="h-32 bg-gradient-to-br from-purple-500/10 via-fuchsia-500/5 to-pink-500/10 flex items-center justify-center relative">
                 <span className="text-5xl">{vendor.image}</span>
                 {/* Badges */}
-                <div className="absolute top-3 left-3 flex gap-1.5">
+                <div className="absolute top-3 left-3 flex flex-wrap items-center gap-1.5">
                   {vendor.verified && (
-                    <span className="bg-blue-500/80 backdrop-blur-sm text-slate-800 dark:text-white px-2 py-0.5 rounded-lg text-[9px] font-semibold">✓ Verified</span>
+                    <span className="inline-flex items-center gap-1 bg-blue-500 text-white px-2 py-1 rounded-full text-[10px] font-semibold shadow-sm ring-1 ring-white/25">
+                      <BadgeCheck className="h-3 w-3" /> Verified
+                    </span>
                   )}
                   {vendor.premium && (
-                    <span className="bg-gradient-to-r from-amber-500 to-yellow-500 text-black px-2 py-0.5 rounded-lg text-[9px] font-bold">★ Featured</span>
+                    <span className="inline-flex items-center gap-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-amber-950 px-2 py-1 rounded-full text-[10px] font-bold shadow-sm ring-1 ring-white/30">
+                      <Crown className="h-3 w-3" /> Featured
+                    </span>
                   )}
                 </div>
                 {/* Price */}

@@ -8,6 +8,7 @@ import {
   Alert,
   Image,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -23,9 +24,10 @@ const PHOTO_SIZE = (width - 64 - 16) / 3;
 
 export const EditProfileScreen = () => {
   const navigation = useNavigation<any>();
-  const { user, updateProfile, updateUser } = useAuthStore();
+  const { user, updateProfile, updateUser, loadUser } = useAuthStore();
   const profile = user?.profile;
   const [loading, setLoading] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [form, setForm] = useState({
     firstName: profile?.firstName || '',
     lastName: profile?.lastName || '',
@@ -57,6 +59,7 @@ export const EditProfileScreen = () => {
     try {
       const data: any = { ...form };
       if (data.height) data.height = parseInt(data.height) || undefined;
+      if (data.siblings) data.siblings = parseInt(data.siblings) || undefined;
       if (data.hobbies) data.hobbies = data.hobbies.split(',').map((h: string) => h.trim()).filter(Boolean);
       else delete data.hobbies;
       // Remove empty strings
@@ -73,6 +76,13 @@ export const EditProfileScreen = () => {
   };
 
   const pickAndUploadPhoto = async () => {
+    if (uploadingPhoto) return;
+
+    if ((user?.photos?.length || 0) >= 10) {
+      Alert.alert('Limit reached', 'You can upload a maximum of 10 photos.');
+      return;
+    }
+
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert('Permission Required', 'We need photo library access.');
@@ -84,19 +94,36 @@ export const EditProfileScreen = () => {
       aspect: [3, 4],
       quality: 0.8,
     });
-    if (!result.canceled && result.assets[0]) {
-      try {
-        const formData = new FormData();
-        formData.append('photo', {
-          uri: result.assets[0].uri,
-          type: 'image/jpeg',
-          name: 'photo.jpg',
-        } as any);
-        await profileService.uploadPhoto(formData);
-        Alert.alert('Success', 'Photo uploaded!');
-      } catch {
-        Alert.alert('Error', 'Could not upload photo');
-      }
+    if (result.canceled || !result.assets?.[0]) return;
+
+    const asset = result.assets[0];
+    setUploadingPhoto(true);
+    try {
+      // Derive a filename & mime type from the picked asset so the server
+      // stores the correct extension.
+      const name = asset.fileName || asset.uri.split('/').pop() || `photo-${Date.now()}.jpg`;
+      const ext = (name.split('.').pop() || 'jpg').toLowerCase();
+      const type = asset.mimeType || `image/${ext === 'jpg' ? 'jpeg' : ext}`;
+
+      const formData = new FormData();
+      formData.append('photo', {
+        uri: asset.uri,
+        type,
+        name,
+      } as any);
+
+      await profileService.uploadPhoto(formData);
+      // Refresh the user so the newly-uploaded photo appears in the grid.
+      await loadUser();
+      Alert.alert('Success', 'Photo uploaded!');
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        'Could not upload photo. Please try again.';
+      Alert.alert('Upload failed', message);
+    } finally {
+      setUploadingPhoto(false);
     }
   };
 
@@ -119,15 +146,21 @@ export const EditProfileScreen = () => {
         <View style={styles.photoGrid}>
           {[0, 1, 2, 3, 4, 5].map((i) => {
             const photo = photos[i];
+            const isNextEmptySlot = !photo && i === photos.length;
             return (
               <TouchableOpacity
                 key={i}
                 style={styles.photoSlot}
                 onPress={pickAndUploadPhoto}
                 activeOpacity={0.7}
+                disabled={uploadingPhoto}
               >
                 {photo ? (
                   <Image source={{ uri: photo.url }} style={styles.photoImage} />
+                ) : uploadingPhoto && isNextEmptySlot ? (
+                  <View style={styles.photoEmpty}>
+                    <ActivityIndicator color={Colors.primary} />
+                  </View>
                 ) : (
                   <View style={styles.photoEmpty}>
                     <Ionicons name="add" size={28} color={Colors.primary} />

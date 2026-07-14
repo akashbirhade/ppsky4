@@ -21,14 +21,16 @@ export async function GET(req: NextRequest) {
     const region = searchParams.get('region')
     const district = searchParams.get('district')
     const city = searchParams.get('city')
+    const community = searchParams.get('community')
 
     let hosts = readHosts()
     const members = readMembers()
 
     // Apply filters
-    if (region) hosts = hosts.filter((h: any) => h.region.toLowerCase().includes(region.toLowerCase()))
-    if (district) hosts = hosts.filter((h: any) => h.district.toLowerCase().includes(district.toLowerCase()))
-    if (city) hosts = hosts.filter((h: any) => h.city.toLowerCase().includes(city.toLowerCase()))
+    if (region) hosts = hosts.filter((h: any) => (h.region || '').toLowerCase().includes(region.toLowerCase()))
+    if (district) hosts = hosts.filter((h: any) => (h.district || '').toLowerCase().includes(district.toLowerCase()))
+    if (city) hosts = hosts.filter((h: any) => (h.city || '').toLowerCase().includes(city.toLowerCase()))
+    if (community) hosts = hosts.filter((h: any) => (h.community || '').toLowerCase().includes(community.toLowerCase()))
 
     // Build response (remove password, add counts)
     const response = hosts.map((h: any) => {
