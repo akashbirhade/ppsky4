@@ -22,13 +22,25 @@ const getDevHost = (): string => {
 
 const DEV_HOST = getDevHost();
 
-export const API_BASE_URL = __DEV__
-  ? `http://${DEV_HOST}:${DEV_PORT}/api/v1`
-  : 'https://api.soulmatesync.com/api/v1';
+// A live/hosted backend URL can be injected via Expo public env vars so the app
+// points at a deployed API without code changes (works in dev and production).
+// e.g. EXPO_PUBLIC_API_URL=https://your-api.example.com
+const ENV_API_URL = (process.env.EXPO_PUBLIC_API_URL || '').trim().replace(/\/+$/, '');
+const ENV_SOCKET_URL = (process.env.EXPO_PUBLIC_SOCKET_URL || '').trim().replace(/\/+$/, '');
 
-export const SOCKET_URL = __DEV__
-  ? `http://${DEV_HOST}:${DEV_PORT}`
-  : 'https://api.soulmatesync.com';
+export const API_BASE_URL = ENV_API_URL
+  ? `${ENV_API_URL}/api/v1`
+  : __DEV__
+    ? `http://${DEV_HOST}:${DEV_PORT}/api/v1`
+    : 'https://api.soulmatesync.com/api/v1';
+
+export const SOCKET_URL = ENV_SOCKET_URL
+  ? ENV_SOCKET_URL
+  : ENV_API_URL
+    ? ENV_API_URL
+    : __DEV__
+      ? `http://${DEV_HOST}:${DEV_PORT}`
+      : 'https://api.soulmatesync.com';
 
 // ─── APP CONSTANTS ────────────────────────────────────────────────────────────
 

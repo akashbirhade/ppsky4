@@ -1,0 +1,68 @@
+# Render Blueprint — one-file deploy for the Soulmate Sync backend API.
+# Deploy: push this repo to GitHub, then in Render → "New +" → "Blueprint" and
+# point it at the repo. Render provisions the web service + a managed Postgres
+# and injects DATABASE_URL automatically.
+#
+# After the FIRST successful deploy, seed test data. On Render's free tier the
+# in-dashboard Shell may be unavailable, so the reliable way is to seed from your
+# own machine against the database's EXTERNAL connection string (Render dashboard
+# → the "soulmate-sync-db" database → "External Database URL"):
+#     cd backend && DATABASE_URL="<external-db-url>" npm run db:seed
+#
+# Secrets marked `sync: false` must be filled in the Render dashboard
+# (Environment tab) — they are intentionally not stored in the repo.
+services:
+  - type: web
+    name: soulmate-sync-api
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: backend
+    buildCommand: npm ci && npx prisma generate && npm run build
+    startCommand: npx prisma db push --skip-generate && node dist/server.js
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: soulmate-sync-db
+          property: connectionString
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_RESET_SECRET
+        generateValue: true
+      # Comma-separated list of allowed browser origins (mobile native apps
+      # send no Origin header and are always allowed). Add your web app URL here.
+      - key: ALLOWED_ORIGINS
+        value: https://soulmatesync.com,http://localhost:3000,http://localhost:8081
+      # ── Optional integrations (add real values in the Render dashboard) ──
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+
+databases:
+  - name: soulmate-sync-db
+    plan: free
+    databaseName: soulmate_sync
+    user: soulmate

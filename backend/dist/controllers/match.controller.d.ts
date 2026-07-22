@@ -1,0 +1,22 @@
+import { Request, Response, NextFunction } from 'express';
+export declare const getNewProfiles: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getRecentlyActive: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getNearMe: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getMostViewed: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getMostLiked: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getPremiumProfiles: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getVerifiedProfiles: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getRecommended: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const likeProfile: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const unlikeProfile: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const superLikeProfile: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const favoriteProfile: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const unfavoriteProfile: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const blockUser: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const viewProfile: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getLikesReceived: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getLikesSent: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getViewedByMe: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getFavorites: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getCompatibilityScore: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+//# sourceMappingURL=match.controller.d.ts.map

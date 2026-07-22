@@ -119,7 +119,7 @@ export const MessagesScreen = () => {
   const callUser = (phone?: string, userId?: string) => {
     Haptics.mediumTap();
     if (phone) Linking.openURL(`tel:${phone}`);
-    else if (userId) navigation.navigate('VideoCall', { receiverId: userId, type: 'audio' });
+    else if (userId) navigation.navigate('VideoCall', { receiverId: userId, type: 'AUDIO', callId: '' });
   };
 
   const whatsappUser = (phone?: string) => {

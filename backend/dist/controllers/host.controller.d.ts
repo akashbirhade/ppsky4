@@ -1,0 +1,19 @@
+import { Request, Response, NextFunction } from 'express';
+export declare const createHost: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getHosts: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getHostById: (req: Request, res: Response, next: NextFunction) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const updateHost: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const deleteHost: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const assignMember: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const removeMember: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const transferMember: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getHostMembers: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const createHostEvent: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getHostEvents: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const updateHostEvent: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const deleteHostEvent: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const createInterest: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getHostInterests: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const updateInterestStatus: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const getHostStats: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+//# sourceMappingURL=host.controller.d.ts.map

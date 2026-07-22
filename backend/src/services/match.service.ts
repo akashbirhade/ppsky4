@@ -269,6 +269,12 @@ export class MatchService {
   async likeProfile(fromUserId: string, toUserId: string) {
     if (fromUserId === toUserId) throw new AppError('Cannot like yourself', 400);
 
+    const target = await prisma.user.findFirst({
+      where: { id: toUserId, deletedAt: null },
+      select: { id: true },
+    });
+    if (!target) throw new AppError('Profile not found', 404);
+
     // Check if target already liked this user → mutual like = MATCH!
     const [existingLike, reverseLike] = await Promise.all([
       prisma.like.findUnique({ where: { fromUserId_toUserId: { fromUserId, toUserId } } }),
@@ -325,6 +331,12 @@ export class MatchService {
 
   async superLikeProfile(fromUserId: string, toUserId: string, message?: string) {
     if (fromUserId === toUserId) throw new AppError('Cannot super like yourself', 400);
+
+    const target = await prisma.user.findFirst({
+      where: { id: toUserId, deletedAt: null },
+      select: { id: true },
+    });
+    if (!target) throw new AppError('Profile not found', 404);
 
     const existing = await prisma.superLike.findUnique({
       where: { fromUserId_toUserId: { fromUserId, toUserId } },
