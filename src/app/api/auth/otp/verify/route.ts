@@ -1,25 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserByPhone, getUserByPhoneAsync, createUser, updateUser, syncUserToSupabaseAwait } from '@/lib/database'
+import { getUserByPhone, getUserByPhoneAsync, getUserByEmail, getUserByEmailAsync, createUser, updateUser, syncUserToSupabaseAwait } from '@/lib/database'
 import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '@/lib/auth'
 import { verifyStatelessOtp, getOtpStore } from '@/lib/otp-store'
 
-// Rate limit OTP verification attempts (max 5 per phone per 15 min)
+// Rate limit OTP verification attempts (max 5 per identifier per 15 min)
 const verifyAttempts = new Map<string, { count: number; resetAt: number }>()
 
 export async function POST(req: NextRequest) {
   try {
-    const { phone, otp, purpose, otpToken, firebaseVerified, firebaseUid } = await req.json()
+    const { phone, email, otp, purpose, otpToken, firebaseVerified, firebaseUid } = await req.json()
 
-    if (!phone || !purpose) {
-      return NextResponse.json({ error: 'Phone and purpose are required' }, { status: 400 })
+    if (!purpose) {
+      return NextResponse.json({ error: 'Purpose is required' }, { status: 400 })
     }
 
-    const cleanPhone = phone.replace(/\D/g, '')
+    // Determine identifier (email or phone)
+    const isEmailOtp = !!email
+    const identifier = isEmailOtp ? email.trim().toLowerCase() : phone?.replace(/\D/g, '')
 
-    // Rate limit: max 5 verify attempts per phone per 15 min
+    if (!identifier) {
+      return NextResponse.json({ error: 'Email or phone is required' }, { status: 400 })
+    }
+
+    // Rate limit
     const now = Date.now()
-    const entry = verifyAttempts.get(cleanPhone)
+    const entry = verifyAttempts.get(identifier)
     if (entry && now < entry.resetAt) {
       entry.count++
       if (entry.count > 5) {
@@ -29,44 +35,37 @@ export async function POST(req: NextRequest) {
         )
       }
     } else {
-      verifyAttempts.set(cleanPhone, { count: 1, resetAt: now + 15 * 60 * 1000 })
+      verifyAttempts.set(identifier, { count: 1, resetAt: now + 15 * 60 * 1000 })
     }
 
-    // Firebase-verified: skip OTP check (Firebase already verified the phone)
+    // Firebase-verified: skip OTP check
     if (firebaseVerified && firebaseUid) {
-      // Firebase has already verified this phone number via real SMS
-      // Proceed directly to login/register logic below
+      // Firebase has already verified this phone number
     } else if (!otp) {
       return NextResponse.json({ error: 'OTP is required' }, { status: 400 })
     } else if (otpToken) {
-      // Try stateless verification first (works on serverless)
-      const result = verifyStatelessOtp(cleanPhone, otp, purpose, otpToken)
+      const result = verifyStatelessOtp(identifier, otp, purpose, otpToken)
       if (!result.valid) {
         return NextResponse.json({ error: result.error || 'Invalid OTP' }, { status: 400 })
       }
     } else {
-      // Fallback: check in-memory store (local dev)
       const otpStore = getOtpStore()
-      const storedOtp = otpStore.get(cleanPhone)
+      const storedOtp = otpStore.get(identifier)
 
       if (!storedOtp) {
         return NextResponse.json({ error: 'OTP expired or not found. Please request a new OTP.' }, { status: 400 })
       }
-
       if (storedOtp.expiresAt < Date.now()) {
-        otpStore.delete(cleanPhone)
+        otpStore.delete(identifier)
         return NextResponse.json({ error: 'OTP has expired. Please request a new one.' }, { status: 400 })
       }
-
       if (storedOtp.otp !== otp) {
         return NextResponse.json({ error: 'Invalid OTP. Please try again.' }, { status: 400 })
       }
-
       if (storedOtp.purpose !== purpose) {
         return NextResponse.json({ error: 'OTP was not generated for this purpose' }, { status: 400 })
       }
-
-      otpStore.delete(cleanPhone)
+      otpStore.delete(identifier)
     }
 
     // For registration: just confirm verification
@@ -74,29 +73,48 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         verified: true,
-        message: 'Phone number verified successfully',
+        message: isEmailOtp ? 'Email verified successfully' : 'Phone number verified successfully',
       })
     }
 
     // For login: find user and generate JWT (auto-register if not found)
     if (purpose === 'login') {
-      let user = getUserByPhone(cleanPhone) || await getUserByPhoneAsync(cleanPhone)
+      let user
       let isNewUser = false
 
-      // Auto-create account if phone not registered (mobile-first signup)
-      if (!user) {
-        isNewUser = true
-        user = createUser({
-          name: '',
-          email: '',
-          password: '',
-          phone: cleanPhone,
-          gender: '',
-          dateOfBirth: '',
-          age: 0,
-          profileComplete: false,
-        })
-        await syncUserToSupabaseAwait(user)
+      if (isEmailOtp) {
+        user = getUserByEmail(identifier) || await getUserByEmailAsync(identifier)
+        if (!user) {
+          isNewUser = true
+          user = createUser({
+            name: identifier.split('@')[0],
+            email: identifier,
+            password: '',
+            phone: '',
+            gender: '',
+            dateOfBirth: '',
+            age: 0,
+            profileComplete: false,
+            verified: true,
+          })
+          await syncUserToSupabaseAwait(user)
+        }
+      } else {
+        user = getUserByPhone(identifier) || await getUserByPhoneAsync(identifier)
+        if (!user) {
+          isNewUser = true
+          user = createUser({
+            name: '',
+            email: '',
+            password: '',
+            phone: identifier,
+            gender: '',
+            dateOfBirth: '',
+            age: 0,
+            profileComplete: false,
+          })
+          await syncUserToSupabaseAwait(user)
+        }
       }
 
       // Update last active

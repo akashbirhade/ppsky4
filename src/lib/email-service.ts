@@ -351,3 +351,37 @@ export async function sendWeeklyDigestEmail(to: string, data: Parameters<typeof 
     html: weeklyDigestTemplate(data),
   })
 }
+
+// ─── OTP Email ─────────────────────────────────────────────────────────────
+
+export function otpEmailTemplate(data: { otp: string; purpose: string }) {
+  const purposeText = data.purpose === 'login' ? 'sign in to' : 'register on'
+  const content = `
+    <h2 style="margin:0 0 8px;font-size:22px;color:#ffffff;font-weight:600;">Your Verification Code 🔐</h2>
+    <p style="margin:0 0 24px;font-size:15px;color:rgba(196,181,253,0.7);line-height:1.6;">
+      Use the code below to ${purposeText} Soulmate Sync. This code is valid for <strong style="color:#e9d5ff;">10 minutes</strong>.
+    </p>
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+      <tr>
+        <td align="center" style="padding:24px 0;">
+          <div style="display:inline-block;background:rgba(139,92,246,0.1);border:2px dashed rgba(139,92,246,0.3);border-radius:12px;padding:20px 48px;">
+            <span style="font-size:36px;font-weight:700;color:#a78bfa;letter-spacing:12px;font-family:'Courier New',monospace;">${data.otp}</span>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <p style="margin:16px 0 0;font-size:13px;color:rgba(196,181,253,0.4);line-height:1.5;text-align:center;">
+      If you didn't request this code, please ignore this email.<br/>
+      Never share this code with anyone.
+    </p>
+  `
+  return baseTemplate(content, `Your Soulmate Sync verification code is ${data.otp}`)
+}
+
+export async function sendOtpEmail(to: string, otp: string, purpose: string) {
+  return sendEmail({
+    to,
+    subject: `${otp} - Your Soulmate Sync Verification Code`,
+    html: otpEmailTemplate({ otp, purpose }),
+  })
+}

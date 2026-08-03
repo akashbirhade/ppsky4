@@ -24,7 +24,9 @@ declare global {
 
 export default function LoginPage() {
   const [mode, setMode] = useState<'password' | 'otp'>('password')
+  const [otpMethod, setOtpMethod] = useState<'email' | 'phone'>('email')
   const [email, setEmail] = useState('')
+  const [otpEmail, setOtpEmail] = useState('')
   const [password, setPassword] = useState('')
   const [phone, setPhone] = useState('')
   const [otp, setOtp] = useState('')
@@ -53,43 +55,67 @@ export default function LoginPage() {
     if (!clientId || clientId === 'YOUR_GOOGLE_CLIENT_ID_HERE') return
     if (googleLoaded) return // Prevent re-initialization
 
-    const script = document.createElement('script')
-    script.src = 'https://accounts.google.com/gsi/client'
-    script.async = true
-    script.defer = true
-    script.onload = () => {
-      window.google?.accounts.id.initialize({
+    const handleGoogleCallback = async (response: { credential?: string }) => {
+      if (!response.credential) {
+        setError('Google sign-in failed. Please try again.')
+        return
+      }
+      setError('')
+      setLoading(true)
+      const result = await loginWithGoogle(response.credential)
+      if (result.success) {
+        router.push(result.isNewUser ? '/onboarding' : '/matches')
+      } else {
+        setError(result.error || 'Google login failed')
+      }
+      setLoading(false)
+    }
+
+    const initializeGoogle = () => {
+      if (!window.google?.accounts?.id) return
+      window.google.accounts.id.initialize({
         client_id: clientId,
-        callback: async (response: { credential?: string }) => {
-          if (!response.credential) {
-            setError('Google sign-in failed. Please try again.')
-            return
-          }
-          setError('')
-          setLoading(true)
-          const result = await loginWithGoogle(response.credential)
-          if (result.success) {
-            router.push(result.isNewUser ? '/onboarding' : '/matches')
-          } else {
-            setError(result.error || 'Google login failed')
-          }
-          setLoading(false)
-        },
+        callback: handleGoogleCallback,
+        ux_mode: 'popup',
+        itp_support: true,
+        auto_select: false,
       })
       if (googleBtnRef.current) {
-        window.google?.accounts.id.renderButton(googleBtnRef.current, {
+        window.google.accounts.id.renderButton(googleBtnRef.current, {
           theme: 'outline',
           size: 'large',
-          width: '100%',
+          width: 360,
           text: 'signin_with',
           shape: 'pill',
         })
         setGoogleLoaded(true)
       }
     }
+
+    // If the script is already loaded (navigating back to page)
+    if (window.google?.accounts?.id) {
+      initializeGoogle()
+      return
+    }
+
+    // Check if script tag already exists
+    const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]')
+    if (existingScript) {
+      existingScript.addEventListener('load', initializeGoogle)
+      return
+    }
+
+    const script = document.createElement('script')
+    script.src = 'https://accounts.google.com/gsi/client'
+    script.async = true
+    script.defer = true
+    script.onload = initializeGoogle
+    script.onerror = () => {
+      console.error('Failed to load Google Sign-In script')
+    }
     document.head.appendChild(script)
-    return () => { script.remove() }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    // Do NOT remove the script on cleanup - it should persist
+  }, [googleLoaded]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // OTP countdown timer
   useEffect(() => {
@@ -117,12 +143,42 @@ export default function LoginPage() {
   }
 
   const sendOtp = async () => {
-    const cleanPhone = phone.replace(/\D/g, '')
-    if (cleanPhone.length !== 10) {
-      setError('Please enter a valid 10-digit mobile number'); return
-    }
     setError('')
     setOtpLoading(true)
+
+    if (otpMethod === 'email') {
+      // Email OTP
+      const cleanEmail = otpEmail.trim().toLowerCase()
+      if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+        setError('Please enter a valid email address'); setOtpLoading(false); return
+      }
+      try {
+        const res = await fetch('/api/auth/otp/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: cleanEmail, purpose: 'login' })
+        })
+        const data = await res.json()
+        if (res.ok) {
+          setOtpSent(true)
+          setCountdown(30)
+          if (data.otpToken) setOtpToken(data.otpToken)
+          if (data.demo_otp) setDemoOtp(data.demo_otp)
+        } else {
+          setError(data.error || 'Failed to send OTP')
+        }
+      } catch {
+        setError('Failed to send OTP. Please try again.')
+      }
+      setOtpLoading(false)
+      return
+    }
+
+    // Phone OTP
+    const cleanPhone = phone.replace(/\D/g, '')
+    if (cleanPhone.length !== 10) {
+      setError('Please enter a valid 10-digit mobile number'); setOtpLoading(false); return
+    }
 
     // Try Firebase OTP first (real SMS, free)
     const firebaseConfigured = !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY
@@ -135,11 +191,10 @@ export default function LoginPage() {
         setOtpLoading(false)
         return
       }
-      // If Firebase fails, fall through to API fallback
       console.warn('Firebase OTP failed, using API fallback:', result.error)
     }
 
-    // Fallback: use custom API (Fast2SMS / demo mode)
+    // Fallback: use custom API (Fast2SMS)
     try {
       const res = await fetch('/api/auth/otp/send', {
         method: 'POST',
@@ -169,12 +224,11 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
 
-    // If Firebase OTP was used (otpSent via Firebase)
+    // If Firebase OTP was used (phone only)
     const firebaseConfigured = !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY
-    if (firebaseConfigured && firebaseOtp.otpSent) {
+    if (otpMethod === 'phone' && firebaseConfigured && firebaseOtp.otpSent) {
       const result = await firebaseOtp.verifyOtp(otp)
       if (result.success) {
-        // Firebase verified — now login/register with our backend using the phone
         const cleanPhone = phone.replace(/\D/g, '')
         try {
           const res = await fetch('/api/auth/otp/verify', {
@@ -182,7 +236,7 @@ export default function LoginPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               phone: cleanPhone,
-              otp: '000000', // Bypass — Firebase already verified
+              otp: '000000',
               purpose: 'login',
               firebaseUid: result.firebaseUid,
               firebaseVerified: true,
@@ -207,13 +261,15 @@ export default function LoginPage() {
       }
     }
 
-    // Fallback: custom API verification
+    // API verification (email or phone fallback)
     try {
-      const cleanPhone = phone.replace(/\D/g, '')
+      const identifier = otpMethod === 'email'
+        ? { email: otpEmail.trim().toLowerCase() }
+        : { phone: phone.replace(/\D/g, '') }
       const res = await fetch('/api/auth/otp/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: cleanPhone, otp, purpose: 'login', otpToken })
+        body: JSON.stringify({ ...identifier, otp, purpose: 'login', otpToken })
       })
       const data = await res.json()
       if (res.ok && data.verified && data.token) {
@@ -317,34 +373,73 @@ export default function LoginPage() {
           {/* OTP Login */}
           {mode === 'otp' && (
             <form onSubmit={handleOtpLogin} className="space-y-5">
-              <p className="text-xs text-slate-400 dark:text-purple-300/40 text-center -mt-2 mb-2">Sign in or create a new account with your mobile number</p>
-              <div>
-                <label className="block text-sm text-slate-500 dark:text-purple-200/60 mb-1.5">Mobile Number</label>
-                <div className="relative">
-                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-teal-600 dark:text-purple-400/50" />
-                  <span className="absolute left-10 top-1/2 -translate-y-1/2 text-sm text-slate-500 dark:text-purple-300/60">+91</span>
-                  <input 
-                    type="tel" 
-                    value={phone} 
-                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))} 
-                    className="input-field pl-20" 
-                    placeholder="Enter 10-digit number" 
-                    maxLength={10}
-                    disabled={otpSent}
-                  />
-                  {otpSent && (
-                    <button type="button" onClick={() => { setOtpSent(false); setOtp(''); setDemoOtp(''); setOtpToken('') }} className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-purple-400 hover:text-purple-300">
-                      Change
-                    </button>
-                  )}
-                </div>
+              <p className="text-xs text-slate-400 dark:text-purple-300/40 text-center -mt-2 mb-2">Sign in or create a new account with OTP</p>
+              
+              {/* Email / Phone toggle */}
+              <div className="flex bg-slate-100 dark:bg-white/5 rounded-lg p-0.5 mb-1">
+                <button type="button" onClick={() => { setOtpMethod('email'); setOtpSent(false); setOtp(''); setDemoOtp(''); setOtpToken(''); setError('') }}
+                  className={`flex-1 py-2 rounded-md text-xs font-medium transition-all ${otpMethod === 'email' ? 'bg-white dark:bg-purple-600/20 text-slate-800 dark:text-white shadow-sm' : 'text-slate-400 dark:text-purple-300/50'}`}>
+                  Email OTP
+                </button>
+                <button type="button" onClick={() => { setOtpMethod('phone'); setOtpSent(false); setOtp(''); setDemoOtp(''); setOtpToken(''); setError('') }}
+                  className={`flex-1 py-2 rounded-md text-xs font-medium transition-all ${otpMethod === 'phone' ? 'bg-white dark:bg-purple-600/20 text-slate-800 dark:text-white shadow-sm' : 'text-slate-400 dark:text-purple-300/50'}`}>
+                  Phone OTP
+                </button>
               </div>
+
+              {/* Email input */}
+              {otpMethod === 'email' && (
+                <div>
+                  <label className="block text-sm text-slate-500 dark:text-purple-200/60 mb-1.5">Email Address</label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-teal-600 dark:text-purple-400/50" />
+                    <input 
+                      type="email" 
+                      value={otpEmail} 
+                      onChange={(e) => setOtpEmail(e.target.value)} 
+                      className="input-field pl-11" 
+                      placeholder="Enter your email"
+                      disabled={otpSent}
+                    />
+                    {otpSent && (
+                      <button type="button" onClick={() => { setOtpSent(false); setOtp(''); setDemoOtp(''); setOtpToken('') }} className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-purple-400 hover:text-purple-300">
+                        Change
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Phone input */}
+              {otpMethod === 'phone' && (
+                <div>
+                  <label className="block text-sm text-slate-500 dark:text-purple-200/60 mb-1.5">Mobile Number</label>
+                  <div className="relative">
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-teal-600 dark:text-purple-400/50" />
+                    <span className="absolute left-10 top-1/2 -translate-y-1/2 text-sm text-slate-500 dark:text-purple-300/60">+91</span>
+                    <input 
+                      type="tel" 
+                      value={phone} 
+                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))} 
+                      className="input-field pl-20" 
+                      placeholder="Enter 10-digit number" 
+                      maxLength={10}
+                      disabled={otpSent}
+                    />
+                    {otpSent && (
+                      <button type="button" onClick={() => { setOtpSent(false); setOtp(''); setDemoOtp(''); setOtpToken('') }} className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-purple-400 hover:text-purple-300">
+                        Change
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {!otpSent && (
                 <button 
                   type="button" 
                   onClick={sendOtp} 
-                  disabled={otpLoading || phone.length !== 10}
+                  disabled={otpLoading || (otpMethod === 'phone' ? phone.length !== 10 : !otpEmail.includes('@'))}
                   className="w-full btn-primary py-3.5 flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {otpLoading ? 'Sending...' : 'Send OTP'}
@@ -402,7 +497,13 @@ export default function LoginPage() {
                   if (window.google?.accounts?.id) {
                     window.google.accounts.id.prompt()
                   } else {
-                    setError('Google Sign-In is loading. Please try again in a moment.')
+                    // Retry loading Google script
+                    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+                    if (!clientId || clientId === 'YOUR_GOOGLE_CLIENT_ID_HERE') {
+                      setError('Google Sign-In is not configured.')
+                      return
+                    }
+                    setError('Google Sign-In is loading. Please wait a moment and try again.')
                   }
                 }}
                 className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-slate-200 dark:border-purple-500/20 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors text-sm font-medium text-slate-700 dark:text-purple-200 mb-4"

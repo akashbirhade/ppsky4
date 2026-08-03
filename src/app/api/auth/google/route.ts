@@ -9,21 +9,36 @@ const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''
  * Verify Google ID token by calling Google's tokeninfo endpoint
  */
 async function verifyGoogleToken(idToken: string) {
-  const res = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`)
-  if (!res.ok) return null
-  const payload = await res.json()
+  try {
+    const res = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`)
+    if (!res.ok) {
+      console.error('Google token verification failed:', res.status, await res.text().catch(() => ''))
+      return null
+    }
+    const payload = await res.json()
 
-  // Verify audience matches our client ID
-  if (GOOGLE_CLIENT_ID && payload.aud !== GOOGLE_CLIENT_ID) {
+    // Verify audience matches our client ID
+    if (GOOGLE_CLIENT_ID && payload.aud !== GOOGLE_CLIENT_ID) {
+      console.error('Google token audience mismatch:', payload.aud, 'expected:', GOOGLE_CLIENT_ID)
+      return null
+    }
+
+    // Verify token is not expired
+    if (payload.exp && Number(payload.exp) * 1000 < Date.now()) {
+      console.error('Google token expired')
+      return null
+    }
+
+    return {
+      email: payload.email,
+      name: payload.name || payload.given_name || payload.email?.split('@')[0] || '',
+      picture: payload.picture || '',
+      emailVerified: payload.email_verified === 'true',
+      sub: payload.sub,
+    }
+  } catch (error) {
+    console.error('Google token verification error:', error)
     return null
-  }
-
-  return {
-    email: payload.email,
-    name: payload.name || payload.email.split('@')[0],
-    picture: payload.picture || '',
-    emailVerified: payload.email_verified === 'true',
-    sub: payload.sub,
   }
 }
 

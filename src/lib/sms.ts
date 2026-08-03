@@ -39,8 +39,8 @@ export async function sendOtpSms(phone: string, otp: string): Promise<SmsResult>
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        route: 'otp',
-        variables_values: otp,
+        route: 'q',
+        message: `Your Soulmate Sync verification code is: ${otp}. Do not share this with anyone.`,
         numbers: cleanPhone,
         flash: '0',
       }),

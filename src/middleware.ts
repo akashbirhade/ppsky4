@@ -23,6 +23,7 @@ const PUBLIC_API_PATHS = [
   '/api/auth/login',
   '/api/auth/register',
   '/api/auth/refresh',
+  '/api/auth/google',
   '/api/auth/otp/send',
   '/api/auth/otp/verify',
   '/api/health',
@@ -105,12 +106,12 @@ export function middleware(request: NextRequest) {
   // CSP header
   response.headers.set('Content-Security-Policy', [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com https://www.google.com https://www.gstatic.com",
-    "style-src 'self' 'unsafe-inline' https://accounts.google.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com https://www.google.com https://www.gstatic.com https://cdn.jsdelivr.net",
+    "style-src 'self' 'unsafe-inline' https://accounts.google.com https://fonts.googleapis.com",
     "img-src 'self' data: blob: https:",
     "font-src 'self' data: https://fonts.gstatic.com",
-    "connect-src 'self' ws: wss: https://accounts.google.com https://oauth2.googleapis.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com",
-    "frame-src https://accounts.google.com https://www.google.com https://*.firebaseapp.com",
+    "connect-src 'self' ws: wss: https://accounts.google.com https://oauth2.googleapis.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com",
+    "frame-src https://accounts.google.com https://www.google.com https://*.firebaseapp.com https://content.googleapis.com",
     "media-src 'self'",
     "frame-ancestors 'none'",
   ].join('; '))

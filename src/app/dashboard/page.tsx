@@ -88,7 +88,7 @@ export default function DashboardPage() {
   if (authLoading || !user) return null
 
   return (
-    <div className="min-h-screen bg-mesh pt-20 sm:pt-[104px] pb-20">
+    <div className="min-h-screen bg-mesh pt-16 sm:pt-[104px] pb-20">
       <div className={`max-w-7xl mx-auto px-3 sm:px-4 transition-all duration-300 ${chatOpen ? 'xl:pr-80' : 'xl:pr-4'}`}>
         {user && <ProfileCompletion user={user} />}
 

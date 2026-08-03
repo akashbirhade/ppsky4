@@ -39,32 +39,55 @@ export default function RegisterPage() {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
     if (!clientId || clientId === 'YOUR_GOOGLE_CLIENT_ID_HERE') return
 
+    const handleGoogleCallback = async (response: { credential?: string }) => {
+      if (!response.credential) { setError('Google sign-in failed'); return }
+      setLoading(true)
+      const result = await loginWithGoogle(response.credential)
+      if (result.success) router.push('/onboarding')
+      else setError(result.error || 'Google sign-up failed')
+      setLoading(false)
+    }
+
+    const initializeGoogle = () => {
+      if (!window.google?.accounts?.id) return
+      if (googleLoaded) return
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleCallback,
+        ux_mode: 'popup',
+        itp_support: true,
+        auto_select: false,
+      })
+      if (googleBtnRef.current) {
+        window.google.accounts.id.renderButton(googleBtnRef.current, {
+          theme: 'outline', size: 'large', width: 360, text: 'signup_with', shape: 'pill',
+        })
+        setGoogleLoaded(true)
+      }
+    }
+
+    // If the script is already loaded
+    if (window.google?.accounts?.id) {
+      initializeGoogle()
+      return
+    }
+
+    const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]')
+    if (existingScript) {
+      existingScript.addEventListener('load', initializeGoogle)
+      return
+    }
+
     const script = document.createElement('script')
     script.src = 'https://accounts.google.com/gsi/client'
     script.async = true
     script.defer = true
-    script.onload = () => {
-      const w = window as unknown as { google?: { accounts: { id: { initialize: (c: unknown) => void; renderButton: (el: HTMLElement | null, c: unknown) => void } } } }
-      if (!w.google) return
-      w.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: async (response: { credential?: string }) => {
-          if (!response.credential) { setError('Google sign-in failed'); return }
-          setLoading(true)
-          const result = await loginWithGoogle(response.credential)
-          if (result.success) router.push('/onboarding')
-          else setError(result.error || 'Google sign-up failed')
-          setLoading(false)
-        },
-      })
-      w.google.accounts.id.renderButton(googleBtnRef.current, {
-        theme: 'outline', size: 'large', width: '100%', text: 'signup_with', shape: 'pill',
-      })
-      setGoogleLoaded(true)
+    script.onload = initializeGoogle
+    script.onerror = () => {
+      console.error('Failed to load Google Sign-In script')
     }
     document.head.appendChild(script)
-    return () => { script.remove() }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [googleLoaded]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // OTP countdown timer
   useEffect(() => {

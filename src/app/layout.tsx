@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/context/AuthContext'
 import { LanguageProvider } from '@/context/LanguageContext'
@@ -16,7 +16,11 @@ import ServiceWorkerRegistration from '@/components/ServiceWorker'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import NavigationWrapper from '@/components/NavigationWrapper'
 
-const inter = Inter({ subsets: ['latin'] })
+const plusJakarta = Plus_Jakarta_Sans({ 
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-jakarta',
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://soulmatesync.com'),
@@ -79,7 +83,7 @@ export default function RootLayout({
           } catch(e) {}
         `}} />
       </head>
-      <body className={`${inter.className} min-h-screen transition-colors duration-300`}>
+      <body className={`${plusJakarta.className} ${plusJakarta.variable} min-h-screen transition-colors duration-300 antialiased`}>
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-white focus:text-slate-900"
@@ -107,8 +111,8 @@ export default function RootLayout({
                 </PageTransition>
               </main>
             </div>
-            <AIChatBot />
-            <VoiceAssistant />
+            {/* <AIChatBot /> */}
+            {/* <VoiceAssistant /> */}
             <PWAInstallPrompt />
             <ServiceWorkerRegistration />
               </div>
